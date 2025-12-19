@@ -777,6 +777,195 @@ app.get('/api/credits/pricing', (req, res) => {
   });
 });
 
+// ==================== CLIENT ENDPOINTS ====================
+
+/**
+ * GET /api/clients
+ * Get all clients with portfolio and report counts
+ */
+app.get('/api/clients', async (req, res) => {
+  try {
+    const clients = await db.getAllClients();
+
+    res.json({
+      success: true,
+      clients: clients
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching clients:', error);
+    res.status(500).json({
+      error: 'Failed to fetch clients',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/clients/:id
+ * Get single client by ID
+ */
+app.get('/api/clients/:id', async (req, res) => {
+  try {
+    const client = await db.getClient(req.params.id);
+
+    if (!client) {
+      return res.status(404).json({
+        error: 'Client not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      client: client
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching client:', error);
+    res.status(500).json({
+      error: 'Failed to fetch client',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/clients
+ * Create new client
+ */
+app.post('/api/clients', async (req, res) => {
+  try {
+    const { name, entity_type, email, phone } = req.body;
+
+    // Validation
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({
+        error: 'Client name is required'
+      });
+    }
+
+    const client = await db.createClient(
+      name.trim(),
+      entity_type,
+      email,
+      phone
+    );
+
+    res.json({
+      success: true,
+      client: client
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating client:', error);
+    res.status(500).json({
+      error: 'Failed to create client',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * PUT /api/clients/:id
+ * Update client
+ */
+app.put('/api/clients/:id', async (req, res) => {
+  try {
+    const { name, entity_type, email, phone } = req.body;
+
+    // Validation
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({
+        error: 'Client name is required'
+      });
+    }
+
+    const client = await db.updateClient(
+      req.params.id,
+      name.trim(),
+      entity_type,
+      email,
+      phone
+    );
+
+    if (!client) {
+      return res.status(404).json({
+        error: 'Client not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      client: client
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating client:', error);
+    res.status(500).json({
+      error: 'Failed to update client',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * DELETE /api/clients/:id
+ * Delete client
+ */
+app.delete('/api/clients/:id', async (req, res) => {
+  try {
+    const deleted = await db.deleteClient(req.params.id);
+
+    if (!deleted) {
+      return res.status(404).json({
+        error: 'Client not found'
+      });
+    }
+
+    res.json({
+      success: true,
+      message: 'Client deleted successfully'
+    });
+
+  } catch (error) {
+    // Check if error is due to foreign key constraint
+    if (error.code === '23503') {
+      return res.status(400).json({
+        error: 'Cannot delete client with existing portfolios',
+        message: 'Please delete all portfolios for this client first'
+      });
+    }
+
+    console.error('❌ Error deleting client:', error);
+    res.status(500).json({
+      error: 'Failed to delete client',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/clients/:id/portfolios
+ * Get all portfolios for a client
+ */
+app.get('/api/clients/:id/portfolios', async (req, res) => {
+  try {
+    const portfolios = await db.getClientPortfolios(req.params.id);
+
+    res.json({
+      success: true,
+      portfolios: portfolios
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching client portfolios:', error);
+    res.status(500).json({
+      error: 'Failed to fetch portfolios',
+      message: error.message
+    });
+  }
+});
+
 // ==================== START SERVER ====================
 
 async function start() {

@@ -2,7 +2,8 @@
  * Credits Widget - Dropdown functionality and API integration
  */
 
-const API_BASE = 'https://sol.inoutconnect.com:11130/api';
+// Define global API_BASE if not already defined
+window.API_BASE = window.API_BASE || 'https://sol.inoutconnect.com:11130/api';
 
 // DOM Elements
 const creditsWidgetTrigger = document.getElementById('creditsWidgetTrigger');
@@ -90,7 +91,7 @@ function closeDropdown() {
  */
 async function loadCredits() {
     try {
-        const response = await fetch(`${API_BASE}/credits/balance`);
+        const response = await fetch(`${window.API_BASE}/credits/balance`);
         const data = await response.json();
 
         if (data.success) {

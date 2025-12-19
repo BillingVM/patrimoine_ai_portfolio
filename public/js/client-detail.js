@@ -3,7 +3,8 @@
  * Portfolio AI v1.1
  */
 
-const API_BASE = 'https://sol.inoutconnect.com:11130/api';
+// Define global API_BASE if not already defined
+window.API_BASE = window.API_BASE || 'https://sol.inoutconnect.com:11130/api';
 
 // Get client ID from URL
 const urlParams = new URLSearchParams(window.location.search);
@@ -80,7 +81,7 @@ uploadSection.addEventListener('drop', (e) => {
  */
 async function loadClient() {
     try {
-        const response = await fetch(`${API_BASE}/clients/${clientId}`);
+        const response = await fetch(`${window.API_BASE}/clients/${clientId}`);
         const data = await response.json();
 
         if (data.success) {
@@ -166,7 +167,7 @@ async function handleFileUpload() {
         uploadSection.style.display = 'none';
         uploadProgress.style.display = 'block';
 
-        const response = await fetch(`${API_BASE}/upload`, {
+        const response = await fetch(`${window.API_BASE}/upload`, {
             method: 'POST',
             body: formData
         });

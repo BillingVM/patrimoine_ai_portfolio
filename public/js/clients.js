@@ -3,39 +3,59 @@
  * Portfolio AI v1.1
  */
 
-const API_BASE = 'https://sol.inoutconnect.com:11130/api';
+// Define global API_BASE if not already defined
+window.API_BASE = window.API_BASE || 'https://sol.inoutconnect.com:11130/api';
 
-// DOM elements
-const clientsGrid = document.getElementById('clientsGrid');
-const addClientBtn = document.getElementById('addClientBtn');
-const clientModal = document.getElementById('clientModal');
-const modalClose = document.getElementById('modalClose');
-const cancelBtn = document.getElementById('cancelBtn');
-const clientForm = document.getElementById('clientForm');
-const modalTitle = document.getElementById('modalTitle');
-const submitBtn = document.getElementById('submitBtn');
-const toast = document.getElementById('toast');
+// DOM elements (will be initialized on DOMContentLoaded)
+let clientsGrid, addClientBtn, clientModal, modalClose, cancelBtn, clientForm, modalTitle, submitBtn, toast;
+let statsSection, totalClients, totalPortfolios, totalReports;
 
-// Stats elements
-const statsSection = document.getElementById('statsSection');
-const totalClients = document.getElementById('totalClients');
-const totalPortfolios = document.getElementById('totalPortfolios');
-const totalReports = document.getElementById('totalReports');
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize DOM elements
+    clientsGrid = document.getElementById('clientsGrid');
+    addClientBtn = document.getElementById('addClientBtn');
+    clientModal = document.getElementById('clientModal');
+    modalClose = document.getElementById('modalClose');
+    cancelBtn = document.getElementById('cancelBtn');
+    clientForm = document.getElementById('clientForm');
+    modalTitle = document.getElementById('modalTitle');
+    submitBtn = document.getElementById('submitBtn');
+    toast = document.getElementById('toast');
 
-// Load clients on page load
-document.addEventListener('DOMContentLoaded', loadClients);
+    statsSection = document.getElementById('statsSection');
+    totalClients = document.getElementById('totalClients');
+    totalPortfolios = document.getElementById('totalPortfolios');
+    totalReports = document.getElementById('totalReports');
 
-// Event listeners
-addClientBtn.addEventListener('click', () => openModal());
-modalClose.addEventListener('click', closeModal);
-cancelBtn.addEventListener('click', closeModal);
-clientForm.addEventListener('submit', handleSubmit);
-
-// Close modal on overlay click
-clientModal.addEventListener('click', (e) => {
-    if (e.target === clientModal) {
-        closeModal();
+    // Setup event listeners
+    if (addClientBtn) {
+        addClientBtn.addEventListener('click', () => openModal());
     }
+
+    if (modalClose) {
+        modalClose.addEventListener('click', closeModal);
+    }
+
+    if (cancelBtn) {
+        cancelBtn.addEventListener('click', closeModal);
+    }
+
+    if (clientForm) {
+        clientForm.addEventListener('submit', handleSubmit);
+    }
+
+    // Close modal on overlay click
+    if (clientModal) {
+        clientModal.addEventListener('click', (e) => {
+            if (e.target === clientModal) {
+                closeModal();
+            }
+        });
+    }
+
+    // Load clients
+    loadClients();
 });
 
 /**
@@ -45,7 +65,7 @@ async function loadClients() {
     try {
         showLoading();
 
-        const response = await fetch(`${API_BASE}/clients`);
+        const response = await fetch(`${window.API_BASE}/clients`);
         const data = await response.json();
 
         if (data.success) {
@@ -145,6 +165,11 @@ function updateStats(clients) {
  * Open modal for add/edit
  */
 function openModal(clientId = null) {
+    if (!clientModal) {
+        console.error('Modal element not found!');
+        return;
+    }
+
     if (clientId) {
         // Edit mode
         modalTitle.textContent = 'Edit Client';
@@ -159,6 +184,7 @@ function openModal(clientId = null) {
     }
 
     clientModal.classList.add('show');
+    clientModal.style.display = 'flex'; // Override inline style
 }
 
 /**
@@ -166,6 +192,7 @@ function openModal(clientId = null) {
  */
 function closeModal() {
     clientModal.classList.remove('show');
+    clientModal.style.display = 'none'; // Hide modal
     clientForm.reset();
     document.getElementById('clientId').value = '';
 }
@@ -175,7 +202,7 @@ function closeModal() {
  */
 async function loadClientForEdit(clientId) {
     try {
-        const response = await fetch(`${API_BASE}/clients/${clientId}`);
+        const response = await fetch(`${window.API_BASE}/clients/${clientId}`);
         const data = await response.json();
 
         if (data.success) {
@@ -222,7 +249,7 @@ async function handleSubmit(e) {
         let response;
         if (clientId) {
             // Update existing client
-            response = await fetch(`${API_BASE}/clients/${clientId}`, {
+            response = await fetch(`${window.API_BASE}/clients/${clientId}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -231,7 +258,7 @@ async function handleSubmit(e) {
             });
         } else {
             // Create new client
-            response = await fetch(`${API_BASE}/clients`, {
+            response = await fetch(`${window.API_BASE}/clients`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -263,7 +290,6 @@ async function handleSubmit(e) {
  * View client details
  */
 function viewClient(clientId) {
-    // TODO: Create client details page
     window.location.href = `client-detail.php?id=${clientId}`;
 }
 
@@ -283,7 +309,7 @@ async function deleteClient(clientId) {
     }
 
     try {
-        const response = await fetch(`${API_BASE}/clients/${clientId}`, {
+        const response = await fetch(`${window.API_BASE}/clients/${clientId}`, {
             method: 'DELETE'
         });
 
@@ -300,6 +326,11 @@ async function deleteClient(clientId) {
         showError('Error connecting to server');
     }
 }
+
+// Make functions globally accessible for inline onclick handlers
+window.viewClient = viewClient;
+window.editClient = editClient;
+window.deleteClient = deleteClient;
 
 /**
  * Show loading state
