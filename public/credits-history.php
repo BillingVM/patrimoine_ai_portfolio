@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Credits History - Portfolio AI</title>
+
+    <?php
+    // Dynamically load CSS with cache busting
+    $cssFile = __DIR__ . '/css/style.css';
+    $cssVersion = file_exists($cssFile) ? filemtime($cssFile) : time();
+    echo "<link rel=\"stylesheet\" href=\"/portai/public/css/style.css?v={$cssVersion}\">";
+    ?>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1>📜 Credits History</h1>
+                <p>View your token usage and purchase history</p>
+            </div>
+            <div>
+                <a href="index.php" class="btn btn-secondary">← Back to Dashboard</a>
+            </div>
+        </header>
+
+        <!-- Summary Cards -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin: 2rem 0;">
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Current Balance</div>
+                <div id="summaryBalance" style="font-size: 2rem; font-weight: 600; color: var(--accent);">Loading...</div>
+            </div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Total Used</div>
+                <div id="summaryUsed" style="font-size: 2rem; font-weight: 600; color: var(--danger);">Loading...</div>
+            </div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Total Purchased</div>
+                <div id="summaryPurchased" style="font-size: 2rem; font-weight: 600; color: var(--success);">Loading...</div>
+            </div>
+            <div style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 1.5rem;">
+                <div style="color: var(--text-muted); font-size: 0.875rem; margin-bottom: 0.5rem;">Reports Generated</div>
+                <div id="summaryReports" style="font-size: 2rem; font-weight: 600; color: var(--text-primary);">Loading...</div>
+            </div>
+        </div>
+
+        <!-- History Table -->
+        <section style="background: var(--bg-secondary); border: 1px solid var(--border); border-radius: 12px; padding: 2rem; margin-top: 2rem;">
+            <h2>Transaction History</h2>
+            <table class="history-table" id="historyTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Description</th>
+                        <th style="text-align: right;">Amount</th>
+                        <th style="text-align: right;">Balance After</th>
+                    </tr>
+                </thead>
+                <tbody id="historyBody">
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                            Loading history...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+    </div>
+
+    <script>
+        const API_URL = '/portai/api';
+
+        // Load summary and history
+        async function loadHistory() {
+            try {
+                // Load summary
+                const summaryResponse = await fetch(`${API_URL}/credits/balance`);
+                const summary = await summaryResponse.json();
+
+                if (summary.success) {
+                    document.getElementById('summaryBalance').textContent = summary.balance.toLocaleString();
+                    document.getElementById('summaryUsed').textContent = summary.totalUsed.toLocaleString();
+                    document.getElementById('summaryPurchased').textContent = summary.totalPurchased.toLocaleString();
+                    document.getElementById('summaryReports').textContent = summary.reportsGenerated.toLocaleString();
+                }
+
+                // Load history
+                const historyResponse = await fetch(`${API_URL}/credits/history`);
+                const historyData = await historyResponse.json();
+
+                if (historyData.success && historyData.history.length > 0) {
+                    renderHistory(historyData.history);
+                } else {
+                    document.getElementById('historyBody').innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 3rem; color: var(--text-muted);">
+                                No transactions yet
+                            </td>
+                        </tr>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Error loading history:', error);
+                document.getElementById('historyBody').innerHTML = `
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 3rem; color: var(--danger);">
+                            Failed to load history
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Render history table
+        function renderHistory(history) {
+            const tbody = document.getElementById('historyBody');
+            tbody.innerHTML = history.map(tx => {
+                const date = new Date(tx.created_at).toLocaleString();
+                const amountClass = tx.amount > 0 ? 'positive' : 'negative';
+                const amountSign = tx.amount > 0 ? '+' : '';
+                const typeClass = tx.transaction_type === 'purchase' ? 'purchase' : 'usage';
+
+                return `
+                    <tr>
+                        <td>${date}</td>
+                        <td><span class="transaction-type ${typeClass}">${tx.transaction_type}</span></td>
+                        <td>${escapeHtml(tx.description || '-')}</td>
+                        <td style="text-align: right;" class="transaction-amount ${amountClass}">
+                            ${amountSign}${Math.abs(tx.amount).toLocaleString()}
+                        </td>
+                        <td style="text-align: right;">${tx.balance_after.toLocaleString()}</td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        // Escape HTML
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Load on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            loadHistory();
+        });
+    </script>
+</body>
+</html>
