@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Client Details - Portfolio AI</title>
+
+    <?php
+    // Dynamic asset loading with cache busting
+    $cssFile = __DIR__ . '/css/style.css';
+    $cssVersion = file_exists($cssFile) ? filemtime($cssFile) : time();
+    echo "<link rel=\"stylesheet\" href=\"/portai/public/css/style.css?v={$cssVersion}\">";
+    ?>
+
+    <meta name="description" content="View client details and portfolios">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <h1 id="clientName">Client Details</h1>
+                <p id="clientSubtitle">Loading client information...</p>
+            </div>
+            <div class="header-actions">
+                <a href="clients.php" class="btn btn-secondary">← Back to Clients</a>
+                <button class="btn btn-primary" id="editClientBtn">Edit Client</button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="main-nav">
+            <a href="index.php" class="nav-link">Dashboard</a>
+            <a href="clients.php" class="nav-link">Clients</a>
+            <a href="#" class="nav-link active">Client Details</a>
+        </nav>
+
+        <!-- Client Info Card -->
+        <section class="client-info-section" id="clientInfoSection" style="display: none;">
+            <div class="info-grid">
+                <div class="info-card">
+                    <div class="info-label">Entity Type</div>
+                    <div class="info-value" id="entityType">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Email</div>
+                    <div class="info-value" id="email">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value" id="phone">-</div>
+                </div>
+                <div class="info-card">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value" id="memberSince">-</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats Section -->
+        <section class="stats-section" id="statsSection" style="display: none;">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-value" id="portfolioCount">0</div>
+                    <div class="stat-label">Portfolios</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-value" id="reportCount">0</div>
+                    <div class="stat-label">Reports Generated</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-value" id="totalAUM">$0</div>
+                    <div class="stat-label">Total AUM</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Portfolios Section -->
+        <section class="portfolios-section">
+            <div class="section-header">
+                <h2>Portfolios</h2>
+                <button class="btn btn-primary btn-sm" id="uploadPortfolioBtn">+ Upload Portfolio</button>
+            </div>
+
+            <div class="portfolios-grid" id="portfoliosGrid">
+                <div class="empty-state">
+                    <div class="loading-spinner"></div>
+                    <p>Loading portfolios...</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Upload Portfolio Modal -->
+    <div class="modal" id="uploadModal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Upload Portfolio</h2>
+                <button class="modal-close" id="uploadModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="upload-section" id="uploadSection">
+                        <h3>Drop portfolio file here</h3>
+                        <p>Supported: CSV, Excel, PDF, JSON</p>
+                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.json">
+                        <button type="button" class="btn btn-primary" id="selectFileBtn">Select File</button>
+                    </div>
+                    <div id="uploadProgress" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        <p>Uploading...</p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast" style="display: none;"></div>
+
+    <?php
+    // Dynamically load JavaScript with cache busting
+    $jsFile = __DIR__ . '/js/client-detail.js';
+    $jsVersion = file_exists($jsFile) ? filemtime($jsFile) : time();
+    echo "<script src=\"/portai/public/js/client-detail.js?v={$jsVersion}\"></script>";
+    ?>
+</body>
+</html>

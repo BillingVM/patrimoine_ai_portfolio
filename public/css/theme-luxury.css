@@ -1,0 +1,189 @@
+/**
+ * Luxury Financial Theme Enhancement
+ * Premium dark theme with subtle elegance
+ */
+
+:root {
+  /* Enhanced Premium Dark Backgrounds */
+  --bg-primary: #0B0E11;           /* Deeper, richer black */
+  --bg-secondary: #151922;         /* Elevated cards */
+  --bg-tertiary: #1D232E;          /* Hover states */
+  --bg-hover: #252D3A;             /* Interactive hover */
+  
+  /* Refined Text Colors */
+  --text-primary: #F5F7FA;         /* Brighter, cleaner white */
+  --text-secondary: #C5CDD8;       /* Softer secondary */
+  --text-muted: #8B95A5;           /* Refined muted */
+  --text-disabled: #5A6374;        /* Disabled state */
+  
+  /* Premium Gold Accents (Financial luxury) */
+  --gold-primary: #D4AF37;         /* Classic gold */
+  --gold-light: #F4E5A1;           /* Light gold highlight */
+  --gold-dark: #B8932F;            /* Deep gold */
+  
+  /* Professional Financial Colors */
+  --accent-blue: #4A9FFF;          /* Brighter, more premium blue */
+  --accent-blue-hover: #3A8FEF;    
+  --success: #10C97F;              /* Vibrant green */
+  --danger: #FF4D6D;               /* Refined red */
+  --warning: #FFB547;              /* Warm orange */
+  
+  /* Enhanced Borders with subtle glow */
+  --border-primary: #2A3441;       /* Lighter, more visible */
+  --border-secondary: #1F2831;     
+  --border-accent: rgba(212, 175, 55, 0.2); /* Gold border */
+  
+  /* Luxury Shadows */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-gold: 0 0 20px rgba(212, 175, 55, 0.15); /* Gold glow */
+}
+
+/* Premium Card Enhancement */
+.stat-card,
+.client-card,
+.portfolio-card,
+.info-card {
+  background: linear-gradient(135deg, var(--bg-secondary) 0%, #181E28 100%);
+  border: 1px solid var(--border-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.stat-card:hover,
+.client-card:hover,
+.portfolio-card:hover {
+  border-color: var(--border-accent);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Premium Gold Accents */
+.credits-balance,
+.stat-value,
+.balance-number {
+  color: var(--gold-primary);
+  text-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+/* Refined Table Styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+table thead th {
+  background: var(--bg-tertiary);
+  border-bottom: 2px solid var(--border-accent);
+  padding: 16px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+table tbody tr {
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-primary);
+  transition: all 0.2s ease;
+}
+
+table tbody tr:hover {
+  background: var(--bg-tertiary);
+  transform: translateX(4px);
+}
+
+table tbody td {
+  padding: 16px;
+  border-bottom: 1px solid var(--border-primary);
+}
+
+/* Transaction Type Colors */
+.transaction-type.purchase {
+  background: rgba(16, 201, 127, 0.15);
+  color: var(--success);
+  border: 1px solid rgba(16, 201, 127, 0.3);
+}
+
+.transaction-type.usage {
+  background: rgba(255, 77, 109, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(255, 77, 109, 0.3);
+}
+
+/* Amount Colors in Tables */
+.amount-positive {
+  color: var(--success);
+  font-weight: 600;
+}
+
+.amount-negative {
+  color: var(--danger);
+  font-weight: 600;
+}
+
+.amount-neutral {
+  color: var(--text-secondary);
+}
+
+/* Enhanced Buttons */
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #3A7FD5 100%);
+  box-shadow: 0 4px 12px rgba(74, 159, 255, 0.25);
+}
+
+.btn-primary:hover {
+  box-shadow: 0 6px 20px rgba(74, 159, 255, 0.4);
+}
+
+/* Sidebar Premium Enhancement */
+.sidebar {
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border-primary);
+  box-shadow: 4px 0 16px rgba(0, 0, 0, 0.3);
+}
+
+.sidebar-link.active {
+  background: linear-gradient(135deg, var(--accent-blue) 0%, #3A7FD5 100%);
+  box-shadow: var(--shadow-gold);
+}
+
+/* Credits Widget Premium */
+.credits-trigger {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  box-shadow: var(--shadow-sm);
+}
+
+.credits-trigger:hover {
+  border-color: var(--gold-primary);
+  box-shadow: var(--shadow-gold);
+}
+
+.credits-dropdown {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7), var(--shadow-gold);
+}
+
+/* Header Premium Enhancement */
+.header {
+  border-bottom: 1px solid var(--border-accent);
+  padding-bottom: 24px;
+}
+
+/* Luxury Loading States */
+.loading-spinner {
+  border-color: var(--border-primary);
+  border-top-color: var(--gold-primary);
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+}
+
+/* Premium Modal */
+.modal {
+  background: rgba(11, 14, 17, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-accent);
+  box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8), var(--shadow-gold);
+}

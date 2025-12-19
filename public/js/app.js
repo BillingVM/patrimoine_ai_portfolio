@@ -3,7 +3,7 @@
  */
 
 // API Base URL
-const API_URL = '/portai/api';
+const API_URL = 'https://sol.inoutconnect.com:11130/api';
 
 // State
 let portfolios = [];

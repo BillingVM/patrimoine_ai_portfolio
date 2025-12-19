@@ -5,9 +5,9 @@
 
 const db = require('./db');
 
-// Pricing: 100,000 tokens = $3 USD
+// Pricing: 100,000 tokens = $10 USD
 const CREDITS_PRICING = {
-  TOKENS_PER_DOLLAR: 100000 / 3, // ~33,333 tokens per dollar
+  TOKENS_PER_DOLLAR: 100000 / 10, // ~33,333 tokens per dollar
   MIN_PURCHASE: 10000,  // Minimum 10k tokens
   DEFAULT_BALANCE: 100000, // New users get 100k tokens
 };
