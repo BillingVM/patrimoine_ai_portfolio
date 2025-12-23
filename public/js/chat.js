@@ -10,6 +10,8 @@ class PortfolioChat {
         this.messageHistory = [];
         this.isStreaming = false;
         this.currentThinkingId = null;
+        this.currentEventSource = null; // Store EventSource for stopping
+        this.userScrolledUp = false; // Track if user manually scrolled up
 
         this.initializeElements();
         this.attachEventListeners();
@@ -29,10 +31,16 @@ class PortfolioChat {
     }
 
     attachEventListeners() {
-        // Form submission
+        // Form submission or stop button
         this.elements.chatForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            this.sendMessage();
+
+            // If streaming, stop it; otherwise send message
+            if (this.isStreaming) {
+                this.stopStreaming();
+            } else {
+                this.sendMessage();
+            }
         });
 
         // Auto-resize textarea
@@ -52,6 +60,11 @@ class PortfolioChat {
         // New chat button
         this.elements.newChatBtn.addEventListener('click', () => {
             this.startNewChat();
+        });
+
+        // Detect manual scrolling
+        this.elements.chatContainer.addEventListener('scroll', () => {
+            this.checkScrollPosition();
         });
     }
 
@@ -93,9 +106,10 @@ class PortfolioChat {
         this.elements.chatInput.style.height = 'auto';
         this.updateCharCount();
 
-        // Disable send button
+        // Mark as streaming and update button to STOP
         this.isStreaming = true;
-        this.elements.sendBtn.disabled = true;
+        this.userScrolledUp = false; // Reset scroll tracking for new message
+        this.updateSendButton();
 
         // Show thinking indicator
         this.showThinkingIndicator();
@@ -107,6 +121,7 @@ class PortfolioChat {
             url.searchParams.append('history', JSON.stringify(this.messageHistory));
 
             const eventSource = new EventSource(url.toString());
+            this.currentEventSource = eventSource; // Store for stopping
             let finalResult = null;
             let streamingMessageEl = null;
             let streamingContent = '';
@@ -114,6 +129,7 @@ class PortfolioChat {
             eventSource.onmessage = (event) => {
                 if (event.data === '[DONE]') {
                     eventSource.close();
+                    this.currentEventSource = null;
                     this.removeThinkingIndicator();
 
                     if (finalResult && finalResult.success) {
@@ -139,7 +155,7 @@ class PortfolioChat {
                     }
 
                     this.isStreaming = false;
-                    this.elements.sendBtn.disabled = false;
+                    this.updateSendButton();
                     this.elements.chatInput.focus();
                     return;
                 }
@@ -166,10 +182,11 @@ class PortfolioChat {
                         finalResult = data;
                     } else if (data.type === 'error') {
                         eventSource.close();
+                        this.currentEventSource = null;
                         this.removeThinkingIndicator();
                         this.showError(data.message || 'Failed to get response');
                         this.isStreaming = false;
-                        this.elements.sendBtn.disabled = false;
+                        this.updateSendButton();
                         this.elements.chatInput.focus();
                     }
                 } catch (parseError) {
@@ -180,19 +197,21 @@ class PortfolioChat {
             eventSource.onerror = (error) => {
                 console.error('SSE error:', error);
                 eventSource.close();
+                this.currentEventSource = null;
                 this.removeThinkingIndicator();
                 this.showError('Connection lost. Please try again.');
                 this.isStreaming = false;
-                this.elements.sendBtn.disabled = false;
+                this.updateSendButton();
                 this.elements.chatInput.focus();
             };
 
         } catch (error) {
             console.error('Chat error:', error);
+            this.currentEventSource = null;
             this.removeThinkingIndicator();
             this.showError('Failed to connect to AI assistant. Please check your connection and try again.');
             this.isStreaming = false;
-            this.elements.sendBtn.disabled = false;
+            this.updateSendButton();
             this.elements.chatInput.focus();
         }
     }
@@ -426,10 +445,24 @@ class PortfolioChat {
         this.elements.chatInput.focus();
     }
 
-    scrollToBottom() {
-        requestAnimationFrame(() => {
-            this.elements.chatContainer.scrollTop = this.elements.chatContainer.scrollHeight;
-        });
+    checkScrollPosition() {
+        const container = this.elements.chatContainer;
+        const threshold = 100; // pixels from bottom
+
+        // Check if user is near the bottom
+        const isNearBottom = container.scrollHeight - container.scrollTop - container.clientHeight < threshold;
+
+        // If user scrolled up from bottom, mark it
+        this.userScrolledUp = !isNearBottom;
+    }
+
+    scrollToBottom(force = false) {
+        // Only auto-scroll if user hasn't scrolled up OR if forced
+        if (force || !this.userScrolledUp) {
+            requestAnimationFrame(() => {
+                this.elements.chatContainer.scrollTop = this.elements.chatContainer.scrollHeight;
+            });
+        }
     }
 
     formatMessage(text) {
@@ -455,6 +488,66 @@ class PortfolioChat {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    updateSendButton() {
+        if (this.isStreaming) {
+            // Show STOP button
+            this.elements.sendBtn.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <rect x="6" y="6" width="12" height="12" stroke-width="2" rx="2" />
+                </svg>
+            `;
+            this.elements.sendBtn.title = 'Stop generating';
+            this.elements.sendBtn.classList.add('stop-mode');
+            this.elements.sendBtn.disabled = false;
+        } else {
+            // Show SEND button
+            this.elements.sendBtn.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                </svg>
+            `;
+            this.elements.sendBtn.title = 'Send message';
+            this.elements.sendBtn.classList.remove('stop-mode');
+            this.elements.sendBtn.disabled = false;
+        }
+    }
+
+    stopStreaming() {
+        if (!this.isStreaming || !this.currentEventSource) return;
+
+        console.log('🛑 User stopped streaming');
+
+        // Close EventSource connection
+        this.currentEventSource.close();
+        this.currentEventSource = null;
+
+        // Clean up UI
+        this.removeThinkingIndicator();
+
+        // Reset state
+        this.isStreaming = false;
+        this.updateSendButton();
+        this.elements.chatInput.focus();
+
+        // Show message that streaming was stopped
+        const stopMessage = document.createElement('div');
+        stopMessage.className = 'chat-message assistant';
+        stopMessage.innerHTML = `
+            <div class="chat-message-avatar" style="background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <rect x="6" y="6" width="12" height="12" stroke-width="2" rx="2" />
+                </svg>
+            </div>
+            <div class="chat-message-content">
+                <div class="chat-message-text" style="color: var(--text-muted); font-style: italic;">
+                    Response stopped by user
+                </div>
+            </div>
+        `;
+        this.elements.chatMessages.appendChild(stopMessage);
+        this.scrollToBottom(true);
     }
 
     async copyToClipboard(text, button) {

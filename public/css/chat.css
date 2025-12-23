@@ -321,6 +321,14 @@
     cursor: not-allowed;
 }
 
+.chat-send-btn.stop-mode {
+    background: linear-gradient(135deg, #F59E0B 0%, #F97316 100%);
+}
+
+.chat-send-btn.stop-mode:hover:not(:disabled) {
+    box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
 .chat-input-footer {
     max-width: 900px;
     margin: 0.75rem auto 0;
