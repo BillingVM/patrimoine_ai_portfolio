@@ -152,8 +152,12 @@ class ModelManager {
 
     /**
      * Call AI model with automatic retry and fallback
+     * @param {Array} messages - Chat messages
+     * @param {Array} tools - Optional tool definitions
+     * @param {Number} maxRetries - Max retry attempts
+     * @param {Function} onToken - Optional callback for streaming tokens
      */
-    async callModel(messages, tools = null, maxRetries = 3) {
+    async callModel(messages, tools = null, maxRetries = 3, onToken = null) {
         let lastError = null;
         let retriesLeft = maxRetries;
 
@@ -168,7 +172,7 @@ class ModelManager {
             try {
                 console.log(`🔄 Attempt ${maxRetries - retriesLeft + 1}/${maxRetries} with ${model.name}`);
 
-                const response = await this.executeModelCall(model, messages, tools);
+                const response = await this.executeModelCall(model, messages, tools, onToken);
 
                 // Mark as successful
                 this.markSuccess(model.id);
@@ -199,14 +203,18 @@ class ModelManager {
 
     /**
      * Execute actual API call to model
+     * @param {Object} model - Model configuration
+     * @param {Array} messages - Chat messages
+     * @param {Array} tools - Optional tool definitions
+     * @param {Function} onToken - Optional callback for streaming tokens
      */
-    async executeModelCall(model, messages, tools) {
+    async executeModelCall(model, messages, tools, onToken = null) {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 45000);
+        const timeoutId = setTimeout(() => controller.abort(), 120000); // Longer timeout for streaming
 
         try {
             // Build request body based on provider
-            const requestBody = this.buildRequestBody(model, messages, tools);
+            const requestBody = this.buildRequestBody(model, messages, tools, !!onToken);
 
             // Build headers based on provider
             const headers = this.buildHeaders(model);
@@ -231,6 +239,12 @@ class ModelManager {
                 throw error;
             }
 
+            // Handle streaming response
+            if (onToken && requestBody.stream) {
+                return await this.handleStreamingResponse(response, onToken);
+            }
+
+            // Handle non-streaming response
             const data = await response.json();
 
             // Validate response
@@ -260,15 +274,95 @@ class ModelManager {
     }
 
     /**
+     * Handle streaming response from AI model
+     */
+    async handleStreamingResponse(response, onToken) {
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = '';
+        let fullContent = '';
+        let usage = null;
+
+        try {
+            while (true) {
+                const { done, value } = await reader.read();
+
+                if (done) break;
+
+                // Decode chunk
+                buffer += decoder.decode(value, { stream: true });
+
+                // Process complete lines
+                const lines = buffer.split('\n');
+                buffer = lines.pop() || ''; // Keep incomplete line in buffer
+
+                for (const line of lines) {
+                    const trimmedLine = line.trim();
+
+                    // Skip empty lines and comments
+                    if (!trimmedLine || trimmedLine.startsWith(':')) continue;
+
+                    // Parse SSE data
+                    if (trimmedLine.startsWith('data: ')) {
+                        const data = trimmedLine.slice(6); // Remove 'data: ' prefix
+
+                        // Check for stream end
+                        if (data === '[DONE]') continue;
+
+                        try {
+                            const parsed = JSON.parse(data);
+
+                            // Extract token from different response formats
+                            const delta = parsed.choices?.[0]?.delta;
+                            if (delta?.content) {
+                                const token = delta.content;
+                                fullContent += token;
+
+                                // Call token callback
+                                if (onToken) {
+                                    onToken(token);
+                                }
+                            }
+
+                            // Capture usage info if available
+                            if (parsed.usage) {
+                                usage = parsed.usage;
+                            }
+
+                        } catch (parseError) {
+                            // Skip unparseable lines
+                            console.warn('Failed to parse SSE line:', data);
+                        }
+                    }
+                }
+            }
+
+            return {
+                content: fullContent,
+                tool_calls: null,
+                usage: usage
+            };
+
+        } finally {
+            reader.releaseLock();
+        }
+    }
+
+    /**
      * Build request body based on provider
      */
-    buildRequestBody(model, messages, tools) {
+    buildRequestBody(model, messages, tools, stream = false) {
         const body = {
             model: model.model,
             messages: messages,
             max_tokens: 2000,
             temperature: 0.7
         };
+
+        // Enable streaming if requested
+        if (stream) {
+            body.stream = true;
+        }
 
         // Add tools if provided and provider supports them
         if (tools && tools.length > 0) {

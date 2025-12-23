@@ -262,8 +262,23 @@ class EnhancedChatWithProgress extends EventEmitter {
             console.log('🔍 Calling modelManager.callModel()...');
             console.log('   (This is the longest step, may take 20-30 seconds)');
 
-            // Call AI with enhanced prompt
-            const aiResponse = await this.chatHandler.modelManager.callModel(messages, null, 3);
+            // Emit streaming start event
+            this.emit('progress', {
+                stage: 'ai_streaming',
+                message: 'Streaming AI response...',
+                progress: 70
+            });
+
+            // Call AI with enhanced prompt and streaming
+            const aiResponse = await this.chatHandler.modelManager.callModel(
+                messages,
+                null,
+                3,
+                (token) => {
+                    // Emit each token as it arrives
+                    this.emit('token', { token });
+                }
+            );
             console.log(`✅ AI response received`);
             console.log(`   - Model used: ${aiResponse.modelUsed}`);
             console.log(`   - Tokens: ${JSON.stringify(aiResponse.usage || {})}`);
@@ -278,7 +293,7 @@ class EnhancedChatWithProgress extends EventEmitter {
             console.log('📤 Emitting: AI response received progress (90%)');
             this.emit('progress', {
                 stage: 'ai',
-                message: 'AI response received',
+                message: 'AI response complete',
                 progress: 90
             });
 
@@ -445,15 +460,23 @@ Guidelines:
                 { role: 'user', content: userMessage }
             ];
 
-            // AI Response
+            // AI Response with streaming
             this.emit('progress', {
-                stage: 'ai',
-                message: 'AI processing...',
+                stage: 'ai_streaming',
+                message: 'Streaming AI response...',
                 progress: 60
             });
 
             const aiStart = Date.now();
-            const aiResponse = await this.chatHandler.modelManager.callModel(messages, null, 3);
+            const aiResponse = await this.chatHandler.modelManager.callModel(
+                messages,
+                null,
+                3,
+                (token) => {
+                    // Emit each token as it arrives
+                    this.emit('token', { token });
+                }
+            );
 
             pipeline.stages.aiResponse = {
                 duration: Date.now() - aiStart,

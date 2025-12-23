@@ -469,6 +469,11 @@ app.get('/api/chat-stream', async (req, res) => {
       res.write(`data: ${JSON.stringify({ type: 'progress', ...data })}\n\n`);
     });
 
+    // Listen to token events for streaming text
+    chatWithProgress.on('token', (data) => {
+      res.write(`data: ${JSON.stringify({ type: 'token', ...data })}\n\n`);
+    });
+
     // Process message
     const result = await chatWithProgress.processMessageWithProgress(
       message,
