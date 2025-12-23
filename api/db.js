@@ -58,6 +58,24 @@ async function initTables() {
       )
     `);
 
+    // Add portfolio naming and metadata columns (migrations)
+    await client.query(`
+      ALTER TABLE portfolios_simple
+      ADD COLUMN IF NOT EXISTS name VARCHAR(255),
+      ADD COLUMN IF NOT EXISTS description TEXT,
+      ADD COLUMN IF NOT EXISTS parsed_holdings JSONB,
+      ADD COLUMN IF NOT EXISTS total_value DECIMAL(15, 2),
+      ADD COLUMN IF NOT EXISTS currency VARCHAR(10) DEFAULT 'USD'
+    `);
+
+    // Create indexes for faster queries
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_portfolios_name ON portfolios_simple(name)
+    `);
+    await client.query(`
+      CREATE INDEX IF NOT EXISTS idx_portfolios_client_id ON portfolios_simple(client_id)
+    `);
+
     // Create reports_simple table
     await client.query(`
       CREATE TABLE IF NOT EXISTS reports_simple (

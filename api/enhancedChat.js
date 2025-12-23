@@ -8,6 +8,8 @@ const DataGatherer = require('./dataGatherer');
 const SPAOrchestrator = require('./spa');
 const ModelManager = require('./modelManager');
 const FollowUpDetector = require('./followUpDetector');
+const PortfolioContextDetector = require('./portfolioContextDetector');
+const PortfolioResolver = require('./portfolioResolver');
 const credits = require('./credits');
 
 class EnhancedChatHandler {
@@ -16,6 +18,8 @@ class EnhancedChatHandler {
         this.modelManager = new ModelManager();
         this.spaOrchestrator = new SPAOrchestrator();
         this.followUpDetector = new FollowUpDetector();
+        this.portfolioContextDetector = new PortfolioContextDetector();
+        this.portfolioResolver = new PortfolioResolver();
 
         // Initialize data gatherer with config
         const config = this.modelManager.getConfig();
@@ -67,6 +71,44 @@ class EnhancedChatHandler {
 
             console.log('📌 New topic detected. Using FULL pipeline with data gathering.');
 
+            // ==================== STAGE 0.5: Portfolio Context Detection ====================
+            console.log('\n📊 STAGE 0.5: Portfolio Context Detection (System Cost - FREE for user)');
+            const portfolioDetectStart = Date.now();
+
+            const portfolioContextDetection = this.portfolioContextDetector.detect(userMessage, history);
+
+            pipeline.stages.portfolioDetection = {
+                duration: Date.now() - portfolioDetectStart,
+                isPortfolioRelated: portfolioContextDetection.isPortfolioRelated,
+                scope: portfolioContextDetection.scope
+            };
+
+            // Resolve portfolio context if detected
+            let portfolioContext = null;
+            if (portfolioContextDetection.isPortfolioRelated) {
+                console.log('✅ Portfolio context detected! Resolving to database records...');
+                const portfolioResolveStart = Date.now();
+
+                portfolioContext = await this.portfolioResolver.resolve(portfolioContextDetection, userId);
+
+                pipeline.stages.portfolioResolution = {
+                    duration: Date.now() - portfolioResolveStart,
+                    resolved: portfolioContext.resolved,
+                    portfolioCount: portfolioContext.portfolios?.length || 0
+                };
+
+                if (portfolioContext.resolved) {
+                    console.log(`   ✓ Resolved ${portfolioContext.portfolios.length} portfolio(s)`);
+                } else {
+                    console.log(`   ⚠ ${portfolioContext.reason}`);
+                }
+            } else {
+                console.log('   → No portfolio context detected');
+            }
+
+            // Track system overhead (not charged to user)
+            await credits.trackSystemUsage(userId, 200, 'Portfolio context detection/resolution');
+
             // ==================== STAGE 1: Intent Classification ====================
             console.log('\n📋 STAGE 1: Intent Classification (System Cost - FREE for user)');
             const classifyStart = Date.now();
@@ -99,12 +141,13 @@ class EnhancedChatHandler {
             const superPrompt = await this.spaOrchestrator.generateSuperPrompt(
                 userMessage,
                 classification,
-                gatheredData
+                gatheredData,
+                portfolioContext  // Pass portfolio context to SPA
             );
 
             pipeline.stages.spaGeneration = {
                 duration: Date.now() - spaStart,
-                spaUsed: superPrompt.spaName || superPrompt.combinedFrom
+                spaUsed: superPrompt.spaName || superPrompt.combinedFrom || superPrompt.metadata?.spa
             };
 
             // Track system overhead (not charged to user)
@@ -152,6 +195,9 @@ class EnhancedChatHandler {
             console.log('\n' + '='.repeat(80));
             console.log('✅ ENHANCED CHAT PIPELINE COMPLETED');
             console.log(`   Total Duration: ${pipeline.totalDuration}ms`);
+            if (pipeline.stages.portfolioDetection) {
+                console.log(`   Portfolio Detection: ${pipeline.stages.portfolioDetection.duration}ms`);
+            }
             console.log(`   Classification: ${pipeline.stages.classification.duration}ms`);
             console.log(`   Data Gathering: ${pipeline.stages.dataGathering.duration}ms`);
             console.log(`   SPA Generation: ${pipeline.stages.spaGeneration.duration}ms`);
@@ -164,6 +210,17 @@ class EnhancedChatHandler {
                 response: aiResponse.content,
                 modelUsed: aiResponse.modelUsed,
                 classification: classification,
+                portfolioContext: portfolioContext ? {
+                    detected: true,
+                    scope: portfolioContext.scope,
+                    portfolioCount: portfolioContext.portfolios?.length || 0,
+                    portfolios: portfolioContext.portfolios?.map(p => ({
+                        id: p.id,
+                        name: p.name || `Portfolio #${p.id}`,
+                        totalValue: p.totalValue,
+                        assetCount: p.assetCount
+                    })) || []
+                } : { detected: false },
                 dataSourcesUsed: pipeline.stages.dataGathering.sources,
                 tokensUsed: tokensUsed,
                 balance: creditsResult.balance,
@@ -171,6 +228,8 @@ class EnhancedChatHandler {
                 pipeline: {
                     totalDuration: pipeline.totalDuration,
                     stages: {
+                        portfolioDetection: pipeline.stages.portfolioDetection?.duration,
+                        portfolioResolution: pipeline.stages.portfolioResolution?.duration,
                         classification: pipeline.stages.classification.duration,
                         dataGathering: pipeline.stages.dataGathering.duration,
                         spaGeneration: pipeline.stages.spaGeneration.duration,
@@ -197,10 +256,34 @@ class EnhancedChatHandler {
         console.log('='.repeat(80));
 
         try {
+            // ==================== Portfolio Context Detection (even for follow-ups) ====================
+            console.log('\n📊 Checking portfolio context (follow-up)');
+            const portfolioDetectStart = Date.now();
+
+            const portfolioContextDetection = this.portfolioContextDetector.detect(userMessage, history);
+            let portfolioContext = null;
+
+            if (portfolioContextDetection.isPortfolioRelated) {
+                console.log('✅ Portfolio context detected in follow-up! Resolving...');
+                portfolioContext = await this.portfolioResolver.resolve(portfolioContextDetection, userId);
+
+                pipeline.stages.portfolioDetection = {
+                    duration: Date.now() - portfolioDetectStart,
+                    isPortfolioRelated: true,
+                    resolved: portfolioContext.resolved
+                };
+
+                if (portfolioContext.resolved) {
+                    console.log(`   ✓ Resolved ${portfolioContext.portfolios.length} portfolio(s)`);
+                }
+            } else {
+                console.log('   → No portfolio context in follow-up');
+            }
+
             // ==================== Build Simple Contextual Prompt ====================
             console.log('\n💬 Building contextual response (no data gathering needed)');
 
-            const systemPrompt = `You are an expert financial analyst and portfolio advisor.
+            let systemPrompt = `You are an expert financial analyst and portfolio advisor.
 
 The user is asking a follow-up question about your previous response.
 Provide a clear, helpful answer based on the conversation context.
@@ -211,11 +294,20 @@ Guidelines:
 - Be specific and actionable
 - Acknowledge what you said before`;
 
+            // Add portfolio context to system prompt if detected
+            if (portfolioContext && portfolioContext.resolved) {
+                systemPrompt += `\n\n**Portfolio Context:**\n`;
+                systemPrompt += this.portfolioResolver.formatForAI(portfolioContext);
+            }
+
+            // Build enhanced user message
+            let enhancedUserMessage = userMessage;
+
             // Build messages with full history
             const messages = [
                 { role: 'system', content: systemPrompt },
                 ...history,
-                { role: 'user', content: userMessage }
+                { role: 'user', content: enhancedUserMessage }
             ];
 
             // ==================== AI Response ====================
@@ -250,6 +342,9 @@ Guidelines:
             console.log('✅ LIGHTWEIGHT FOLLOW-UP COMPLETED');
             console.log(`   Total Duration: ${pipeline.totalDuration}ms (vs ~32s for full pipeline)`);
             console.log(`   Follow-up Detection: ${pipeline.stages.followUpDetection.duration}ms`);
+            if (pipeline.stages.portfolioDetection) {
+                console.log(`   Portfolio Detection: ${pipeline.stages.portfolioDetection.duration}ms`);
+            }
             console.log(`   AI Response: ${pipeline.stages.aiResponse.duration}ms`);
             console.log(`   User Charged: ${tokensUsed} tokens`);
             console.log(`   💰 Saved: No data gathering, no classification, no SPA generation`);
@@ -261,6 +356,17 @@ Guidelines:
                 modelUsed: aiResponse.modelUsed,
                 followUp: true,
                 followUpDetection: pipeline.stages.followUpDetection.result,
+                portfolioContext: portfolioContext ? {
+                    detected: true,
+                    scope: portfolioContext.scope,
+                    portfolioCount: portfolioContext.portfolios?.length || 0,
+                    portfolios: portfolioContext.portfolios?.map(p => ({
+                        id: p.id,
+                        name: p.name || `Portfolio #${p.id}`,
+                        totalValue: p.totalValue,
+                        assetCount: p.assetCount
+                    })) || []
+                } : { detected: false },
                 tokensUsed: tokensUsed,
                 balance: creditsResult.balance,
                 hasCredits: creditsResult.balance > 0,
@@ -269,6 +375,7 @@ Guidelines:
                     type: 'lightweight_followup',
                     stages: {
                         followUpDetection: pipeline.stages.followUpDetection.duration,
+                        portfolioDetection: pipeline.stages.portfolioDetection?.duration,
                         aiResponse: pipeline.stages.aiResponse.duration
                     },
                     saved: 'Skipped: classification, data gathering, SPA generation'

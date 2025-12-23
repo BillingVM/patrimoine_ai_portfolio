@@ -6,6 +6,7 @@
 
 const BaseSPA = require('./baseSPA');
 const PredictionSPA = require('./predictionSPA');
+const PortfolioSPA = require('./portfolioSPA');
 
 class SPAOrchestrator {
     constructor() {
@@ -18,6 +19,9 @@ class SPAOrchestrator {
             // news: new NewsSPA(),
             // general: new GeneralSPA()
         };
+
+        // Initialize portfolio SPA (not intent-based, context-based)
+        this.portfolioSPA = new PortfolioSPA();
     }
 
     /**
@@ -25,10 +29,29 @@ class SPAOrchestrator {
      * @param {string} userPrompt - Original user prompt
      * @param {Object} classification - Intent classification
      * @param {Object} gatheredData - Data from all sources
+     * @param {Object} portfolioContext - Resolved portfolio context (optional)
      * @returns {Promise<Object>} Enhanced prompt components
      */
-    async generateSuperPrompt(userPrompt, classification, gatheredData) {
+    async generateSuperPrompt(userPrompt, classification, gatheredData, portfolioContext = null) {
         console.log('🎯 SPA Orchestrator: Generating super prompt for intents:', classification.intents);
+
+        // PRIORITY: Check if Portfolio SPA should handle this
+        if (portfolioContext && this.portfolioSPA.canHandle(classification, portfolioContext)) {
+            console.log('   ✓ Using Portfolio SPA (portfolio context detected)');
+            try {
+                const result = await this.portfolioSPA.generate(
+                    userPrompt,
+                    classification,
+                    gatheredData,
+                    portfolioContext
+                );
+                console.log('✅ Portfolio super prompt generated');
+                return result;
+            } catch (error) {
+                console.error(`❌ Portfolio SPA error:`, error.message);
+                // Fall through to intent-based routing
+            }
+        }
 
         const { intents } = classification;
         const selectedSPAs = [];
@@ -47,7 +70,7 @@ class SPAOrchestrator {
         // Fallback: if no specific SPA, use general approach
         if (selectedSPAs.length === 0) {
             console.log('   → Using general approach (no specialized SPA)');
-            return this.generateGeneralPrompt(userPrompt, classification, gatheredData);
+            return this.generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext);
         }
 
         // Generate prompts from all selected SPAs
@@ -76,7 +99,7 @@ class SPAOrchestrator {
     /**
      * Generate general prompt when no specific SPA matches
      */
-    generateGeneralPrompt(userPrompt, classification, gatheredData) {
+    generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext = null) {
         const { entities } = classification;
 
         // Build a simple but effective general prompt
