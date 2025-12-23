@@ -171,11 +171,11 @@ class DataGatherer {
             summary.push(`Fundamentals: ${count} entities`);
         }
 
-        if (data.predictionMarkets) {
+        if (data.predictionMarkets && data.predictionMarkets.markets) {
             summary.push(`Prediction Markets: ${data.predictionMarkets.markets.length} markets`);
         }
 
-        if (data.webSearch) {
+        if (data.webSearch && Array.isArray(data.webSearch)) {
             summary.push(`Web Search: ${data.webSearch.length} results`);
         }
 
