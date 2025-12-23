@@ -7,6 +7,7 @@ const IntentClassifier = require('./intentClassifier');
 const DataGatherer = require('./dataGatherer');
 const SPAOrchestrator = require('./spa');
 const ModelManager = require('./modelManager');
+const FollowUpDetector = require('./followUpDetector');
 const credits = require('./credits');
 
 class EnhancedChatHandler {
@@ -14,6 +15,7 @@ class EnhancedChatHandler {
         this.intentClassifier = new IntentClassifier();
         this.modelManager = new ModelManager();
         this.spaOrchestrator = new SPAOrchestrator();
+        this.followUpDetector = new FollowUpDetector();
 
         // Initialize data gatherer with config
         const config = this.modelManager.getConfig();
@@ -45,6 +47,25 @@ class EnhancedChatHandler {
             console.log('\n' + '='.repeat(80));
             console.log('🚀 ENHANCED CHAT PIPELINE STARTED');
             console.log('='.repeat(80));
+
+            // ==================== STAGE 0: Follow-up Detection ====================
+            console.log('\n🔍 STAGE 0: Follow-up Detection (FREE - Instant)');
+            const followUpStart = Date.now();
+
+            const followUpDetection = this.followUpDetector.detect(userMessage, history);
+
+            pipeline.stages.followUpDetection = {
+                duration: Date.now() - followUpStart,
+                result: followUpDetection
+            };
+
+            // If it's a follow-up, use lightweight path
+            if (followUpDetection.isFollowUp) {
+                console.log('✅ Follow-up detected! Using LIGHTWEIGHT path (skipping data gathering)');
+                return await this.processFollowUp(userMessage, history, userId, pipeline);
+            }
+
+            console.log('📌 New topic detected. Using FULL pipeline with data gathering.');
 
             // ==================== STAGE 1: Intent Classification ====================
             console.log('\n📋 STAGE 1: Intent Classification (System Cost - FREE for user)');
@@ -162,6 +183,101 @@ class EnhancedChatHandler {
             console.error('\n❌ ENHANCED CHAT PIPELINE ERROR:', error);
             console.error('='.repeat(80) + '\n');
 
+            throw error;
+        }
+    }
+
+    /**
+     * Process follow-up question using lightweight path
+     * Skips data gathering and complex processing
+     */
+    async processFollowUp(userMessage, history, userId, pipeline) {
+        console.log('\n' + '='.repeat(80));
+        console.log('⚡ LIGHTWEIGHT FOLLOW-UP PATH');
+        console.log('='.repeat(80));
+
+        try {
+            // ==================== Build Simple Contextual Prompt ====================
+            console.log('\n💬 Building contextual response (no data gathering needed)');
+
+            const systemPrompt = `You are an expert financial analyst and portfolio advisor.
+
+The user is asking a follow-up question about your previous response.
+Provide a clear, helpful answer based on the conversation context.
+
+Guidelines:
+- Reference your previous response when relevant
+- Explain concepts clearly and simply
+- Be specific and actionable
+- Acknowledge what you said before`;
+
+            // Build messages with full history
+            const messages = [
+                { role: 'system', content: systemPrompt },
+                ...history,
+                { role: 'user', content: userMessage }
+            ];
+
+            // ==================== AI Response ====================
+            console.log('\n🤖 Generating follow-up response');
+            const aiStart = Date.now();
+
+            const aiResponse = await this.modelManager.callModel(messages, null, 3);
+
+            pipeline.stages.aiResponse = {
+                duration: Date.now() - aiStart,
+                model: aiResponse.modelUsed,
+                tokens: aiResponse.usage || {}
+            };
+
+            // ==================== Credits Deduction ====================
+            console.log('\n💳 Credits Deduction (USER ONLY)');
+
+            const tokensUsed = aiResponse.usage?.total_tokens || 800;
+
+            const creditsResult = await credits.deductUserCredits(
+                userId,
+                tokensUsed,
+                'Chat: follow-up',
+                null,
+                null
+            );
+
+            // ==================== Pipeline Complete ====================
+            pipeline.totalDuration = Date.now() - pipeline.startTime;
+
+            console.log('\n' + '='.repeat(80));
+            console.log('✅ LIGHTWEIGHT FOLLOW-UP COMPLETED');
+            console.log(`   Total Duration: ${pipeline.totalDuration}ms (vs ~32s for full pipeline)`);
+            console.log(`   Follow-up Detection: ${pipeline.stages.followUpDetection.duration}ms`);
+            console.log(`   AI Response: ${pipeline.stages.aiResponse.duration}ms`);
+            console.log(`   User Charged: ${tokensUsed} tokens`);
+            console.log(`   💰 Saved: No data gathering, no classification, no SPA generation`);
+            console.log('='.repeat(80) + '\n');
+
+            return {
+                success: true,
+                response: aiResponse.content,
+                modelUsed: aiResponse.modelUsed,
+                followUp: true,
+                followUpDetection: pipeline.stages.followUpDetection.result,
+                tokensUsed: tokensUsed,
+                balance: creditsResult.balance,
+                hasCredits: creditsResult.balance > 0,
+                pipeline: {
+                    totalDuration: pipeline.totalDuration,
+                    type: 'lightweight_followup',
+                    stages: {
+                        followUpDetection: pipeline.stages.followUpDetection.duration,
+                        aiResponse: pipeline.stages.aiResponse.duration
+                    },
+                    saved: 'Skipped: classification, data gathering, SPA generation'
+                }
+            };
+
+        } catch (error) {
+            console.error('\n❌ LIGHTWEIGHT FOLLOW-UP ERROR:', error);
+            console.error('='.repeat(80) + '\n');
             throw error;
         }
     }
