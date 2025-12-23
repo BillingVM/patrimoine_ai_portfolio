@@ -736,3 +736,406 @@
         font-size: 1rem;
     }
 }
+
+/* ==================== FILE UPLOAD COMPONENTS ==================== */
+
+/* Upload Button */
+.chat-upload-btn {
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 2px solid var(--border-primary);
+    border-radius: 12px;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.chat-upload-btn:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.chat-upload-btn:active {
+    transform: scale(0.95);
+}
+
+/* Attachment Preview */
+.chat-attachment-preview {
+    max-width: 900px;
+    margin: 0 auto 0.75rem;
+    padding: 0.875rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 10px;
+    transition: all 0.2s ease;
+}
+
+.attachment-item {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+}
+
+.attachment-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    overflow: hidden;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+}
+
+.attachment-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.attachment-icon svg {
+    width: 20px;
+    height: 20px;
+}
+
+.attachment-info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.attachment-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.attachment-size {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.attachment-remove {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.attachment-remove:hover {
+    background: rgba(246, 70, 93, 0.1);
+    border-color: var(--danger);
+    color: var(--danger);
+}
+
+/* Drag-Drop Overlay */
+.chat-drag-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(6px);
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.drag-overlay-content {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--bg-secondary);
+    border: 3px dashed var(--accent-blue);
+    border-radius: 24px;
+    min-width: 400px;
+    animation: scaleIn 0.2s ease;
+}
+
+@keyframes scaleIn {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.drag-overlay-content svg {
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+}
+
+.drag-overlay-content h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+}
+
+.drag-overlay-content p {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    margin: 0;
+}
+
+/* Portfolio Detection Dialog */
+.portfolio-dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    animation: fadeIn 0.2s ease;
+    backdrop-filter: blur(4px);
+}
+
+.portfolio-dialog {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-primary);
+    border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(0, 0, 0, 0.5);
+    max-width: 520px;
+    width: 90%;
+    animation: dialogSlideUp 0.3s ease;
+}
+
+@keyframes dialogSlideUp {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.portfolio-dialog-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.5rem 1.75rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.portfolio-dialog-header h3 {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.portfolio-dialog-close {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--border-primary);
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 1.5rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.portfolio-dialog-close:hover {
+    background: var(--bg-tertiary);
+    border-color: var(--text-muted);
+    color: var(--text-primary);
+}
+
+.portfolio-dialog-body {
+    padding: 1.75rem;
+}
+
+.portfolio-dialog-body > p {
+    font-size: 0.9375rem;
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.portfolio-dialog-body > p strong {
+    color: var(--text-primary);
+}
+
+.form-group {
+    margin-bottom: 1.25rem;
+}
+
+.form-group:last-child {
+    margin-bottom: 0;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-select {
+    width: 100%;
+    padding: 0.875rem 1rem;
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    font-family: inherit;
+    transition: all 0.2s ease;
+}
+
+.form-input:focus,
+.form-select:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    background: var(--bg-secondary);
+}
+
+.form-select {
+    cursor: pointer;
+}
+
+.form-input::placeholder {
+    color: var(--text-muted);
+}
+
+.portfolio-dialog-footer {
+    display: flex;
+    gap: 0.875rem;
+    padding: 1.5rem 1.75rem;
+    border-top: 1px solid var(--border-primary);
+}
+
+.portfolio-dialog-footer .btn {
+    flex: 1;
+    padding: 0.875rem 1.5rem;
+    font-size: 0.9375rem;
+    font-weight: 600;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.portfolio-dialog-cancel {
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-primary) !important;
+    color: var(--text-primary);
+}
+
+.portfolio-dialog-cancel:hover {
+    background: var(--bg-secondary);
+}
+
+.portfolio-dialog-save {
+    background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+    color: #fff;
+}
+
+.portfolio-dialog-save:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+}
+
+/* Uploading State */
+.chat-attachment-preview.uploading {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.chat-attachment-preview.success {
+    border-color: #10b981;
+    background: rgba(16, 185, 129, 0.05);
+}
+
+.chat-attachment-preview.error {
+    border-color: var(--danger);
+    background: rgba(246, 70, 93, 0.05);
+}
+
+/* Responsive Upload UI */
+@media (max-width: 768px) {
+    .drag-overlay-content {
+        min-width: 0;
+        width: 85%;
+        padding: 2rem 1.5rem;
+    }
+
+    .drag-overlay-content svg {
+        width: 48px;
+        height: 48px;
+    }
+
+    .drag-overlay-content h3 {
+        font-size: 1.25rem;
+    }
+
+    .drag-overlay-content p {
+        font-size: 0.875rem;
+    }
+
+    .portfolio-dialog {
+        width: 95%;
+    }
+
+    .portfolio-dialog-footer {
+        flex-direction: column;
+    }
+
+    .portfolio-dialog-footer .btn {
+        width: 100%;
+    }
+}

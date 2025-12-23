@@ -12,6 +12,8 @@ class PortfolioChat {
         this.currentThinkingId = null;
         this.currentEventSource = null; // Store EventSource for stopping
         this.userScrolledUp = false; // Track if user manually scrolled up
+        this.currentFile = null; // Currently selected file
+        this.currentFileData = null; // Uploaded file data (portfolioId, etc.)
 
         this.initializeElements();
         this.attachEventListeners();
@@ -26,7 +28,12 @@ class PortfolioChat {
             chatMessages: document.getElementById('chatMessages'),
             chatContainer: document.getElementById('chatContainer'),
             charCount: document.getElementById('charCount'),
-            newChatBtn: document.getElementById('newChatBtn')
+            newChatBtn: document.getElementById('newChatBtn'),
+            // Upload elements
+            uploadBtn: document.getElementById('uploadBtn'),
+            fileInput: document.getElementById('fileInput'),
+            attachmentPreview: document.getElementById('attachmentPreview'),
+            dragOverlay: document.getElementById('dragOverlay')
         };
     }
 
@@ -66,6 +73,52 @@ class PortfolioChat {
         this.elements.chatContainer.addEventListener('scroll', () => {
             this.checkScrollPosition();
         });
+
+        // ==================== UPLOAD EVENT LISTENERS ====================
+
+        // Upload button click
+        this.elements.uploadBtn.addEventListener('click', () => {
+            this.elements.fileInput.click();
+        });
+
+        // File input change
+        this.elements.fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.handleFileSelection(e.target.files[0]);
+            }
+        });
+
+        // Drag and drop
+        this.elements.chatContainer.addEventListener('dragenter', (e) => {
+            e.preventDefault();
+            this.elements.dragOverlay.style.display = 'flex';
+        });
+
+        this.elements.dragOverlay.addEventListener('dragleave', (e) => {
+            if (e.target === this.elements.dragOverlay) {
+                this.elements.dragOverlay.style.display = 'none';
+            }
+        });
+
+        this.elements.dragOverlay.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        this.elements.dragOverlay.addEventListener('drop', (e) => {
+            e.preventDefault();
+            this.elements.dragOverlay.style.display = 'none';
+            if (e.dataTransfer.files.length > 0) {
+                this.handleFileSelection(e.dataTransfer.files[0]);
+            }
+        });
+
+        // Remove attachment
+        const removeBtn = this.elements.attachmentPreview.querySelector('.attachment-remove');
+        if (removeBtn) {
+            removeBtn.addEventListener('click', () => {
+                this.removeAttachment();
+            });
+        }
     }
 
     autoResizeTextarea(textarea) {
@@ -90,7 +143,15 @@ class PortfolioChat {
 
     async sendMessage() {
         const message = this.elements.chatInput.value.trim();
-        if (!message || this.isStreaming) return;
+
+        // Allow sending with just a file attachment (no message required)
+        if ((!message && !this.currentFileData) || this.isStreaming) return;
+
+        // Use default message if only file is attached
+        let messageText = message;
+        if (!messageText && this.currentFileData) {
+            messageText = `Analyze this file: ${this.currentFileData.filename || 'uploaded file'}`;
+        }
 
         // Clear welcome message on first interaction
         const welcomeMsg = this.elements.chatMessages.querySelector('.chat-welcome');
@@ -99,7 +160,7 @@ class PortfolioChat {
         }
 
         // Add user message to UI
-        this.addUserMessage(message);
+        this.addUserMessage(messageText);
 
         // Clear input
         this.elements.chatInput.value = '';
@@ -117,8 +178,13 @@ class PortfolioChat {
         try {
             // Use Server-Sent Events for real-time progress
             const url = new URL(`${API_URL}/chat-stream`);
-            url.searchParams.append('message', message);
+            url.searchParams.append('message', messageText);
             url.searchParams.append('history', JSON.stringify(this.messageHistory));
+
+            // Include portfolio context if file is attached
+            if (this.currentFileData) {
+                url.searchParams.append('portfolio_id', this.currentFileData.portfolioId);
+            }
 
             const eventSource = new EventSource(url.toString());
             this.currentEventSource = eventSource; // Store for stopping
@@ -149,13 +215,19 @@ class PortfolioChat {
 
                         // Update message history
                         this.messageHistory.push(
-                            { role: 'user', content: message },
+                            { role: 'user', content: messageText },
                             { role: 'assistant', content: streamingContent || finalResult.response }
                         );
                     }
 
                     this.isStreaming = false;
                     this.updateSendButton();
+
+                    // Clear attachment after successful send
+                    if (this.currentFileData) {
+                        this.removeAttachment();
+                    }
+
                     this.elements.chatInput.focus();
                     return;
                 }
@@ -590,6 +662,251 @@ class PortfolioChat {
                 button.innerHTML = originalHTML;
                 button.classList.remove('copy-failed');
             }, 2000);
+        }
+    }
+
+    // ==================== FILE UPLOAD METHODS ====================
+
+    async handleFileSelection(file) {
+        // Validate file type
+        const allowedTypes = ['csv', 'xlsx', 'xls', 'pdf', 'json', 'docx', 'doc', 'txt', 'jpg', 'jpeg', 'png', 'tiff', 'tif', 'bmp'];
+        const fileExt = file.name.split('.').pop().toLowerCase();
+
+        if (!allowedTypes.includes(fileExt)) {
+            this.showError(`File type .${fileExt} is not supported`);
+            return;
+        }
+
+        // Validate file size (10MB)
+        if (file.size > 10 * 1024 * 1024) {
+            this.showError('File size exceeds 10MB limit');
+            return;
+        }
+
+        this.currentFile = file;
+        this.showAttachmentPreview(file);
+        await this.uploadFile(file);
+    }
+
+    showAttachmentPreview(file) {
+        const preview = this.elements.attachmentPreview;
+        preview.style.display = 'block';
+        preview.classList.remove('success', 'error');
+        preview.classList.add('uploading');
+
+        const nameEl = preview.querySelector('.attachment-name');
+        const sizeEl = preview.querySelector('.attachment-size');
+        const iconEl = preview.querySelector('.attachment-icon');
+
+        nameEl.textContent = file.name;
+        sizeEl.textContent = this.formatFileSize(file.size);
+
+        // Show thumbnail for images
+        const fileExt = file.name.split('.').pop().toLowerCase();
+        if (['jpg', 'jpeg', 'png'].includes(fileExt)) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                iconEl.innerHTML = `<img src="${e.target.result}" alt="${file.name}">`;
+            };
+            reader.readAsDataURL(file);
+        } else {
+            iconEl.innerHTML = this.getFileIcon(fileExt);
+        }
+    }
+
+    async uploadFile(file) {
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch(`${API_URL}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.currentFileData = {
+                    portfolioId: data.portfolio.id,
+                    filename: data.portfolio.filename,
+                    originalName: data.portfolio.fileType,
+                    fileType: data.portfolio.fileType
+                };
+
+                // Show success
+                this.elements.attachmentPreview.classList.remove('uploading');
+                this.elements.attachmentPreview.classList.add('success');
+
+                // Trigger portfolio detection
+                await this.detectPortfolio(data.portfolio.id);
+            } else {
+                throw new Error(data.error || 'Upload failed');
+            }
+        } catch (error) {
+            console.error('Upload error:', error);
+            this.showError(`Upload failed: ${error.message}`);
+            this.elements.attachmentPreview.classList.remove('uploading');
+            this.elements.attachmentPreview.classList.add('error');
+        }
+    }
+
+    async detectPortfolio(portfolioId) {
+        try {
+            const response = await fetch(`${API_URL}/portfolio/detect`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ portfolioId })
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.detection.isPortfolio) {
+                this.showPortfolioDialog(data);
+            }
+        } catch (error) {
+            console.error('Portfolio detection error:', error);
+            // Fail silently - file already uploaded
+        }
+    }
+
+    showPortfolioDialog(detectionData) {
+        const detection = detectionData.detection;
+
+        const dialog = document.createElement('div');
+        dialog.className = 'portfolio-dialog-overlay';
+        dialog.innerHTML = `
+            <div class="portfolio-dialog">
+                <div class="portfolio-dialog-header">
+                    <h3>📊 Portfolio Detected!</h3>
+                    <button class="portfolio-dialog-close" type="button">&times;</button>
+                </div>
+                <div class="portfolio-dialog-body">
+                    <p>This appears to be a <strong>${detection.portfolioType}</strong>.</p>
+
+                    <div class="form-group">
+                        <label>Portfolio Name</label>
+                        <input type="text" id="portfolioNameInput" class="form-input" value="${this.escapeHtml(detection.suggestedTitle)}">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Assign to Client (Optional)</label>
+                        <select id="portfolioClientSelect" class="form-select">
+                            <option value="">No client</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="portfolio-dialog-footer">
+                    <button class="btn btn-secondary portfolio-dialog-cancel" type="button">Skip</button>
+                    <button class="btn btn-primary portfolio-dialog-save" type="button">Save Portfolio</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(dialog);
+
+        // Load clients
+        this.loadClientsForDialog();
+
+        // Event listeners
+        dialog.querySelector('.portfolio-dialog-close').addEventListener('click', () => dialog.remove());
+        dialog.querySelector('.portfolio-dialog-cancel').addEventListener('click', () => dialog.remove());
+
+        dialog.querySelector('.portfolio-dialog-save').addEventListener('click', async () => {
+            const name = document.getElementById('portfolioNameInput').value.trim();
+            const clientId = document.getElementById('portfolioClientSelect').value;
+
+            if (name) {
+                await this.savePortfolioMetadata(detectionData.portfolio.id, name, clientId);
+                dialog.remove();
+            }
+        });
+    }
+
+    async loadClientsForDialog() {
+        try {
+            const response = await fetch(`${API_URL}/clients`);
+            const data = await response.json();
+
+            if (data.success) {
+                const select = document.getElementById('portfolioClientSelect');
+                data.clients.forEach(client => {
+                    const option = document.createElement('option');
+                    option.value = client.id;
+                    option.textContent = client.name;
+                    select.appendChild(option);
+                });
+            }
+        } catch (error) {
+            console.error('Failed to load clients:', error);
+        }
+    }
+
+    async savePortfolioMetadata(portfolioId, name, clientId) {
+        try {
+            const response = await fetch(`${API_URL}/portfolio/${portfolioId}/metadata`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, clientId: clientId || null })
+            });
+
+            const data = await response.json();
+            if (data.success) {
+                this.showSuccess(`Portfolio "${name}" saved successfully!`);
+            }
+        } catch (error) {
+            this.showError('Failed to save portfolio');
+        }
+    }
+
+    removeAttachment() {
+        this.currentFile = null;
+        this.currentFileData = null;
+        this.elements.attachmentPreview.style.display = 'none';
+        this.elements.attachmentPreview.classList.remove('uploading', 'success', 'error');
+        this.elements.fileInput.value = '';
+    }
+
+    formatFileSize(bytes) {
+        if (bytes < 1024) return bytes + ' B';
+        if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+        return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    getFileIcon(fileExt) {
+        return `<svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>`;
+    }
+
+    escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+
+    showSuccess(message) {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = message;
+            toast.style.background = '#10b981';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+    }
+
+    showError(message) {
+        const toast = document.getElementById('toast');
+        if (toast) {
+            toast.textContent = message;
+            toast.style.background = '#ef4444';
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
         }
     }
 }

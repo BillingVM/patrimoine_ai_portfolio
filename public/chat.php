@@ -74,7 +74,26 @@
 
         <!-- Chat Input -->
         <div class="chat-input-container">
+            <!-- File Attachment Preview (hidden by default) -->
+            <div class="chat-attachment-preview" id="attachmentPreview" style="display: none;">
+                <div class="attachment-item">
+                    <div class="attachment-icon"></div>
+                    <div class="attachment-info">
+                        <div class="attachment-name"></div>
+                        <div class="attachment-size"></div>
+                    </div>
+                    <button type="button" class="attachment-remove" title="Remove attachment">&times;</button>
+                </div>
+            </div>
+
             <form class="chat-input-form" id="chatForm">
+                <!-- Upload Button -->
+                <button type="button" id="uploadBtn" class="chat-upload-btn" title="Upload file (CSV, Excel, PDF, images, Word, TXT)">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                    </svg>
+                </button>
+
                 <textarea
                     id="chatInput"
                     placeholder="Ask about your portfolios, clients, or financial insights..."
@@ -87,6 +106,21 @@
                     </svg>
                 </button>
             </form>
+
+            <!-- Hidden File Input -->
+            <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.json,.docx,.doc,.txt,.jpg,.jpeg,.png,.tiff,.tif,.bmp" style="display: none;">
+
+            <!-- Drag-Drop Overlay -->
+            <div class="chat-drag-overlay" id="dragOverlay" style="display: none;">
+                <div class="drag-overlay-content">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="64" height="64">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <h3>Drop file here</h3>
+                    <p>Supports: CSV, Excel, PDF, JSON, images, Word, TXT</p>
+                </div>
+            </div>
+
             <div class="chat-input-footer">
                 <span class="input-hint">AI can make mistakes. Verify important information.</span>
                 <span class="char-count" id="charCount">0/4000</span>

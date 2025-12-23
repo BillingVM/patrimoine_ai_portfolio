@@ -23,6 +23,8 @@ const FinancialDatasetsAPI = require('./financialDatasets');
 const ModelManager = require('./modelManager');
 const EnhancedChatHandler = require('./enhancedChat');
 const EnhancedChatWithProgress = require('./enhancedChatWithProgress');
+const VisionService = require('./visionService');
+const ocr = require('./ocr');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -68,6 +70,9 @@ if (domain) {
 
 // Initialize Model Manager (Round-robin with fallback)
 const modelManager = new ModelManager();
+
+// Initialize Vision Service (Hybrid image/document analysis)
+const visionService = new VisionService(modelManager, ocr);
 
 // Initialize Enhanced Chat Handler (Multi-agent AI system)
 const enhancedChat = new EnhancedChatHandler();
@@ -369,6 +374,206 @@ app.delete('/api/portfolio/:id', async (req, res) => {
   }
 });
 
+/**
+ * POST /api/portfolio/detect
+ * AI-powered portfolio detection using Vision AI/OCR + classification
+ */
+app.post('/api/portfolio/detect', async (req, res) => {
+  try {
+    const { portfolioId } = req.body;
+
+    if (!portfolioId) {
+      return res.status(400).json({ error: 'Portfolio ID is required' });
+    }
+
+    console.log(`🔍 Detecting portfolio for ID: ${portfolioId}`);
+
+    // 1. Fetch portfolio from database
+    const portfolio = await db.getPortfolio(portfolioId);
+    if (!portfolio) {
+      return res.status(404).json({ error: 'Portfolio not found' });
+    }
+
+    // 2. Construct file path
+    const filePath = path.join(__dirname, '../uploads', portfolio.filename);
+
+    // Check if file exists
+    try {
+      await fs.access(filePath);
+    } catch (err) {
+      return res.status(404).json({ error: 'Portfolio file not found on disk' });
+    }
+
+    // 3. Analyze with Vision AI/OCR or use raw_data
+    console.log(`📸 Analyzing file: ${portfolio.filename}`);
+    const visionResult = await visionService.analyzeFile(
+      filePath,
+      portfolio.file_type,
+      'Extract financial data from this document. Identify any portfolio holdings, stock tickers, amounts, dates, and account information. Describe the document type and structure.'
+    );
+
+    if (!visionResult.success) {
+      return res.status(500).json({
+        error: 'File analysis failed',
+        message: visionResult.error
+      });
+    }
+
+    console.log(`✅ File analyzed using: ${visionResult.method}`);
+
+    // Determine content source: vision/OCR result or raw_data for structured files
+    let contentForAI;
+    if (visionResult.method === 'text' || !visionResult.content) {
+      // Use raw_data from database for structured files (CSV, Excel, JSON, etc.)
+      contentForAI = portfolio.raw_data || 'No content available';
+      console.log(`   Using raw_data from database (${contentForAI.length} chars)`);
+    } else {
+      // Use vision/OCR analysis result
+      contentForAI = visionResult.content;
+    }
+
+    // 4. AI classification to detect portfolio
+    console.log(`🤖 Running AI classification...`);
+
+    const detectionPrompt = `Analyze this document and respond ONLY with valid JSON in this exact format:
+{
+  "isPortfolio": true or false,
+  "portfolioType": "stock portfolio" | "bond portfolio" | "crypto portfolio" | "mixed portfolio" | "NOT_A_PORTFOLIO",
+  "suggestedTitle": "A descriptive title for this portfolio",
+  "confidence": "high" | "medium" | "low"
+}
+
+Rules:
+- isPortfolio: true if document contains investment holdings, positions, or account statements
+- portfolioType: classify the type if it's a portfolio, otherwise "NOT_A_PORTFOLIO"
+- suggestedTitle: Create a concise title (e.g., "John's Stock Portfolio", "Q4 2024 Investment Holdings")
+- confidence: high if clear portfolio indicators, medium if ambiguous, low if unclear
+
+Document content:
+${contentForAI.substring(0, 3000)}`;
+
+    const aiResponse = await modelManager.callModel([
+      { role: 'system', content: 'You are a financial document classifier. Respond ONLY with valid JSON. Do not include any explanatory text.' },
+      { role: 'user', content: detectionPrompt }
+    ]);
+
+    // 5. Parse JSON response
+    let detection;
+    try {
+      // Extract JSON from response (handle cases where AI adds extra text)
+      const jsonMatch = aiResponse.content.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in AI response');
+      }
+      detection = JSON.parse(jsonMatch[0]);
+    } catch (parseError) {
+      console.error('❌ Failed to parse AI response:', aiResponse.content);
+      return res.status(500).json({
+        error: 'AI classification failed',
+        message: 'Could not parse detection results'
+      });
+    }
+
+    // 6. Store vision analysis in database
+    await db.pool.query(
+      `UPDATE portfolios_simple
+       SET vision_analysis = $1, portfolio_type = $2
+       WHERE id = $3`,
+      [
+        JSON.stringify({
+          method: visionResult.method,
+          content: (visionResult.content || contentForAI).substring(0, 5000), // Store first 5000 chars
+          model: visionResult.model || 'text-parser',
+          tokens: visionResult.tokens,
+          confidence: visionResult.confidence,
+          detectedAt: new Date().toISOString()
+        }),
+        detection.isPortfolio ? detection.portfolioType : null,
+        portfolioId
+      ]
+    );
+
+    console.log(`✅ Portfolio detection complete:`);
+    console.log(`   Is Portfolio: ${detection.isPortfolio}`);
+    console.log(`   Type: ${detection.portfolioType}`);
+    console.log(`   Confidence: ${detection.confidence}`);
+
+    res.json({
+      success: true,
+      detection: {
+        isPortfolio: detection.isPortfolio,
+        portfolioType: detection.portfolioType,
+        suggestedTitle: detection.suggestedTitle,
+        confidence: detection.confidence
+      },
+      analysisMethod: visionResult.method,
+      portfolio: {
+        id: portfolio.id,
+        filename: portfolio.original_name
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Portfolio detection error:', error);
+    res.status(500).json({
+      error: 'Portfolio detection failed',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * PUT /api/portfolio/:id/metadata
+ * Update portfolio name and client assignment
+ */
+app.put('/api/portfolio/:id/metadata', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, clientId } = req.body;
+
+    if (!name || name.trim().length === 0) {
+      return res.status(400).json({ error: 'Portfolio name is required' });
+    }
+
+    console.log(`📝 Updating portfolio #${id} metadata:`);
+    console.log(`   Name: ${name}`);
+    console.log(`   Client ID: ${clientId || 'None'}`);
+
+    // Update database
+    const query = `
+      UPDATE portfolios_simple
+      SET portfolio_name = $1, client_id = $2
+      WHERE id = $3
+      RETURNING id, portfolio_name, client_id, filename, original_name
+    `;
+
+    const result = await db.pool.query(query, [name.trim(), clientId || null, id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Portfolio not found' });
+    }
+
+    console.log(`✅ Portfolio metadata updated successfully`);
+
+    res.json({
+      success: true,
+      portfolio: {
+        id: result.rows[0].id,
+        name: result.rows[0].portfolio_name,
+        clientId: result.rows[0].client_id,
+        filename: result.rows[0].original_name
+      }
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating portfolio metadata:', error);
+    res.status(500).json({
+      error: 'Failed to update portfolio metadata',
+      message: error.message
+    });
+  }
+});
+
 // ==================== CHAT ENDPOINT ====================
 
 /**
@@ -429,10 +634,11 @@ app.post('/api/chat', async (req, res) => {
 /**
  * GET /api/chat-stream
  * Chat with AI assistant with Server-Sent Events for real-time progress
+ * Supports optional portfolio_id parameter for including file context
  */
 app.get('/api/chat-stream', async (req, res) => {
   try {
-    const { message, history } = req.query;
+    const { message, history, portfolio_id } = req.query;
     const userId = 1; // Demo user
 
     if (!message) {
@@ -455,6 +661,41 @@ app.get('/api/chat-stream', async (req, res) => {
       });
     }
 
+    // Fetch portfolio context if portfolio_id provided
+    let enhancedMessage = message;
+    let portfolioContext = null;
+
+    if (portfolio_id) {
+      console.log(`📎 Including portfolio context for ID: ${portfolio_id}`);
+
+      try {
+        const portfolio = await db.getPortfolio(portfolio_id);
+
+        if (portfolio) {
+          portfolioContext = {
+            id: portfolio.id,
+            name: portfolio.portfolio_name || portfolio.original_name,
+            type: portfolio.portfolio_type,
+            fileType: portfolio.file_type,
+            rawData: portfolio.raw_data
+          };
+
+          // Enhance message with portfolio context
+          const contextHeader = `\n\n[ATTACHED FILE]\nFile: ${portfolioContext.name}\nType: ${portfolioContext.type || 'Document'}\nFormat: ${portfolioContext.fileType}\n\nContent:\n`;
+          const contentPreview = portfolioContext.rawData ? portfolioContext.rawData.substring(0, 2000) : '[No content available]';
+
+          enhancedMessage = `${message}${contextHeader}${contentPreview}${portfolioContext.rawData && portfolioContext.rawData.length > 2000 ? '\n\n[Content truncated...]' : ''}`;
+
+          console.log(`✅ Portfolio context added (${portfolioContext.rawData ? portfolioContext.rawData.length : 0} chars)`);
+        } else {
+          console.warn(`⚠️ Portfolio ${portfolio_id} not found, proceeding without context`);
+        }
+      } catch (error) {
+        console.error(`❌ Error fetching portfolio context:`, error);
+        // Continue without portfolio context
+      }
+    }
+
     // Set SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
     res.setHeader('Cache-Control', 'no-cache');
@@ -474,9 +715,9 @@ app.get('/api/chat-stream', async (req, res) => {
       res.write(`data: ${JSON.stringify({ type: 'token', ...data })}\n\n`);
     });
 
-    // Process message
+    // Process message with enhanced context
     const result = await chatWithProgress.processMessageWithProgress(
-      message,
+      enhancedMessage,
       parsedHistory,
       userId
     );

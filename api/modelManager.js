@@ -64,7 +64,8 @@ class ModelManager {
                         apiKey: modelConfig.apiKey || openrouterKey,
                         endpoint: 'https://openrouter.ai/api/v1/chat/completions',
                         free: isFree,
-                        pricing: modelConfig.price
+                        pricing: modelConfig.price,
+                        vision: modelConfig.vision || false
                     });
                 }
             });
@@ -485,6 +486,52 @@ class ModelManager {
      */
     getConfig() {
         return this.config;
+    }
+
+    /**
+     * Get first available vision-capable model
+     */
+    getVisionModel() {
+        const visionModels = this.models.filter(m => m.vision && this.healthStatus[m.id].active);
+
+        if (visionModels.length === 0) {
+            console.warn('⚠️ No vision models available');
+            return null;
+        }
+
+        console.log(`👁️ Selected vision model: ${visionModels[0].name}`);
+        return visionModels[0];
+    }
+
+    /**
+     * Call vision model with image
+     * @param {String} imageDataUrl - Base64 data URL or image URL
+     * @param {String} prompt - Text prompt for vision analysis
+     * @param {Number} maxRetries - Maximum retry attempts
+     */
+    async callVisionModel(imageDataUrl, prompt, maxRetries = 2) {
+        const model = this.getVisionModel();
+
+        if (!model) {
+            throw new Error('No vision model available');
+        }
+
+        console.log(`📸 Calling vision model: ${model.name}`);
+        console.log(`   Prompt: ${prompt.substring(0, 100)}...`);
+
+        // Build vision message format (OpenAI-compatible)
+        const messages = [{
+            role: 'user',
+            content: [
+                { type: 'text', text: prompt },
+                {
+                    type: 'image_url',
+                    image_url: { url: imageDataUrl }
+                }
+            ]
+        }];
+
+        return await this.callModel(messages, null, maxRetries);
     }
 }
 
