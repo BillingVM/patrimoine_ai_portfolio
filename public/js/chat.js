@@ -101,55 +101,72 @@ class PortfolioChat {
         this.showThinkingIndicator();
 
         try {
-            // Send message to API
-            const response = await fetch(`${API_URL}/chat`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    message: message,
-                    history: this.messageHistory
-                })
-            });
+            // Use Server-Sent Events for real-time progress
+            const url = new URL(`${API_URL}/chat-stream`);
+            url.searchParams.append('message', message);
+            url.searchParams.append('history', JSON.stringify(this.messageHistory));
 
-            const data = await response.json();
+            const eventSource = new EventSource(url.toString());
+            let finalResult = null;
 
-            // Remove thinking indicator
-            this.removeThinkingIndicator();
+            eventSource.onmessage = (event) => {
+                if (event.data === '[DONE]') {
+                    eventSource.close();
+                    this.removeThinkingIndicator();
 
-            if (data.success) {
-                // Add assistant response
-                this.addAssistantMessage(data.response);
+                    if (finalResult && finalResult.success) {
+                        // Add assistant response
+                        this.addAssistantMessage(finalResult.response);
 
-                // Update message history
-                this.messageHistory.push(
-                    { role: 'user', content: message },
-                    { role: 'assistant', content: data.response }
-                );
-            } else {
-                // Handle specific error cases
-                if (data.maintenanceMode) {
-                    this.showMaintenancePage();
-                } else if (data.needsPayment) {
-                    this.showError('Your credit balance is depleted. Please add more credits to continue chatting.');
-                } else if (data.needsSetup) {
-                    this.showError('The AI assistant is currently being set up. Please contact your administrator or try again later.');
-                } else {
-                    this.showError(data.message || 'Failed to get response');
+                        // Update message history
+                        this.messageHistory.push(
+                            { role: 'user', content: message },
+                            { role: 'assistant', content: finalResult.response }
+                        );
+                    }
+
+                    this.isStreaming = false;
+                    this.elements.sendBtn.disabled = false;
+                    this.elements.chatInput.focus();
+                    return;
                 }
-            }
+
+                try {
+                    const data = JSON.parse(event.data);
+
+                    if (data.type === 'progress') {
+                        // Update thinking indicator with progress
+                        this.updateThinkingIndicator(data.message, data.progress);
+                    } else if (data.type === 'result') {
+                        // Store final result
+                        finalResult = data;
+                    } else if (data.type === 'error') {
+                        eventSource.close();
+                        this.removeThinkingIndicator();
+                        this.showError(data.message || 'Failed to get response');
+                        this.isStreaming = false;
+                        this.elements.sendBtn.disabled = false;
+                        this.elements.chatInput.focus();
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing SSE data:', parseError);
+                }
+            };
+
+            eventSource.onerror = (error) => {
+                console.error('SSE error:', error);
+                eventSource.close();
+                this.removeThinkingIndicator();
+                this.showError('Connection lost. Please try again.');
+                this.isStreaming = false;
+                this.elements.sendBtn.disabled = false;
+                this.elements.chatInput.focus();
+            };
+
         } catch (error) {
             console.error('Chat error:', error);
             this.removeThinkingIndicator();
-
-            // Try to parse error response
-            if (error.message && error.message.includes('503')) {
-                this.showError('The AI assistant is currently unavailable. Please contact your administrator.');
-            } else {
-                this.showError('Failed to connect to AI assistant. Please check your connection and try again.');
-            }
-        } finally {
+            this.showError('Failed to connect to AI assistant. Please check your connection and try again.');
             this.isStreaming = false;
             this.elements.sendBtn.disabled = false;
             this.elements.chatInput.focus();
@@ -210,15 +227,40 @@ class PortfolioChat {
             </div>
             <div class="chat-message-content">
                 <div class="thinking-indicator">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" class="thinking-spinner">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
-                    <span>Thinking...</span>
+                    <div class="thinking-content">
+                        <span class="thinking-status">Starting AI pipeline...</span>
+                        <div class="thinking-progress">
+                            <div class="thinking-progress-bar" style="width: 0%"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         `;
 
         this.elements.chatMessages.appendChild(thinkingEl);
+        this.scrollToBottom();
+    }
+
+    updateThinkingIndicator(message, progress = 0) {
+        if (!this.currentThinkingId) return;
+
+        const thinkingEl = document.getElementById(this.currentThinkingId);
+        if (!thinkingEl) return;
+
+        const statusEl = thinkingEl.querySelector('.thinking-status');
+        const progressBar = thinkingEl.querySelector('.thinking-progress-bar');
+
+        if (statusEl) {
+            statusEl.textContent = message;
+        }
+
+        if (progressBar) {
+            progressBar.style.width = `${progress}%`;
+        }
+
         this.scrollToBottom();
     }
 

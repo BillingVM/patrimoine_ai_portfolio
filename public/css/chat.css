@@ -192,21 +192,25 @@
 /* Thinking Indicator */
 .thinking-indicator {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem 1.25rem;
     background: var(--bg-tertiary);
     border: 1px solid var(--border-primary);
     border-radius: 12px;
     width: fit-content;
+    min-width: 300px;
+    max-width: 500px;
     margin-bottom: 1rem;
 }
 
-.thinking-indicator svg {
+.thinking-spinner {
     width: 18px;
     height: 18px;
     color: var(--accent-blue);
     animation: spin 1s linear infinite;
+    flex-shrink: 0;
+    margin-top: 2px;
 }
 
 @keyframes spin {
@@ -218,9 +222,37 @@
     }
 }
 
-.thinking-indicator span {
+.thinking-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+    min-width: 0;
+}
+
+.thinking-status {
     font-size: 0.875rem;
     color: var(--text-muted);
+    font-weight: 500;
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.thinking-progress {
+    width: 100%;
+    height: 4px;
+    background: var(--bg-primary);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.thinking-progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent-blue) 0%, #2563eb 100%);
+    transition: width 0.3s ease;
+    border-radius: 2px;
 }
 
 /* Chat Input Container */

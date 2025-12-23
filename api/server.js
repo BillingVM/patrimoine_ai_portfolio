@@ -22,6 +22,7 @@ const credits = require('./credits');
 const FinancialDatasetsAPI = require('./financialDatasets');
 const ModelManager = require('./modelManager');
 const EnhancedChatHandler = require('./enhancedChat');
+const EnhancedChatWithProgress = require('./enhancedChatWithProgress');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -422,6 +423,74 @@ app.post('/api/chat', async (req, res) => {
       error: 'Failed to get response from AI',
       message: error.message
     });
+  }
+});
+
+/**
+ * GET /api/chat-stream
+ * Chat with AI assistant with Server-Sent Events for real-time progress
+ */
+app.get('/api/chat-stream', async (req, res) => {
+  try {
+    const { message, history } = req.query;
+    const userId = 1; // Demo user
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    // Parse history from JSON string
+    const parsedHistory = history ? JSON.parse(history) : [];
+
+    // Check credits balance
+    const hasCredits = await credits.hasCredits(userId);
+    const balance = await credits.getBalance(userId);
+
+    if (!hasCredits) {
+      return res.status(402).json({
+        error: 'Insufficient credits',
+        message: 'Your credit balance is depleted. Please add more credits to continue.',
+        balance: balance,
+        needsPayment: true
+      });
+    }
+
+    // Set SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+
+    // Create progress-enabled chat handler
+    const chatWithProgress = new EnhancedChatWithProgress();
+
+    // Listen to progress events and send to client
+    chatWithProgress.on('progress', (data) => {
+      res.write(`data: ${JSON.stringify({ type: 'progress', ...data })}\n\n`);
+    });
+
+    // Process message
+    const result = await chatWithProgress.processMessageWithProgress(
+      message,
+      parsedHistory,
+      userId
+    );
+
+    // Send final result
+    res.write(`data: ${JSON.stringify({ type: 'result', ...result })}\n\n`);
+    res.write('data: [DONE]\n\n');
+    res.end();
+
+  } catch (error) {
+    console.error('❌ Chat stream error:', error);
+
+    // Send error event
+    res.write(`data: ${JSON.stringify({
+      type: 'error',
+      message: error.message,
+      error: true
+    })}\n\n`);
+    res.end();
   }
 });
 
