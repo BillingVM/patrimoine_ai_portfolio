@@ -870,3 +870,53 @@ body {
 .stat-card:has(.stat-content:only-child) {
   justify-content: center;
 }
+
+/* ==================== PORTFOLIO DROP ZONE ==================== */
+.portfolio-drop-zone {
+    margin: 1.5rem 0;
+    padding: 2.5rem 2rem;
+    border: 2px dashed var(--border-primary);
+    border-radius: 12px;
+    background: var(--bg-tertiary);
+    text-align: center;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.portfolio-drop-zone:hover {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.05);
+}
+
+.portfolio-drop-zone.drag-over {
+    border-color: var(--accent-blue);
+    background: rgba(59, 130, 246, 0.1);
+    transform: scale(1.02);
+}
+
+.portfolio-drop-zone svg {
+    color: var(--accent-blue);
+    margin-bottom: 1rem;
+}
+
+.portfolio-drop-zone h4 {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0 0 0.5rem 0;
+}
+
+.portfolio-drop-zone p {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+    margin: 0 0 0.75rem 0;
+}
+
+.drop-zone-hint {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--text-tertiary);
+    padding: 0.375rem 0.75rem;
+    background: var(--bg-secondary);
+    border-radius: 6px;
+}

@@ -31,6 +31,7 @@ const selectFileBtn = document.getElementById('selectFileBtn');
 const fileInput = document.getElementById('fileInput');
 const uploadSection = document.getElementById('uploadSection');
 const uploadProgress = document.getElementById('uploadProgress');
+const portfolioDropZone = document.getElementById('portfolioDropZone');
 const toast = document.getElementById('toast');
 
 // Load client data on page load
@@ -57,7 +58,7 @@ selectFileBtn.addEventListener('click', () => {
 
 fileInput.addEventListener('change', handleFileUpload);
 
-// Drag and drop
+// Drag and drop - Modal upload section
 uploadSection.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadSection.classList.add('drag-over');
@@ -75,6 +76,38 @@ uploadSection.addEventListener('drop', (e) => {
         handleFileUpload();
     }
 });
+
+// Drag and drop - Portfolio drop zone on main page
+if (portfolioDropZone) {
+    // Click to upload
+    portfolioDropZone.addEventListener('click', () => {
+        uploadModal.classList.add('show');
+    });
+
+    // Drag over
+    portfolioDropZone.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        portfolioDropZone.classList.add('drag-over');
+    });
+
+    // Drag leave
+    portfolioDropZone.addEventListener('dragleave', (e) => {
+        if (e.target === portfolioDropZone) {
+            portfolioDropZone.classList.remove('drag-over');
+        }
+    });
+
+    // Drop
+    portfolioDropZone.addEventListener('drop', (e) => {
+        e.preventDefault();
+        portfolioDropZone.classList.remove('drag-over');
+
+        if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileUpload();
+        }
+    });
+}
 
 /**
  * Load client data

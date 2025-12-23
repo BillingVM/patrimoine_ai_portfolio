@@ -97,6 +97,16 @@
                     <button class="btn btn-primary btn-sm" id="uploadPortfolioBtn">+ Upload Portfolio</button>
                 </div>
 
+                <!-- Drag & Drop Upload Area -->
+                <div class="portfolio-drop-zone" id="portfolioDropZone">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="40" height="40">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                    </svg>
+                    <h4>Drop portfolio files here</h4>
+                    <p>or click Upload Portfolio button</p>
+                    <span class="drop-zone-hint">CSV, Excel, PDF, JSON supported</span>
+                </div>
+
                 <div class="portfolios-grid" id="portfoliosGrid">
                     <div class="empty-state">
                         <div class="loading-spinner"></div>
