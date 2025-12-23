@@ -187,10 +187,40 @@ async function getUserSummary(userId = 1) {
   };
 }
 
+/**
+ * Track system token usage (not charged to user)
+ * This is for infrastructure overhead: intent classification, SPA generation, etc.
+ */
+async function trackSystemUsage(userId = 1, tokens, description) {
+  try {
+    // Log system usage for monitoring, but don't deduct from user balance
+    console.log(`🔧 System overhead: ${tokens} tokens (${description}) - NOT charged to user ${userId}`);
+
+    // Optionally record in a separate system_usage table if needed for analytics
+    // For now, just log it
+
+    return { tracked: tokens, description };
+  } catch (error) {
+    console.error('❌ Error tracking system usage:', error.message);
+    return { tracked: 0, error: error.message };
+  }
+}
+
+/**
+ * Deduct credits only for user-facing AI responses
+ * System overhead (intent classification, SPA, data gathering) is NOT charged
+ */
+async function deductUserCredits(userId = 1, tokens, description, reportId = null, portfolioId = null) {
+  console.log(`💳 Charging user ${userId}: ${tokens} tokens (${description})`);
+  return deductCredits(userId, tokens, description, reportId, portfolioId);
+}
+
 module.exports = {
   getBalance,
   addCredits,
   deductCredits,
+  deductUserCredits,      // NEW: Explicitly for user-facing AI responses
+  trackSystemUsage,       // NEW: Track but don't charge system overhead
   hasCredits,
   getHistory,
   calculatePrice,

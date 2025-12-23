@@ -21,6 +21,7 @@ const { generateReport } = require('./ai');
 const credits = require('./credits');
 const FinancialDatasetsAPI = require('./financialDatasets');
 const ModelManager = require('./modelManager');
+const EnhancedChatHandler = require('./enhancedChat');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -66,6 +67,9 @@ if (domain) {
 
 // Initialize Model Manager (Round-robin with fallback)
 const modelManager = new ModelManager();
+
+// Initialize Enhanced Chat Handler (Multi-agent AI system)
+const enhancedChat = new EnhancedChatHandler();
 
 // Middleware
 app.use(cors());
@@ -395,205 +399,10 @@ app.post('/api/chat', async (req, res) => {
     console.log(`💬 Chat message from user: ${message.substring(0, 50)}...`);
     console.log(`💰 Current balance: ${balance} credits`);
 
-    // Check if OpenRouter API key is configured
-    if (!process.env.OPENROUTER_API_KEY) {
-      return res.status(503).json({
-        error: 'AI service not configured',
-        message: 'The AI assistant is not currently available. Please contact support.',
-        needsSetup: true
-      });
-    }
+    // ==================== USE ENHANCED CHAT HANDLER ====================
+    const result = await enhancedChat.processMessage(message, history, userId);
 
-    // Initialize Financial Datasets API
-    const financialAPI = new FinancialDatasetsAPI(modelManager.getFinancialAPIKey());
-
-    // Convert Financial Datasets tools to OpenAI function format
-    const toolDefinitions = financialAPI.getToolDefinitions();
-    const tools = toolDefinitions.map(tool => ({
-      type: 'function',
-      function: {
-        name: tool.name,
-        description: tool.description,
-        parameters: {
-          type: 'object',
-          properties: Object.entries(tool.parameters).reduce((acc, [key, value]) => {
-            acc[key] = {
-              type: 'string',
-              description: value
-            };
-            return acc;
-          }, {}),
-          required: ['ticker']
-        }
-      }
-    }));
-
-    // Build messages array for OpenRouter
-    let messages = [
-      {
-        role: 'system',
-        content: `You are a professional financial AI assistant for Portfolio AI platform with access to real-time financial data for 30,000+ tickers.
-
-You help users with:
-- Portfolio analysis and real-time market insights
-- Client management advice
-- Financial market information with live data
-- Investment strategies and recommendations
-
-CRITICAL INSTRUCTIONS:
-When users ask about specific stocks, companies, or financial data:
-1. Use the available tools to fetch real-time data
-2. After receiving ALL tool results, you MUST provide a complete analysis
-3. Include specific numbers, percentages, and recent trends from the data
-4. Cite recent news or market events when relevant
-
-IMPORTANT:
-- NEVER stop after saying "Let me fetch..." - always complete your analysis
-- After using tools, ALWAYS provide your final insights and recommendations
-- Do NOT request the same tool multiple times unless the first attempt failed
-- Provide comprehensive responses with all available data
-
-Provide helpful, accurate, and professional responses. Keep answers clear and actionable.`
-      },
-      // Add conversation history
-      ...history,
-      // Add current user message
-      { role: 'user', content: message }
-    ];
-
-    // Check if any models are available
-    if (!modelManager.hasAvailableModels()) {
-      return res.status(503).json({
-        success: false,
-        error: 'MAINTENANCE_MODE',
-        message: 'All AI models are currently unavailable. Please try again later.',
-        maintenanceMode: true
-      });
-    }
-
-    // Multi-round tool calling loop
-    let allMessages = [];
-    let currentResponse = await modelManager.callModel(messages, tools);
-    let usedTools = [];
-    let maxRounds = 5; // Prevent infinite loops
-    let roundCount = 0;
-
-    // Keep calling AI until it stops requesting tools or hits max rounds
-    while (currentResponse.tool_calls && currentResponse.tool_calls.length > 0 && roundCount < maxRounds) {
-      roundCount++;
-      console.log(`🔧 Round ${roundCount}: AI requesting ${currentResponse.tool_calls.length} tool calls...`);
-
-      // Capture any message content from this round
-      if (currentResponse.content) {
-        allMessages.push(currentResponse.content);
-      }
-
-      // Add assistant's tool request to messages
-      messages.push({
-        role: 'assistant',
-        content: currentResponse.content,
-        tool_calls: currentResponse.tool_calls
-      });
-
-      // Track which tools were used
-      currentResponse.tool_calls.forEach(tc => {
-        if (!usedTools.includes(tc.function.name)) {
-          usedTools.push(tc.function.name);
-        }
-      });
-
-      // Execute all tool calls for this round
-      for (const toolCall of currentResponse.tool_calls) {
-        console.log(`📊 Executing tool: ${toolCall.function.name}`);
-
-        try {
-          const toolResult = await financialAPI.executeToolCall(
-            toolCall.function.name,
-            JSON.parse(toolCall.function.arguments)
-          );
-
-          messages.push({
-            role: 'tool',
-            tool_call_id: toolCall.id,
-            content: JSON.stringify(toolResult)
-          });
-        } catch (toolError) {
-          console.error(`❌ Tool execution error for ${toolCall.function.name}:`, toolError.message);
-          // Add error result to messages so AI can handle it
-          messages.push({
-            role: 'tool',
-            tool_call_id: toolCall.id,
-            content: JSON.stringify({
-              error: true,
-              message: toolError.message,
-              note: 'This tool encountered an error. Please provide analysis without this data or suggest alternatives.'
-            })
-          });
-        }
-      }
-
-      // Get next AI response (might request more tools or give final answer)
-      currentResponse = await modelManager.callModel(messages, tools);
-    }
-
-    // Final response from AI (no more tool calls)
-    let finalMessage = currentResponse.content || '';
-
-    console.log(`📝 Final message length: ${finalMessage ? finalMessage.length : 0} chars`);
-    console.log(`📝 Intermediate messages: ${allMessages.length}`);
-
-    // SAFEGUARD: If no final message after tool calls, force AI to provide analysis
-    if (usedTools.length > 0 && (!finalMessage || finalMessage.trim().length < 50)) {
-      console.log(`⚠️ No proper final response after using tools. Requesting analysis...`);
-
-      // Add a message to force the AI to provide analysis
-      messages.push({
-        role: 'user',
-        content: 'Based on the data you just gathered, please provide your complete analysis and recommendations now.'
-      });
-
-      // Get final response without tools (tool_choice: 'none')
-      currentResponse = await modelManager.callModel(messages, null);
-      finalMessage = currentResponse.content || 'I apologize, but I encountered an issue generating the analysis. Please try again.';
-
-      console.log(`✅ Forced final response: ${finalMessage.length} chars`);
-    }
-
-    // Combine all intermediate messages with final message
-    if (allMessages.length > 0) {
-      // Join all messages with newlines
-      const combinedMessage = [...allMessages, finalMessage].filter(m => m && m.trim()).join('\n\n');
-      finalMessage = combinedMessage;
-    }
-
-    // Count tokens in FINAL RESPONSE ONLY (fair billing)
-    const tokenCounter = require('./tokenCounter');
-    const tokensUsed = tokenCounter.countTokens(finalMessage);
-
-    // Deduct credits
-    const creditsResult = await credits.deductCredits(
-      userId,
-      tokensUsed,
-      `AI Chat: ${message.substring(0, 50)}...`,
-      null, // no report_id for chat
-      null  // no portfolio_id for chat
-    );
-
-    const resultMessage = usedTools.length > 0
-      ? `✅ Chat response generated (${roundCount} rounds, ${usedTools.length} tools used)`
-      : `✅ Chat response generated`;
-    console.log(resultMessage);
-    console.log(`💳 Deducted ${tokensUsed} credits. New balance: ${creditsResult.balance}`);
-
-    res.json({
-      success: true,
-      response: finalMessage,
-      tokensUsed: tokensUsed,
-      balance: creditsResult.balance,
-      hasCredits: creditsResult.balance > 0,
-      usedTools: usedTools.length > 0 ? usedTools : undefined,
-      rounds: roundCount > 0 ? roundCount : undefined
-    });
+    return res.json(result);
 
   } catch (error) {
     console.error('❌ Chat error:', error);
