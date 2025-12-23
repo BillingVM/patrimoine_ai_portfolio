@@ -20,6 +20,7 @@ const { parseFile } = require('./upload');
 const { generateReport } = require('./ai');
 const credits = require('./credits');
 const FinancialDatasetsAPI = require('./financialDatasets');
+const ModelManager = require('./modelManager');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -62,6 +63,9 @@ if (domain) {
   console.log('⚠️  Could not detect domain from path, using HTTP');
   server = http.createServer(app);
 }
+
+// Initialize Model Manager (Round-robin with fallback)
+const modelManager = new ModelManager();
 
 // Middleware
 app.use(cors());
@@ -401,7 +405,7 @@ app.post('/api/chat', async (req, res) => {
     }
 
     // Initialize Financial Datasets API
-    const financialAPI = new FinancialDatasetsAPI(process.env.FINANCIAL_DATASETS_API_KEY);
+    const financialAPI = new FinancialDatasetsAPI(modelManager.getFinancialAPIKey());
 
     // Convert Financial Datasets tools to OpenAI function format
     const toolDefinitions = financialAPI.getToolDefinitions();
@@ -457,9 +461,19 @@ Provide helpful, accurate, and professional responses. Keep answers clear and ac
       { role: 'user', content: message }
     ];
 
+    // Check if any models are available
+    if (!modelManager.hasAvailableModels()) {
+      return res.status(503).json({
+        success: false,
+        error: 'MAINTENANCE_MODE',
+        message: 'All AI models are currently unavailable. Please try again later.',
+        maintenanceMode: true
+      });
+    }
+
     // Multi-round tool calling loop
     let allMessages = [];
-    let currentResponse = await callOpenRouterChat(messages, tools);
+    let currentResponse = await modelManager.callModel(messages, tools);
     let usedTools = [];
     let maxRounds = 5; // Prevent infinite loops
     let roundCount = 0;
@@ -519,7 +533,7 @@ Provide helpful, accurate, and professional responses. Keep answers clear and ac
       }
 
       // Get next AI response (might request more tools or give final answer)
-      currentResponse = await callOpenRouterChat(messages, tools);
+      currentResponse = await modelManager.callModel(messages, tools);
     }
 
     // Final response from AI (no more tool calls)
@@ -539,7 +553,7 @@ Provide helpful, accurate, and professional responses. Keep answers clear and ac
       });
 
       // Get final response without tools (tool_choice: 'none')
-      currentResponse = await callOpenRouterChat(messages, null);
+      currentResponse = await modelManager.callModel(messages, null);
       finalMessage = currentResponse.content || 'I apologize, but I encountered an issue generating the analysis. Please try again.';
 
       console.log(`✅ Forced final response: ${finalMessage.length} chars`);
@@ -583,86 +597,52 @@ Provide helpful, accurate, and professional responses. Keep answers clear and ac
 
   } catch (error) {
     console.error('❌ Chat error:', error);
+
+    // Check if it's maintenance mode
+    if (error.message === 'MAINTENANCE_MODE') {
+      return res.status(503).json({
+        success: false,
+        error: 'MAINTENANCE_MODE',
+        message: 'All AI models are currently unavailable. Please try again later.',
+        maintenanceMode: true
+      });
+    }
+
     res.status(500).json({
+      success: false,
       error: 'Failed to get response from AI',
       message: error.message
     });
   }
 });
 
+// ==================== AI MODEL HEALTH ENDPOINTS ====================
+
 /**
- * Helper function to call OpenRouter API for chat with timeout
+ * GET /api/ai/health
+ * Get health status of all AI models
  */
-async function callOpenRouterChat(messages, tools) {
-  // Create AbortController for timeout
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 45000); // 45 second timeout
-
+app.get('/api/ai/health', (req, res) => {
   try {
-    // Build request body
-    const requestBody = {
-      model: process.env.AI_MODEL || 'xiaomi/mimo-v2-flash:free',
-      messages: messages,
-      max_tokens: 2000,
-      temperature: 0.7,
-    };
+    const healthStatus = modelManager.getHealthStatus();
+    const activeCount = healthStatus.filter(m => m.active).length;
 
-    // Only add tools if provided
-    if (tools && tools.length > 0) {
-      requestBody.tools = tools;
-      requestBody.tool_choice = 'auto';
-    }
-
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://sol.inoutconnect.com',
-        'X-Title': 'Portfolio AI Chat',
-      },
-      body: JSON.stringify(requestBody),
-      signal: controller.signal
+    res.json({
+      success: true,
+      totalModels: healthStatus.length,
+      activeModels: activeCount,
+      maintenanceMode: activeCount === 0,
+      models: healthStatus
     });
 
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`❌ OpenRouter API error (${response.status}):`, errorText);
-
-      // Check for authentication errors
-      if (response.status === 401) {
-        throw new Error('AI service authentication failed');
-      }
-
-      throw new Error(`OpenRouter API error (${response.status}): ${errorText}`);
-    }
-
-    const responseData = await response.json();
-
-    // Handle case where response might be incomplete
-    if (!responseData.choices || !responseData.choices[0]) {
-      throw new Error('Invalid response from AI service - no choices returned');
-    }
-
-    const message = responseData.choices[0].message;
-
-    return {
-      content: message.content || null,
-      tool_calls: message.tool_calls || null,
-      usage: responseData.usage
-    };
   } catch (error) {
-    clearTimeout(timeoutId);
-
-    if (error.name === 'AbortError') {
-      throw new Error('AI request timed out. Please try again with a simpler question.');
-    }
-
-    throw error;
+    console.error('❌ Error fetching AI health:', error);
+    res.status(500).json({
+      error: 'Failed to fetch AI health status',
+      message: error.message
+    });
   }
-}
+});
 
 // ==================== CREDITS ENDPOINTS ====================
 

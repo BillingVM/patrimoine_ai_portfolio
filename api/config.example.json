@@ -1,0 +1,92 @@
+{
+    "ai": {
+        "openrouter": {
+            "apiKey": "sk-or-v1-your-openrouter-api-key-here",
+            "models": [
+                {
+                    "name": "xiaomi/mimo-v2-flash:free",
+                    "displayName": "Xiaomi Mimo v2 Flash",
+                    "enabled": true,
+                    "price": {
+                        "inPrice": 0,
+                        "outPrice": 0
+                    },
+                    "apiKey": null
+                },
+                {
+                    "name": "meta-llama/llama-3.1-8b-instruct:free",
+                    "displayName": "Meta Llama 3.1 8B",
+                    "enabled": true,
+                    "price": {
+                        "inPrice": 0,
+                        "outPrice": 0
+                    },
+                    "apiKey": null
+                },
+                {
+                    "name": "google/gemma-2-9b-it:free",
+                    "displayName": "Google Gemma 2 9B",
+                    "enabled": true,
+                    "price": {
+                        "inPrice": 0,
+                        "outPrice": 0
+                    },
+                    "apiKey": null
+                },
+                {
+                    "name": "deepseek/deepseek-chat",
+                    "displayName": "DeepSeek Chat",
+                    "enabled": false,
+                    "price": {
+                        "inPrice": 0.27,
+                        "outPrice": 1.1
+                    },
+                    "apiKey": null
+                },
+                {
+                    "name": "qwen/qwen-2.5-72b-instruct",
+                    "displayName": "Qwen 2.5 72B",
+                    "enabled": false,
+                    "price": {
+                        "inPrice": 0.35,
+                        "outPrice": 0.4
+                    },
+                    "apiKey": null
+                }
+            ]
+        },
+        "deepseek": {
+            "enabled": false,
+            "apiKey": "",
+            "models": [
+                {
+                    "name": "deepseek-chat",
+                    "displayName": "DeepSeek Chat (Direct API)",
+                    "enabled": false,
+                    "price": {
+                        "inPrice": 0.14,
+                        "outPrice": 0.28
+                    }
+                }
+            ]
+        },
+        "qwen": {
+            "enabled": false,
+            "apiKey": "",
+            "models": [
+                {
+                    "name": "qwen-turbo",
+                    "displayName": "Qwen Turbo (Direct API)",
+                    "enabled": false,
+                    "price": {
+                        "inPrice": 0.3,
+                        "outPrice": 0.6
+                    }
+                }
+            ]
+        }
+    },
+    "financial": {
+        "financialDatasetsApiKey": "your-financial-datasets-api-key-here"
+    }
+}
