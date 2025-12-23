@@ -184,8 +184,18 @@ class PortfolioChat {
             </div>
             <div class="chat-message-content">
                 <div class="chat-message-text">${this.escapeHtml(text)}</div>
+                <button class="copy-button" title="Copy to clipboard">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Copy</span>
+                </button>
             </div>
         `;
+
+        // Add copy functionality
+        const copyBtn = messageEl.querySelector('.copy-button');
+        copyBtn.addEventListener('click', () => this.copyToClipboard(text, copyBtn));
 
         this.elements.chatMessages.appendChild(messageEl);
         this.scrollToBottom();
@@ -202,8 +212,18 @@ class PortfolioChat {
             </div>
             <div class="chat-message-content">
                 <div class="chat-message-text">${this.formatMessage(text)}</div>
+                <button class="copy-button" title="Copy to clipboard">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <span>Copy</span>
+                </button>
             </div>
         `;
+
+        // Add copy functionality
+        const copyBtn = messageEl.querySelector('.copy-button');
+        copyBtn.addEventListener('click', () => this.copyToClipboard(text, copyBtn));
 
         this.elements.chatMessages.appendChild(messageEl);
         this.scrollToBottom();
@@ -371,6 +391,49 @@ class PortfolioChat {
         const div = document.createElement('div');
         div.textContent = text;
         return div.innerHTML;
+    }
+
+    async copyToClipboard(text, button) {
+        try {
+            // Use Clipboard API to copy text
+            await navigator.clipboard.writeText(text);
+
+            // Store original button content
+            const originalHTML = button.innerHTML;
+
+            // Show success feedback
+            button.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Copied!</span>
+            `;
+            button.classList.add('copied');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove('copied');
+            }, 2000);
+        } catch (error) {
+            console.error('Failed to copy text:', error);
+
+            // Show error feedback
+            const originalHTML = button.innerHTML;
+            button.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span>Failed</span>
+            `;
+            button.classList.add('copy-failed');
+
+            // Reset button after 2 seconds
+            setTimeout(() => {
+                button.innerHTML = originalHTML;
+                button.classList.remove('copy-failed');
+            }, 2000);
+        }
     }
 }
 
