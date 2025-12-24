@@ -67,7 +67,7 @@ class UnifiedContextAnalyzer {
                 }]
             }, userId);
 
-            if (portfolioResolution.resolved) {
+            if (portfolioResolution.resolved && portfolioResolution.portfolios.length > 0) {
                 context.portfolio = portfolioResolution;
                 // Extract tickers from portfolio
                 const portfolioTickers = new Set();
@@ -80,14 +80,17 @@ class UnifiedContextAnalyzer {
                 }
                 context.entities = Array.from(portfolioTickers);
                 console.log(`   ✓ Explicit portfolio resolved: ${portfolioResolution.portfolios.length} portfolio(s)`);
-                console.log(`   ✓ Portfolio tickers: ${context.entities.join(', ')}`);
+                console.log(`   ✓ Portfolio tickers: ${context.entities.join(', ') || 'NONE (empty portfolio)'}`);
+
+                // CRITICAL: Force skip auto-detection for explicit portfolio
+                context.skipAutoDetection = true;
             } else {
-                console.log(`   ⚠️ Explicit portfolio ${explicitPortfolioId} not found. Falling back to auto-detection.`);
+                console.log(`   ⚠️ Explicit portfolio ${explicitPortfolioId} not found in database.`);
             }
         }
 
-        // Only do auto-detection if no explicit portfolio or explicit failed
-        if (!context.portfolio) {
+        // Only do auto-detection if no explicit portfolio AND not skipped
+        if (!context.portfolio && !context.skipAutoDetection) {
             console.log('   → No explicit portfolio. Running auto-detection...');
             const portfolioDetection = this.portfolioDetector.detect(message, history);
 

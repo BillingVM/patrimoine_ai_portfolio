@@ -127,8 +127,10 @@ class PortfolioResolver {
         case 'id':
           // Direct portfolio ID from conversation history
           const portfolioId = parseInt(identifier.value);
+          console.log(`   🔍 Looking for portfolio ID: ${portfolioId}`);
           if (!isNaN(portfolioId)) {
             const portfolio = await portfolioQueries.getPortfolioById(portfolioId, userId);
+            console.log(`   📊 Portfolio query result:`, portfolio ? `Found (ID: ${portfolio.id})` : 'NOT FOUND');
             if (portfolio) portfolios = [portfolio];
           }
           break;
