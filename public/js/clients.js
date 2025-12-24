@@ -412,3 +412,11 @@ function formatDate(dateString) {
     if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
     return date.toLocaleDateString();
 }
+
+/**
+ * Open chat history modal (called from sidebar)
+ * Redirects to chat page where full chat history modal exists
+ */
+function openChatHistoryModal() {
+    window.location.href = '/portai/public/chat.php?openHistory=1';
+}

@@ -460,3 +460,11 @@ function formatCurrency(amount) {
         maximumFractionDigits: 0
     }).format(amount);
 }
+
+/**
+ * Open chat history modal (called from sidebar)
+ * Redirects to chat page where full chat history modal exists
+ */
+function openChatHistoryModal() {
+    window.location.href = '/portai/public/chat.php?openHistory=1';
+}

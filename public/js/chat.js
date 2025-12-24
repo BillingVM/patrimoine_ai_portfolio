@@ -25,6 +25,7 @@ class PortfolioChat {
         this.checkPortfolioContext();
         this.loadChatHistory();
         this.checkPendingPrompt();
+        this.checkAutoOpenHistory();
     }
 
     initializeElements() {
@@ -217,6 +218,23 @@ class PortfolioChat {
             this.elements.chatInput.value = pendingPrompt;
             this.updateCharCount();
             this.sendMessage();
+        }
+    }
+
+    /**
+     * Check if chat history modal should auto-open (from other pages)
+     */
+    checkAutoOpenHistory() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('openHistory') === '1') {
+            // Remove the parameter from URL without reloading
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, '', newUrl);
+
+            // Open the modal after a short delay to ensure DOM is ready
+            setTimeout(() => {
+                this.openChatHistoryModal();
+            }, 100);
         }
     }
 

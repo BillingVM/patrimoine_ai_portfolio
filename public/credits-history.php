@@ -202,6 +202,16 @@
     $creditsWidgetJsVersion = file_exists($creditsWidgetJsFile) ? filemtime($creditsWidgetJsFile) : time();
     echo "<script src=\"/portai/public/js/credits-widget.js?v={$creditsWidgetJsVersion}\"></script>";
     ?>
+
+    <script>
+    /**
+     * Open chat history modal (called from sidebar)
+     * Redirects to chat page where full chat history modal exists
+     */
+    function openChatHistoryModal() {
+        window.location.href = '/portai/public/chat.php?openHistory=1';
+    }
+    </script>
     </main>
 </body>
 </html>
