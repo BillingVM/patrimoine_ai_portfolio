@@ -14,7 +14,8 @@ class PortfolioChat {
         this.userScrolledUp = false; // Track if user manually scrolled up
         this.currentFile = null; // Currently selected file
         this.currentFileData = null; // Uploaded file data (portfolioId, etc.)
-        this.portfolioId = null; // Portfolio ID from URL parameter
+        this.portfolioId = null; // Current portfolio ID (can be from URL, session, or upload)
+        this.urlPortfolioId = null; // Portfolio ID from URL parameter (NEVER overwritten)
         this.portfolioData = null; // Portfolio and client data
         this.currentSessionId = null; // Current chat session ID
         this.isLoadingSession = false; // Flag to prevent double-saving when loading
@@ -147,7 +148,12 @@ class PortfolioChat {
     async checkPortfolioContext() {
         const urlParams = new URLSearchParams(window.location.search);
         // Support both 'portfolio' and 'portfolio_id' parameter names
-        this.portfolioId = urlParams.get('portfolio') || urlParams.get('portfolio_id');
+        const urlPortfolioId = urlParams.get('portfolio') || urlParams.get('portfolio_id');
+
+        if (urlPortfolioId) {
+            this.portfolioId = urlPortfolioId;
+            this.urlPortfolioId = urlPortfolioId; // Store separately to prevent overwriting
+        }
 
         if (!this.portfolioId) return;
 
@@ -254,11 +260,11 @@ class PortfolioChat {
             url.searchParams.append('message', messageText);
             url.searchParams.append('history', JSON.stringify(this.messageHistory));
 
-            // Include portfolio context if available (from URL or uploaded file)
-            const portfolioId = this.portfolioId || (this.currentFileData ? this.currentFileData.portfolioId : null);
+            // Include portfolio context if available (URL parameter takes priority)
+            const portfolioId = this.urlPortfolioId || this.portfolioId || (this.currentFileData ? this.currentFileData.portfolioId : null);
             if (portfolioId) {
                 url.searchParams.append('portfolio_id', portfolioId);
-                console.log(`📎 Including portfolio_id=${portfolioId} in request`);
+                console.log(`📎 Including portfolio_id=${portfolioId} in request (URL: ${this.urlPortfolioId}, Current: ${this.portfolioId})`);
             }
 
             const eventSource = new EventSource(url.toString());
@@ -1461,8 +1467,8 @@ class PortfolioChat {
                 this.messageHistory = [];
                 this.currentSessionId = session.id;
 
-                // Set portfolio context if session has one
-                if (session.portfolio_id) {
+                // Set portfolio context if session has one (but don't overwrite URL parameter)
+                if (session.portfolio_id && !this.urlPortfolioId) {
                     this.portfolioId = session.portfolio_id;
                 }
 
