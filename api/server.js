@@ -695,7 +695,7 @@ app.post('/api/chat', async (req, res) => {
  */
 app.get('/api/chat-stream', async (req, res) => {
   try {
-    const { message, history, portfolio_id } = req.query;
+    const { message, history, portfolio_id, session_id } = req.query;
     const userId = 1; // Demo user
 
     if (!message) {
@@ -704,6 +704,9 @@ app.get('/api/chat-stream', async (req, res) => {
 
     // Parse history from JSON string
     const parsedHistory = history ? JSON.parse(history) : [];
+
+    // Parse session_id if provided
+    const sessionId = session_id ? parseInt(session_id) : null;
 
     // Setup SSE headers
     res.setHeader('Content-Type', 'text/event-stream');
@@ -801,11 +804,13 @@ app.get('/api/chat-stream', async (req, res) => {
 
     // Process message with enhanced context
     // CRITICAL: Pass portfolio_id to ensure we use the EXACT portfolio from URL
+    // CRITICAL: Pass session_id to enable session state persistence
     const result = await chatWithProgress.processMessageWithProgress(
       enhancedMessage,
       parsedHistory,
       userId,
-      portfolio_id ? parseInt(portfolio_id) : null  // Pass explicit portfolio ID
+      portfolio_id ? parseInt(portfolio_id) : null,  // Pass explicit portfolio ID
+      sessionId  // Pass session ID for state persistence
     );
 
     // Send final result

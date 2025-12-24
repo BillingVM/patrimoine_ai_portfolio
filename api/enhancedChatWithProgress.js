@@ -5,11 +5,14 @@
 
 const { EventEmitter } = require('events');
 const EnhancedChatHandler = require('./enhancedChat');
+const SessionStateManager = require('./sessionStateManager');
+const chatSessions = require('./chatSessions');
 
 class EnhancedChatWithProgress extends EventEmitter {
     constructor() {
         super();
         this.chatHandler = new EnhancedChatHandler();
+        this.sessionStateManager = new SessionStateManager();
     }
 
     /**
@@ -18,9 +21,10 @@ class EnhancedChatWithProgress extends EventEmitter {
      * @param {Array} history - Conversation history
      * @param {number} userId - User ID
      * @param {number} explicitPortfolioId - Explicit portfolio ID from URL (optional)
+     * @param {number} sessionId - Session ID for state persistence (optional)
      * @returns {Promise<Object>} Enhanced response
      */
-    async processMessageWithProgress(userMessage, history = [], userId = 1, explicitPortfolioId = null) {
+    async processMessageWithProgress(userMessage, history = [], userId = 1, explicitPortfolioId = null, sessionId = null) {
         console.log('\n' + '='.repeat(80));
         console.log('🚀 ENHANCED CHAT WITH PROGRESS - STARTED');
         console.log('='.repeat(80));
@@ -30,6 +34,9 @@ class EnhancedChatWithProgress extends EventEmitter {
         if (explicitPortfolioId) {
             console.log(`📎 Explicit Portfolio ID from URL: ${explicitPortfolioId}`);
         }
+        if (sessionId) {
+            console.log(`💾 Session ID: ${sessionId}`);
+        }
 
         const pipeline = {
             startTime: Date.now(),
@@ -37,6 +44,16 @@ class EnhancedChatWithProgress extends EventEmitter {
         };
 
         try {
+            // Load session state
+            let sessionState = {};
+            if (sessionId) {
+                console.log(`\n📦 Loading session state for session #${sessionId}`);
+                sessionState = await chatSessions.getSessionState(sessionId);
+                this.sessionStateManager.logState(sessionState);
+            } else {
+                console.log('\n📦 No session ID - starting fresh state');
+                sessionState = this.sessionStateManager.initializeState();
+            }
             console.log('\n📤 Emitting: start progress (0%)');
             this.emit('progress', {
                 stage: 'start',
@@ -132,9 +149,17 @@ class EnhancedChatWithProgress extends EventEmitter {
 
             const gatherStart = Date.now();
             console.log('🔍 Calling dataGatherer.gatherData()...');
-            const gatheredData = await this.chatHandler.dataGatherer.gatherData(unifiedContext, userMessage);
+            const gatheredData = await this.chatHandler.dataGatherer.gatherData(unifiedContext, userMessage, sessionState, this.sessionStateManager);
             console.log(`✅ Data gathering complete`);
             console.log(`   - Data keys:`, Object.keys(gatheredData));
+
+            // Update session state with fresh data
+            if (gatheredData.prices) {
+                this.sessionStateManager.updatePrices(sessionState, gatheredData.prices);
+            }
+            if (gatheredData.fundamentals) {
+                this.sessionStateManager.updateFundamentals(sessionState, gatheredData.fundamentals);
+            }
 
             pipeline.stages.dataGathering = {
                 duration: Date.now() - gatherStart,
@@ -166,7 +191,9 @@ class EnhancedChatWithProgress extends EventEmitter {
                 userMessage,
                 unifiedContext.intent,
                 gatheredData,
-                unifiedContext.portfolio
+                unifiedContext.portfolio,
+                sessionState,
+                this.sessionStateManager
             );
             console.log(`✅ SPA generation complete`);
             console.log(`   - SPA used: ${superPrompt.spaName || superPrompt.combinedFrom || superPrompt.metadata?.spa || 'unknown'}`);
@@ -263,6 +290,13 @@ class EnhancedChatWithProgress extends EventEmitter {
             );
             console.log(`✅ Credits deducted`);
             console.log(`   - New balance: ${creditsResult.balance}`);
+
+            // ==================== Save Session State ====================
+            if (sessionId) {
+                console.log(`\n💾 Saving session state for session #${sessionId}`);
+                await chatSessions.updateSessionState(sessionId, sessionState);
+                console.log('✅ Session state saved successfully');
+            }
 
             // ==================== Pipeline Complete ====================
             pipeline.totalDuration = Date.now() - pipeline.startTime;

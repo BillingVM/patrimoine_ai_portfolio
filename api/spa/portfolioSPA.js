@@ -27,9 +27,11 @@ class PortfolioSPA extends BaseSPA {
    * @param {Object} classification - Intent classification
    * @param {Object} gatheredData - Data from data gatherer
    * @param {Object} portfolioContext - Resolved portfolio data
+   * @param {Object} sessionState - Session state with timestamped data (optional)
+   * @param {Object} stateManager - SessionStateManager instance (optional)
    * @returns {Promise<Object>} Enhanced prompt
    */
-  async generate(userPrompt, classification, gatheredData, portfolioContext) {
+  async generate(userPrompt, classification, gatheredData, portfolioContext, sessionState = null, stateManager = null) {
     console.log(`📊 Portfolio SPA generating enhanced prompt...`);
     console.log(`   Action: ${portfolioContext.action}`);
     console.log(`   Scope: ${portfolioContext.scope}`);
@@ -48,7 +50,9 @@ class PortfolioSPA extends BaseSPA {
       userPrompt,
       portfolioContext,
       gatheredData,
-      classification
+      classification,
+      sessionState,
+      stateManager
     );
 
     return {
@@ -329,10 +333,18 @@ Provide thorough, professional portfolio analysis that helps the user make infor
   /**
    * Build enhanced user prompt with portfolio context
    */
-  buildEnhancedUserPrompt(userPrompt, portfolioContext, gatheredData, classification) {
+  buildEnhancedUserPrompt(userPrompt, portfolioContext, gatheredData, classification, sessionState = null, stateManager = null) {
     const { portfolios, scope, assetMentions, action } = portfolioContext;
 
     let enhancedPrompt = `## User Question\n${userPrompt}\n\n`;
+
+    // Add session state context if available
+    if (sessionState && stateManager && Object.keys(sessionState).length > 0) {
+      const sessionStateFormatted = stateManager.formatForPrompt(sessionState);
+      if (sessionStateFormatted) {
+        enhancedPrompt += sessionStateFormatted;
+      }
+    }
 
     // Add portfolio data
     enhancedPrompt += this.formatPortfolioData(portfolios, scope, assetMentions);

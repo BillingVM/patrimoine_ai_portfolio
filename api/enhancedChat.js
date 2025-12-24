@@ -12,6 +12,8 @@ const PortfolioContextDetector = require('./portfolioContextDetector');
 const PortfolioResolver = require('./portfolioResolver');
 const UnifiedContextAnalyzer = require('./unifiedContextAnalyzer');
 const ConversationDataExtractor = require('./conversationDataExtractor');
+const SessionStateManager = require('./sessionStateManager');
+const chatSessions = require('./chatSessions');
 const credits = require('./credits');
 
 class EnhancedChatHandler {
@@ -24,6 +26,7 @@ class EnhancedChatHandler {
         this.portfolioResolver = new PortfolioResolver();
         this.unifiedContextAnalyzer = new UnifiedContextAnalyzer();
         this.conversationDataExtractor = new ConversationDataExtractor();
+        this.sessionStateManager = new SessionStateManager();
 
         // Initialize data gatherer with config
         const config = this.modelManager.getConfig();
@@ -43,9 +46,10 @@ class EnhancedChatHandler {
      * @param {string} userMessage - User's message
      * @param {Array} history - Conversation history
      * @param {number} userId - User ID
+     * @param {number} sessionId - Chat session ID (for state persistence)
      * @returns {Promise<Object>} Enhanced response
      */
-    async processMessage(userMessage, history = [], userId = 1) {
+    async processMessage(userMessage, history = [], userId = 1, sessionId = null) {
         const pipeline = {
             startTime: Date.now(),
             stages: {}
@@ -55,6 +59,17 @@ class EnhancedChatHandler {
             console.log('\n' + '='.repeat(80));
             console.log('🚀 ENHANCED CHAT PIPELINE STARTED');
             console.log('='.repeat(80));
+
+            // ==================== LOAD SESSION STATE ====================
+            let sessionState = {};
+            if (sessionId) {
+                console.log(`\n📦 Loading session state for session #${sessionId}`);
+                sessionState = await chatSessions.getSessionState(sessionId);
+                this.sessionStateManager.logState(sessionState);
+            } else {
+                console.log('\n📦 No session ID - starting fresh state');
+                sessionState = this.sessionStateManager.initializeState();
+            }
 
             // ==================== STAGE 0: Follow-up Detection ====================
             console.log('\n🔍 STAGE 0: Follow-up Detection (FREE - Instant)');
@@ -131,31 +146,72 @@ class EnhancedChatHandler {
             // Track system overhead (not charged to user)
             await credits.trackSystemUsage(userId, 500, 'Intent classification');
 
-            // ==================== STAGE 1.5: Extract Data from Conversation History ====================
-            console.log('\n📚 STAGE 1.5: Conversation Data Extraction (System Cost - FREE for user)');
+            // ==================== STAGE 1.5: Build/Update Session State ====================
+            console.log('\n📚 STAGE 1.5: Session State Update (System Cost - FREE for user)');
             const extractStart = Date.now();
 
-            const conversationData = this.conversationDataExtractor.extract(history);
+            // If state is empty, extract from conversation history (first message or no session)
+            if (!sessionState.prices || Object.keys(sessionState.prices).length === 0) {
+                console.log('   → Empty state detected - extracting from conversation history');
+                const conversationData = this.conversationDataExtractor.extract(history);
 
-            pipeline.stages.conversationDataExtraction = {
+                // Build state from extracted data
+                if (conversationData.stockPrices && Object.keys(conversationData.stockPrices).length > 0) {
+                    const pricesForState = {};
+                    Object.entries(conversationData.stockPrices).forEach(([ticker, data]) => {
+                        pricesForState[ticker] = {
+                            price: data.price,
+                            source: 'conversation',
+                            confirmed: false
+                        };
+                    });
+                    this.sessionStateManager.updatePrices(sessionState, pricesForState);
+                }
+
+                if (conversationData.portfolioHoldings && Object.keys(conversationData.portfolioHoldings).length > 0) {
+                    const holdingsForState = {};
+                    Object.entries(conversationData.portfolioHoldings).forEach(([ticker, data]) => {
+                        holdingsForState[ticker] = {
+                            shares: data.shares,
+                            companyName: data.companyName,
+                            source: 'conversation',
+                            confirmed: false
+                        };
+                    });
+                    this.sessionStateManager.updateHoldings(sessionState, holdingsForState);
+                }
+
+                console.log(`   ✓ Built state from conversation: ${Object.keys(sessionState.prices || {}).length} prices, ${Object.keys(sessionState.holdings || {}).length} holdings`);
+            } else {
+                console.log('   ✓ Using existing session state');
+            }
+
+            pipeline.stages.sessionStateUpdate = {
                 duration: Date.now() - extractStart,
-                stockPricesFound: Object.keys(conversationData.stockPrices || {}).length,
-                holdingsFound: Object.keys(conversationData.portfolioHoldings || {}).length
+                pricesInState: Object.keys(sessionState.prices || {}).length,
+                holdingsInState: Object.keys(sessionState.holdings || {}).length
             };
-
-            console.log(`   ✓ Extracted ${Object.keys(conversationData.stockPrices || {}).length} stock prices from conversation`);
-            console.log(`   ✓ Extracted ${Object.keys(conversationData.portfolioHoldings || {}).length} holdings from conversation`);
 
             // ==================== STAGE 2: Data Gathering ====================
             console.log('\n📊 STAGE 2: Data Gathering (API costs - FREE for user)');
             const gatherStart = Date.now();
 
-            const gatheredData = await this.dataGatherer.gatherData(classification, userMessage, conversationData);
+            // Pass session state to data gatherer (contains known data with timestamps)
+            const gatheredData = await this.dataGatherer.gatherData(classification, userMessage, sessionState, this.sessionStateManager);
 
             pipeline.stages.dataGathering = {
                 duration: Date.now() - gatherStart,
                 sources: Object.keys(gatheredData).filter(k => k !== 'metadata')
             };
+
+            // Update session state with freshly gathered data
+            console.log('\n💾 Updating session state with fresh data');
+            if (gatheredData.prices) {
+                this.sessionStateManager.updatePrices(sessionState, gatheredData.prices);
+            }
+            if (gatheredData.fundamentals) {
+                this.sessionStateManager.updateFundamentals(sessionState, gatheredData.fundamentals);
+            }
 
             // ==================== STAGE 3: SPA Generation ====================
             console.log('\n🎯 STAGE 3: Super Prompt Generation (System Cost - FREE for user)');
@@ -165,7 +221,9 @@ class EnhancedChatHandler {
                 userMessage,
                 classification,
                 gatheredData,
-                portfolioContext  // Pass portfolio context to SPA
+                portfolioContext,  // Pass portfolio context to SPA
+                sessionState,      // Pass session state to SPA
+                this.sessionStateManager  // Pass state manager to SPA
             );
 
             pipeline.stages.spaGeneration = {
@@ -227,6 +285,13 @@ class EnhancedChatHandler {
             console.log(`   AI Response: ${pipeline.stages.aiResponse.duration}ms`);
             console.log(`   User Charged: ${tokensUsed} tokens`);
             console.log('='.repeat(80) + '\n');
+
+            // ==================== SAVE SESSION STATE ====================
+            if (sessionId) {
+                console.log(`\n💾 Saving session state for session #${sessionId}`);
+                await chatSessions.updateSessionState(sessionId, sessionState);
+                console.log('✅ Session state saved successfully');
+            }
 
             return {
                 success: true,

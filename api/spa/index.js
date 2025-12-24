@@ -30,9 +30,11 @@ class SPAOrchestrator {
      * @param {Object} classification - Intent classification
      * @param {Object} gatheredData - Data from all sources
      * @param {Object} portfolioContext - Resolved portfolio context (optional)
+     * @param {Object} sessionState - Session state with timestamped data (optional)
+     * @param {Object} stateManager - SessionStateManager instance (optional)
      * @returns {Promise<Object>} Enhanced prompt components
      */
-    async generateSuperPrompt(userPrompt, classification, gatheredData, portfolioContext = null) {
+    async generateSuperPrompt(userPrompt, classification, gatheredData, portfolioContext = null, sessionState = null, stateManager = null) {
         console.log('🎯 SPA Orchestrator: Generating super prompt for intents:', classification.intents);
 
         // PRIORITY: Check if Portfolio SPA should handle this
@@ -43,7 +45,9 @@ class SPAOrchestrator {
                     userPrompt,
                     classification,
                     gatheredData,
-                    portfolioContext
+                    portfolioContext,
+                    sessionState,
+                    stateManager
                 );
                 console.log('✅ Portfolio super prompt generated');
                 return result;
@@ -70,7 +74,7 @@ class SPAOrchestrator {
         // Fallback: if no specific SPA, use general approach
         if (selectedSPAs.length === 0) {
             console.log('   → Using general approach (no specialized SPA)');
-            return this.generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext);
+            return this.generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext, sessionState, stateManager);
         }
 
         // Generate prompts from all selected SPAs
@@ -99,7 +103,7 @@ class SPAOrchestrator {
     /**
      * Generate general prompt when no specific SPA matches
      */
-    generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext = null) {
+    generateGeneralPrompt(userPrompt, classification, gatheredData, portfolioContext = null, sessionState = null, stateManager = null) {
         const { entities } = classification;
 
         // Build a simple but effective general prompt
@@ -118,6 +122,14 @@ Guidelines:
 
         // Add data context to user prompt
         let enhancedUserPrompt = userPrompt;
+
+        // Add session state context if available
+        if (sessionState && stateManager && Object.keys(sessionState).length > 0) {
+            const sessionStateFormatted = stateManager.formatForPrompt(sessionState);
+            if (sessionStateFormatted) {
+                enhancedUserPrompt += sessionStateFormatted;
+            }
+        }
 
         if (gatheredData && Object.keys(gatheredData).length > 0) {
             enhancedUserPrompt += '\n\n## Available Market Data\n';

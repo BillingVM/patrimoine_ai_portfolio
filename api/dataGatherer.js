@@ -21,26 +21,48 @@ class DataGatherer {
      * Gather all relevant data based on unified context
      * @param {Object} context - Unified context from UnifiedContextAnalyzer
      * @param {string} userPrompt - Original user prompt
-     * @param {Object} knownData - Data from conversation history (optional)
+     * @param {Object} sessionState - Session state with timestamped data (optional)
+     * @param {Object} stateManager - SessionStateManager instance (optional)
      * @returns {Promise<Object>} Gathered data from all sources
      */
-    async gatherData(context, userPrompt, knownData = null) {
+    async gatherData(context, userPrompt, sessionState = null, stateManager = null) {
         console.log('📊 DataGatherer: Starting smart data collection...');
 
         const { entities, needsData, intent } = context;
         const startTime = Date.now();
 
-        // Filter out entities we already have data for
+        // Check which entities need fresh data based on timestamps
         let entitiesToFetch = entities;
-        if (knownData && knownData.stockPrices) {
-            const knownTickers = Object.keys(knownData.stockPrices);
-            const newEntities = entities.filter(e => !knownTickers.includes(e.toUpperCase()));
+        let knownPrices = {};
+        let knownHoldings = {};
 
-            if (newEntities.length < entities.length) {
-                console.log(`♻️ Using ${knownTickers.length} prices from conversation history`);
-                console.log(`   Known: ${knownTickers.join(', ')}`);
-                console.log(`   Fetching fresh: ${newEntities.length > 0 ? newEntities.join(', ') : 'none'}`);
-                entitiesToFetch = newEntities;
+        if (sessionState && stateManager) {
+            // Use StateManager to check staleness
+            const refreshNeeds = stateManager.getRefreshNeeds(sessionState, entities);
+
+            if (refreshNeeds.fresh.length > 0) {
+                console.log(`♻️ Using ${refreshNeeds.fresh.length} fresh prices from session state`);
+                console.log(`   Fresh: ${refreshNeeds.fresh.join(', ')}`);
+
+                // Extract fresh prices
+                refreshNeeds.fresh.forEach(ticker => {
+                    if (sessionState.prices && sessionState.prices[ticker]) {
+                        knownPrices[ticker] = sessionState.prices[ticker];
+                    }
+                });
+            }
+
+            if (refreshNeeds.stale.length > 0) {
+                console.log(`   ⚠️ Stale: ${refreshNeeds.stale.join(', ')} - will fetch fresh data`);
+                entitiesToFetch = refreshNeeds.stale;
+            } else {
+                console.log('   ✅ All data is fresh - no API calls needed');
+                entitiesToFetch = [];
+            }
+
+            // Extract holdings from session state
+            if (sessionState.holdings) {
+                knownHoldings = sessionState.holdings;
             }
         }
 
@@ -67,11 +89,12 @@ class DataGatherer {
 
         // Only fetch data if we have entities to fetch
         if (!entitiesToFetch || entitiesToFetch.length === 0) {
-            if (knownData && Object.keys(knownData.stockPrices || {}).length > 0) {
-                console.log('✅ All data available from conversation history, skipping API calls');
-                // Merge known data into gatheredData
-                gatheredData.prices = this.convertKnownDataToPrices(knownData.stockPrices);
-                gatheredData.metadata.fromConversation = true;
+            if (Object.keys(knownPrices).length > 0) {
+                console.log('✅ All data fresh in session state, skipping API calls');
+                // Convert session state prices to standard format
+                gatheredData.prices = this.convertSessionStateToPrices(knownPrices);
+                gatheredData.holdings = knownHoldings;
+                gatheredData.metadata.fromSessionState = true;
                 gatheredData.metadata.duration = Date.now() - startTime;
                 return gatheredData;
             } else {
@@ -175,22 +198,22 @@ class DataGatherer {
         // Execute all tasks in parallel
         await Promise.all(tasks);
 
-        // Merge known data from conversation with freshly fetched data
-        if (knownData && knownData.stockPrices && Object.keys(knownData.stockPrices).length > 0) {
-            gatheredData.prices = this.mergeKnownAndFreshPrices(
-                knownData.stockPrices,
+        // Merge fresh session state prices with newly fetched prices
+        if (Object.keys(knownPrices).length > 0) {
+            gatheredData.prices = this.mergeSessionStateAndFreshPrices(
+                knownPrices,
                 gatheredData.prices
             );
-            gatheredData.metadata.usedConversationData = true;
-            gatheredData.metadata.conversationTickers = Object.keys(knownData.stockPrices);
+            gatheredData.metadata.usedSessionState = true;
+            gatheredData.metadata.sessionStateTickers = Object.keys(knownPrices);
         }
 
-        // Preserve holdings from conversation
-        if (knownData && knownData.portfolioHoldings && Object.keys(knownData.portfolioHoldings).length > 0) {
-            gatheredData.holdings = knownData.portfolioHoldings;
-            console.log(`♻️ Preserved ${Object.keys(knownData.portfolioHoldings).length} holdings from conversation`);
-            Object.entries(knownData.portfolioHoldings).forEach(([ticker, data]) => {
-                console.log(`   ${ticker}: ${data.shares} shares`);
+        // Preserve holdings from session state
+        if (Object.keys(knownHoldings).length > 0) {
+            gatheredData.holdings = knownHoldings;
+            console.log(`♻️ Preserved ${Object.keys(knownHoldings).length} holdings from session state`);
+            Object.entries(knownHoldings).forEach(([ticker, data]) => {
+                console.log(`   ${ticker}: ${data.shares} shares (${data.source})`);
             });
         }
 
@@ -606,19 +629,22 @@ class DataGatherer {
     }
 
     /**
-     * Convert known data from conversation to prices format
-     * @param {Object} knownPrices - { AAPL: { price: 272.36, messageIndex: 1 } }
+     * Convert session state prices to standard format
+     * @param {Object} sessionStatePrices - { AAPL: { price: 272.36, timestamp: '...', source: 'api' } }
      * @returns {Object} Prices in standard format
      */
-    convertKnownDataToPrices(knownPrices) {
+    convertSessionStateToPrices(sessionStatePrices) {
         const prices = {};
 
-        for (const [ticker, data] of Object.entries(knownPrices)) {
+        for (const [ticker, data] of Object.entries(sessionStatePrices)) {
             prices[ticker] = {
                 ticker: ticker,
                 price: data.price,
-                source: 'conversation',
-                messageIndex: data.messageIndex
+                source: data.source || 'session_state',
+                timestamp: data.timestamp,
+                changePercent: data.changePercent,
+                fromSessionState: true,
+                confirmed: data.confirmed || false
             };
         }
 
@@ -626,51 +652,48 @@ class DataGatherer {
     }
 
     /**
-     * Merge known prices from conversation with fresh API data
-     * @param {Object} knownPrices - Prices from conversation history
-     * @param {Object} freshPrices - Fresh prices from API
+     * Merge session state prices with fresh API data
+     * @param {Object} sessionStatePrices - Prices from session state { AAPL: { price: 272.36, timestamp: '...', source: 'api' } }
+     * @param {Object} freshPrices - Fresh prices from API { AAPL: { price: 273.12, ... } }
      * @returns {Object} Merged prices with provenance
      */
-    mergeKnownAndFreshPrices(knownPrices, freshPrices) {
+    mergeSessionStateAndFreshPrices(sessionStatePrices, freshPrices) {
         const merged = {};
 
-        // Add all known prices first
-        for (const [ticker, data] of Object.entries(knownPrices)) {
+        // Add all session state prices first (these are fresh, not stale)
+        for (const [ticker, data] of Object.entries(sessionStatePrices)) {
             merged[ticker] = {
                 ticker: ticker,
                 price: data.price,
-                source: 'conversation',
-                messageIndex: data.messageIndex,
-                preserved: true
+                source: data.source || 'session_state',
+                timestamp: data.timestamp,
+                changePercent: data.changePercent,
+                fromSessionState: true,
+                confirmed: data.confirmed || false
             };
         }
 
-        // Merge or update with fresh prices
+        // Merge or update with freshly fetched prices
         if (freshPrices) {
             for (const [ticker, data] of Object.entries(freshPrices)) {
                 if (merged[ticker]) {
-                    // We have both - check if price changed
+                    // We have both - this shouldn't happen often since we only fetch stale data
+                    // But if it does, fresh API data takes precedence
                     const oldPrice = merged[ticker].price;
                     const newPrice = data.price;
 
-                    if (Math.abs(oldPrice - newPrice) > 0.01) {
-                        merged[ticker] = {
-                            ticker: ticker,
-                            price: newPrice,
-                            previousPrice: oldPrice,
-                            source: 'updated',
-                            change: newPrice - oldPrice,
-                            changePercent: ((newPrice - oldPrice) / oldPrice * 100).toFixed(2),
-                            updated: true
-                        };
-                        console.log(`   📊 ${ticker}: $${oldPrice} → $${newPrice} (${merged[ticker].changePercent}%)`);
-                    } else {
-                        // Price confirmed, no change
-                        merged[ticker].source = 'confirmed';
-                        merged[ticker].confirmed = true;
-                    }
+                    merged[ticker] = {
+                        ...data,
+                        previousPrice: oldPrice,
+                        previousTimestamp: merged[ticker].timestamp,
+                        source: 'updated',
+                        change: newPrice - oldPrice,
+                        changePercent: ((newPrice - oldPrice) / oldPrice * 100).toFixed(2),
+                        updated: true
+                    };
+                    console.log(`   📊 ${ticker}: $${oldPrice} → $${newPrice} (${merged[ticker].changePercent}%)`);
                 } else {
-                    // New ticker from API
+                    // New ticker from API (was stale or missing)
                     merged[ticker] = {
                         ...data,
                         source: 'api',
