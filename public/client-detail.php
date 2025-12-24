@@ -104,7 +104,7 @@
                     </svg>
                     <h4>Drop portfolio files here</h4>
                     <p>or click Upload Portfolio button</p>
-                    <span class="drop-zone-hint">CSV, Excel, PDF, JSON supported</span>
+                    <span class="drop-zone-hint">CSV, Excel, PDF, JSON, Images, Word, TXT supported</span>
                 </div>
 
                 <div class="portfolios-grid" id="portfoliosGrid">
@@ -118,7 +118,7 @@
     </main>
 
     <!-- Upload Portfolio Modal -->
-    <div class="modal" id="uploadModal" style="display: none;">
+    <div class="modal" id="uploadModal">
         <div class="modal-content">
             <div class="modal-header">
                 <h2>Upload Portfolio</h2>
@@ -128,8 +128,8 @@
                 <form id="uploadForm">
                     <div class="upload-section" id="uploadSection">
                         <h3>Drop portfolio file here</h3>
-                        <p>Supported: CSV, Excel, PDF, JSON</p>
-                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.json">
+                        <p>Supported: CSV, Excel, PDF, JSON, Images (JPG/PNG)</p>
+                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.json,.jpg,.jpeg,.png,.docx,.doc,.txt">
                         <button type="button" class="btn btn-primary" id="selectFileBtn">Select File</button>
                     </div>
                     <div id="uploadProgress" style="display: none;">

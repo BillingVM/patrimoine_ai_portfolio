@@ -91,6 +91,50 @@ class FinancialDatasetsAPI {
   }
 
   // Market Data
+  async getStockPrice(ticker) {
+    // Get latest price (current/most recent price point)
+    const end_date = new Date().toISOString().split('T')[0];
+    const start_date = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0]; // Last 7 days
+
+    const data = await this.request('/prices', {
+      ticker,
+      interval: 'day',
+      interval_multiplier: 1,
+      start_date,
+      end_date,
+      limit: 10
+    });
+
+    if (!data || !data.prices || data.prices.length === 0) {
+      return null;
+    }
+
+    // Get the most recent price
+    const latest = data.prices[data.prices.length - 1];
+
+    // Calculate change from previous day if available
+    let change = null;
+    let changePercent = null;
+    if (data.prices.length >= 2) {
+      const previous = data.prices[data.prices.length - 2];
+      change = latest.close - previous.close;
+      changePercent = ((change / previous.close) * 100).toFixed(2);
+    }
+
+    return {
+      ticker: ticker,
+      price: latest.close,
+      open: latest.open,
+      high: latest.high,
+      low: latest.low,
+      volume: latest.volume,
+      date: latest.time,
+      change: change,
+      changePercent: changePercent,
+      timestamp: new Date().toISOString()
+    };
+  }
+
   async getStockPrices(ticker, interval = 'day', interval_multiplier = 1, limit = 100) {
     // Calculate date range (default: last 100 days for daily, adjust for other intervals)
     const end_date = new Date().toISOString().split('T')[0]; // Today (YYYY-MM-DD)

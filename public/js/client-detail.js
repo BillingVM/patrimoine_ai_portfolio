@@ -166,14 +166,19 @@ async function loadPortfolios() {
             </div>
         `;
 
-        // For now, show empty state
-        // TODO: Implement client-specific portfolios API endpoint
-        portfoliosGrid.innerHTML = `
-            <div class="empty-state">
-                <h3>No portfolios yet</h3>
-                <p>Upload the first portfolio for this client</p>
-            </div>
-        `;
+        const response = await fetch(`${window.API_BASE}/clients/${clientId}/portfolios`);
+        const data = await response.json();
+
+        if (data.success && data.portfolios.length > 0) {
+            displayPortfolios(data.portfolios);
+        } else {
+            portfoliosGrid.innerHTML = `
+                <div class="empty-state">
+                    <h3>No portfolios yet</h3>
+                    <p>Upload the first portfolio for this client</p>
+                </div>
+            `;
+        }
     } catch (error) {
         console.error('Error loading portfolios:', error);
         portfoliosGrid.innerHTML = `
@@ -183,6 +188,166 @@ async function loadPortfolios() {
             </div>
         `;
     }
+}
+
+/**
+ * Display portfolios in grid
+ */
+function displayPortfolios(portfolios) {
+    portfoliosGrid.innerHTML = portfolios.map(portfolio => `
+        <div class="portfolio-card" data-id="${portfolio.id}">
+            <div class="portfolio-header">
+                <div class="portfolio-icon">
+                    ${getPortfolioIcon(portfolio.file_type)}
+                </div>
+                <div class="portfolio-info">
+                    <h3 class="portfolio-name">${portfolio.portfolio_name || portfolio.original_name}</h3>
+                    <p class="portfolio-meta">
+                        ${formatFileType(portfolio.file_type)} • ${formatDate(portfolio.uploaded_at)}
+                    </p>
+                </div>
+                <div class="portfolio-actions">
+                    <button class="btn btn-primary btn-sm" data-action="chat" data-portfolio-id="${portfolio.id}">
+                        💬 Chat
+                    </button>
+                    <button class="btn btn-danger btn-sm" data-action="delete" data-portfolio-id="${portfolio.id}">
+                        🗑️ Delete
+                    </button>
+                    <button class="btn-icon actions-btn" data-portfolio-id="${portfolio.id}">
+                        <svg fill="currentColor" viewBox="0 0 16 16" width="16" height="16">
+                            <path d="M3 9.5a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3zm5 0a1.5 1.5 0 1 1 0-3 1.5 1.5 0 0 1 0 3z"/>
+                        </svg>
+                    </button>
+                    <div class="actions-menu" data-portfolio-id="${portfolio.id}" style="display: none;">
+                        <button class="actions-menu-item" data-action="report" data-portfolio-id="${portfolio.id}">
+                            📊 Generate a report for my portfolio
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `).join('');
+
+    // Attach event listeners for actions buttons
+    attachPortfolioActionListeners();
+}
+
+/**
+ * Attach event listeners to portfolio action buttons
+ */
+function attachPortfolioActionListeners() {
+    // Handle Chat and Delete button clicks
+    document.querySelectorAll('[data-action="chat"], [data-action="delete"]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const action = btn.dataset.action;
+            const portfolioId = btn.dataset.portfolioId;
+
+            if (action === 'chat') {
+                // Navigate to chat with portfolio context
+                window.location.href = `chat.php?portfolio=${portfolioId}`;
+            } else if (action === 'delete') {
+                // Confirm and delete portfolio
+                deletePortfolio(portfolioId);
+            }
+        });
+    });
+
+    // Toggle actions menu (three dots button)
+    document.querySelectorAll('.actions-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const portfolioId = btn.dataset.portfolioId;
+            const menu = document.querySelector(`.actions-menu[data-portfolio-id="${portfolioId}"]`);
+
+            // Close all other menus
+            document.querySelectorAll('.actions-menu').forEach(m => {
+                if (m !== menu) m.style.display = 'none';
+            });
+
+            // Toggle this menu
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        });
+    });
+
+    // Handle menu item clicks
+    document.querySelectorAll('.actions-menu-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const action = item.dataset.action;
+            const portfolioId = item.dataset.portfolioId;
+
+            if (action === 'report') {
+                // Navigate to report page or generate report
+                window.location.href = `index.php?portfolio=${portfolioId}`;
+            }
+
+            // Close menu
+            item.closest('.actions-menu').style.display = 'none';
+        });
+    });
+
+    // Close menus when clicking outside
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.actions-menu').forEach(menu => {
+            menu.style.display = 'none';
+        });
+    });
+}
+
+/**
+ * Delete portfolio with confirmation
+ */
+async function deletePortfolio(portfolioId) {
+    const confirmed = confirm('Are you sure you want to delete this portfolio? This action cannot be undone.');
+
+    if (!confirmed) return;
+
+    try {
+        const response = await fetch(`${window.API_BASE}/portfolio/${portfolioId}`, {
+            method: 'DELETE'
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            showSuccess('Portfolio deleted successfully');
+            loadPortfolios(); // Reload portfolios
+            loadClient(); // Refresh stats
+        } else {
+            showError(data.error || 'Failed to delete portfolio');
+        }
+    } catch (error) {
+        console.error('Error deleting portfolio:', error);
+        showError('Error deleting portfolio');
+    }
+}
+
+/**
+ * Get icon for portfolio file type
+ */
+function getPortfolioIcon(fileType) {
+    const iconMap = {
+        'csv': '📊',
+        'xlsx': '📈',
+        'xls': '📈',
+        'pdf': '📄',
+        'json': '📋',
+        'jpg': '🖼️',
+        'jpeg': '🖼️',
+        'png': '🖼️',
+        'docx': '📝',
+        'doc': '📝',
+        'txt': '📃'
+    };
+    return iconMap[fileType] || '📁';
+}
+
+/**
+ * Format file type for display
+ */
+function formatFileType(fileType) {
+    return fileType ? fileType.toUpperCase() : 'FILE';
 }
 
 /**

@@ -734,7 +734,7 @@ app.get('/api/chat-stream', async (req, res) => {
     let portfolioContext = null;
 
     if (portfolio_id) {
-      console.log(`📎 Including portfolio context for ID: ${portfolio_id}`);
+      console.log(`📎 Checking portfolio context for ID: ${portfolio_id}`);
 
       // SECURITY: Verify portfolio ownership
       const hasAccess = await sessionHelper.verifyPortfolioOwnership(portfolio_id, userId, db);
@@ -747,31 +747,42 @@ app.get('/api/chat-stream', async (req, res) => {
         });
       }
 
-      try {
-        const portfolio = await db.getPortfolio(portfolio_id);
+      // CRITICAL: Only include raw OCR data in FIRST message
+      // For follow-up messages, rely on conversation data extraction
+      const isFirstMessage = !parsedHistory || parsedHistory.length === 0;
 
-        if (portfolio) {
-          portfolioContext = {
-            id: portfolio.id,
-            name: portfolio.portfolio_name || portfolio.original_name,
-            type: portfolio.portfolio_type,
-            fileType: portfolio.file_type,
-            rawData: portfolio.raw_data
-          };
+      if (isFirstMessage) {
+        console.log(`   → First message: Including full portfolio context`);
 
-          // Enhance message with portfolio context
-          const contextHeader = `\n\n[ATTACHED FILE]\nFile: ${portfolioContext.name}\nType: ${portfolioContext.type || 'Document'}\nFormat: ${portfolioContext.fileType}\n\nContent:\n`;
-          const contentPreview = portfolioContext.rawData ? portfolioContext.rawData.substring(0, 2000) : '[No content available]';
+        try {
+          const portfolio = await db.getPortfolio(portfolio_id);
 
-          enhancedMessage = `${message}${contextHeader}${contentPreview}${portfolioContext.rawData && portfolioContext.rawData.length > 2000 ? '\n\n[Content truncated...]' : ''}`;
+          if (portfolio) {
+            portfolioContext = {
+              id: portfolio.id,
+              name: portfolio.portfolio_name || portfolio.original_name,
+              type: portfolio.portfolio_type,
+              fileType: portfolio.file_type,
+              rawData: portfolio.raw_data
+            };
 
-          console.log(`✅ Portfolio context added (${portfolioContext.rawData ? portfolioContext.rawData.length : 0} chars)`);
-        } else {
-          console.warn(`⚠️ Portfolio ${portfolio_id} not found, proceeding without context`);
+            // Enhance message with portfolio context
+            const contextHeader = `\n\n[ATTACHED FILE]\nFile: ${portfolioContext.name}\nType: ${portfolioContext.type || 'Document'}\nFormat: ${portfolioContext.fileType}\n\nContent:\n`;
+            const contentPreview = portfolioContext.rawData ? portfolioContext.rawData.substring(0, 2000) : '[No content available]';
+
+            enhancedMessage = `${message}${contextHeader}${contentPreview}${portfolioContext.rawData && portfolioContext.rawData.length > 2000 ? '\n\n[Content truncated...]' : ''}`;
+
+            console.log(`✅ Portfolio context added (${portfolioContext.rawData ? portfolioContext.rawData.length : 0} chars)`);
+          } else {
+            console.warn(`⚠️ Portfolio ${portfolio_id} not found, proceeding without context`);
+          }
+        } catch (error) {
+          console.error(`❌ Error fetching portfolio context:`, error);
+          // Continue without portfolio context
         }
-      } catch (error) {
-        console.error(`❌ Error fetching portfolio context:`, error);
-        // Continue without portfolio context
+      } else {
+        console.log(`   → Follow-up message (${parsedHistory.length} previous messages)`);
+        console.log(`   → Skipping raw OCR data - using conversation extraction for consistency`);
       }
     }
 

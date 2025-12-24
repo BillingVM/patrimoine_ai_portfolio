@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio AI - Solo Mode (Unified Dashboard)</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
+    <style>
+        .mockup-badge {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            z-index: 10000;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Context Switcher */
+        .context-switcher {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .context-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .context-current {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .context-icon {
+            font-size: 1.5rem;
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2rem;
+        }
+
+        .metric-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .metric-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .metric-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-change {
+            font-size: 0.75rem;
+            color: var(--success);
+            font-weight: 500;
+        }
+
+        /* Quick Actions */
+        .quick-actions-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .quick-actions-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .quick-actions-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        .action-card {
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-primary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .action-card:hover {
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .action-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .action-desc {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        /* Upgrade CTA */
+        .upgrade-cta {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(124, 58, 237, 0.1) 100%);
+            border: 2px dashed #8B5CF6;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .upgrade-cta h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .upgrade-cta p {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .upgrade-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .upgrade-feature {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-secondary);
+            font-size: 0.9375rem;
+        }
+
+        .upgrade-feature::before {
+            content: "✓";
+            color: #8B5CF6;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        /* Portfolio List */
+        .portfolio-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .portfolio-section h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .portfolio-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.2s ease;
+        }
+
+        .portfolio-item:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+        }
+
+        .portfolio-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .portfolio-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        .portfolio-info {
+            flex: 1;
+        }
+
+        .portfolio-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .portfolio-meta {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .portfolio-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .welcome-header {
+            margin-bottom: 2rem;
+        }
+
+        .welcome-header h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .welcome-header p {
+            font-size: 1rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-badge">
+        📐 UNIFIED - SOLO MODE
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <div class="logo-icon">📊</div>
+                <span class="logo-text">Portfolio AI</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="#" class="nav-item active">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+                </svg>
+                <span>Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>My Portfolios</span>
+                <span class="nav-badge">5</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                <span>Reports</span>
+            </a>
+
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <span>AI Assistant</span>
+            </a>
+
+            <div class="nav-divider"></div>
+
+            <!-- This section appears when user creates first client -->
+            <div style="opacity: 0.4; pointer-events: none;">
+                <div style="padding: 0.75rem 1rem; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 600;">
+                    Agency Features
+                </div>
+
+                <a href="#" class="nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    <span>Clients</span>
+                    <span class="nav-badge">0</span>
+                </a>
+
+                <a href="#" class="nav-item">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span>Analytics</span>
+                </a>
+            </div>
+
+            <div class="nav-divider"></div>
+
+            <a href="#" class="nav-item">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="20" height="20">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <span>Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <div class="user-profile">
+                <div class="user-avatar">JS</div>
+                <div class="user-info">
+                    <div class="user-name">John Smith</div>
+                    <div class="user-role">Solo Mode</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Welcome Header -->
+            <div class="welcome-header">
+                <h1>Welcome back, John! 👋</h1>
+                <p>Manage your portfolios and get AI-powered insights • 500 credits remaining</p>
+            </div>
+
+            <!-- Context Switcher (shows current view) -->
+            <div class="context-switcher">
+                <span class="context-label">Viewing:</span>
+                <div class="context-current">
+                    <span class="context-icon">👤</span>
+                    <span>My Portfolios</span>
+                </div>
+            </div>
+
+            <!-- Metrics Grid -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">💼</div>
+                    <div class="metric-value">5</div>
+                    <div class="metric-label">My Portfolios</div>
+                    <div class="metric-change">2 updated today</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">💰</div>
+                    <div class="metric-value">$3.8M</div>
+                    <div class="metric-label">Total Value</div>
+                    <div class="metric-change">+$125K this month</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">📈</div>
+                    <div class="metric-value">+3.4%</div>
+                    <div class="metric-label">Monthly Performance</div>
+                    <div class="metric-change">Above average</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-value">23</div>
+                    <div class="metric-label">Reports Generated</div>
+                    <div class="metric-change">3 this week</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">🤖</div>
+                    <div class="metric-value">45</div>
+                    <div class="metric-label">AI Chats</div>
+                    <div class="metric-change">12 this week</div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="metric-icon">💳</div>
+                    <div class="metric-value">500</div>
+                    <div class="metric-label">Credits</div>
+                    <div class="metric-change" style="color: var(--text-muted);">Buy more →</div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="quick-actions-section">
+                <div class="quick-actions-header">
+                    <h2>⚡ Quick Actions</h2>
+                </div>
+                <div class="actions-grid">
+                    <div class="action-card">
+                        <div class="action-icon">📤</div>
+                        <div class="action-title">Upload Portfolio</div>
+                        <div class="action-desc">Add new investment data</div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-icon">💬</div>
+                        <div class="action-title">Chat with AI</div>
+                        <div class="action-desc">Ask about your investments</div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-icon">📊</div>
+                        <div class="action-title">Generate Report</div>
+                        <div class="action-desc">AI analysis of your portfolio</div>
+                    </div>
+
+                    <div class="action-card">
+                        <div class="action-icon">📄</div>
+                        <div class="action-title">View Reports</div>
+                        <div class="action-desc">See past analyses</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upgrade to Agency CTA -->
+            <div class="upgrade-cta">
+                <h3>🚀 Manage Client Portfolios</h3>
+                <p>Add clients to manage their portfolios and unlock powerful agency features</p>
+
+                <div class="upgrade-features">
+                    <div class="upgrade-feature">Manage multiple clients</div>
+                    <div class="upgrade-feature">Client portfolio tracking</div>
+                    <div class="upgrade-feature">Bulk operations</div>
+                    <div class="upgrade-feature">Advanced analytics</div>
+                    <div class="upgrade-feature">Activity monitoring</div>
+                    <div class="upgrade-feature">Team collaboration</div>
+                </div>
+
+                <button class="btn btn-primary" style="padding: 0.875rem 2rem; font-size: 1rem;">
+                    + Add Your First Client
+                </button>
+            </div>
+
+            <!-- My Portfolios -->
+            <div class="portfolio-section">
+                <h2>
+                    <span>📂 My Recent Portfolios</span>
+                    <a href="#" style="font-size: 0.875rem; color: var(--accent-blue); font-weight: 500;">View All →</a>
+                </h2>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-header">
+                        <div class="portfolio-info">
+                            <div class="portfolio-title">
+                                📊 Q4 2024 Holdings
+                            </div>
+                            <div class="portfolio-meta">
+                                <span>Updated today</span>
+                                <span>•</span>
+                                <span>12 holdings</span>
+                                <span>•</span>
+                                <span style="color: var(--success); font-weight: 600;">$1.2M value</span>
+                            </div>
+                        </div>
+                        <div class="portfolio-actions">
+                            <button class="btn btn-primary btn-sm">💬 Chat</button>
+                            <button class="btn btn-primary btn-sm">📊 Report</button>
+                            <button class="btn btn-secondary btn-sm">👁️ View</button>
+                            <button class="btn btn-danger btn-sm">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-header">
+                        <div class="portfolio-info">
+                            <div class="portfolio-title">
+                                📈 Retirement Portfolio
+                            </div>
+                            <div class="portfolio-meta">
+                                <span>Updated 3 days ago</span>
+                                <span>•</span>
+                                <span>8 holdings</span>
+                                <span>•</span>
+                                <span style="color: var(--success); font-weight: 600;">$950K value</span>
+                            </div>
+                        </div>
+                        <div class="portfolio-actions">
+                            <button class="btn btn-primary btn-sm">💬 Chat</button>
+                            <button class="btn btn-primary btn-sm">📊 Report</button>
+                            <button class="btn btn-secondary btn-sm">👁️ View</button>
+                            <button class="btn btn-danger btn-sm">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portfolio-item">
+                    <div class="portfolio-header">
+                        <div class="portfolio-info">
+                            <div class="portfolio-title">
+                                💎 Growth Stocks
+                            </div>
+                            <div class="portfolio-meta">
+                                <span>Updated 1 week ago</span>
+                                <span>•</span>
+                                <span>15 holdings</span>
+                                <span>•</span>
+                                <span style="color: var(--success); font-weight: 600;">$1.65M value</span>
+                            </div>
+                        </div>
+                        <div class="portfolio-actions">
+                            <button class="btn btn-primary btn-sm">💬 Chat</button>
+                            <button class="btn btn-primary btn-sm">📊 Report</button>
+                            <button class="btn btn-secondary btn-sm">👁️ View</button>
+                            <button class="btn btn-danger btn-sm">🗑️ Delete</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Unified Dashboard - Portfolio AI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        .mockup-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--bg-primary);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            max-width: 800px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, #8B5CF6 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .concept-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .concept-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .concept-section p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .feature-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 1.5rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 3rem;
+        }
+
+        .mockup-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .mockup-card.solo:hover {
+            border-color: #8B5CF6;
+            box-shadow: 0 12px 32px rgba(139, 92, 246, 0.3);
+        }
+
+        .mockup-card.hybrid:hover {
+            border-color: #10b981;
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
+        }
+
+        .mockup-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mockup-card.solo .mockup-badge {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+        }
+
+        .mockup-card.hybrid .mockup-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .mockup-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mockup-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .mockup-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .mockup-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+
+        .mockup-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mockup-features li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .mockup-card.solo .view-btn {
+            background: linear-gradient(135deg, #8B5CF6 0%, #7C3AED 100%);
+            color: white;
+        }
+
+        .mockup-card.hybrid .view-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .transition-diagram {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+
+        .transition-steps {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            flex-wrap: wrap;
+            margin-top: 1.5rem;
+        }
+
+        .transition-step {
+            flex: 1;
+            min-width: 200px;
+            padding: 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 10px;
+        }
+
+        .transition-step h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .transition-step p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .transition-arrow {
+            font-size: 2rem;
+            color: var(--text-muted);
+        }
+
+        .old-mockups {
+            background: rgba(246, 70, 93, 0.05);
+            border: 1px dashed var(--danger);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .old-mockups h3 {
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .old-mockups p {
+            font-size: 0.9375rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+        }
+
+        .old-mockups-links {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .transition-steps {
+                flex-direction: column;
+            }
+
+            .transition-arrow {
+                transform: rotate(90deg);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎨 Unified Dashboard Design</h1>
+            <p>One dashboard that adapts from solo mode to agency mode seamlessly as you grow</p>
+        </div>
+
+        <!-- Concept Section -->
+        <div class="concept-section">
+            <h2>💡 The Unified Approach</h2>
+            <p>
+                Instead of two separate dashboards, we have <strong>one adaptive dashboard</strong> that grows with you:
+            </p>
+
+            <div class="transition-diagram">
+                <h3 style="margin-bottom: 1.5rem; color: var(--text-primary);">How It Works</h3>
+                <div class="transition-steps">
+                    <div class="transition-step">
+                        <h4>1️⃣ Start Solo</h4>
+                        <p>Manage your own portfolios with a simple, clean interface</p>
+                    </div>
+
+                    <div class="transition-arrow">→</div>
+
+                    <div class="transition-step">
+                        <h4>2️⃣ Add Clients</h4>
+                        <p>Click "+ Add Client" to start managing others</p>
+                    </div>
+
+                    <div class="transition-arrow">→</div>
+
+                    <div class="transition-step">
+                        <h4>3️⃣ Unlock Features</h4>
+                        <p>Agency features appear automatically</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🎯 Context Switcher</h3>
+                    <p>Easily switch between "My Portfolios" and any client account with a dropdown menu</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📊 Adaptive Stats</h3>
+                    <p>Dashboard shows stats for currently selected context (your portfolios or client's)</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔓 Progressive Features</h3>
+                    <p>Clients menu appears when you add first client. Analytics unlocks at 2+ clients.</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>✨ Smooth Transition</h3>
+                    <p>No hard switches or mode changes - features unlock naturally as you grow</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🧭 Unified Navigation</h3>
+                    <p>Same sidebar, same structure, whether managing yourself or 100 clients</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚡ Same Actions</h3>
+                    <p>Upload, chat, report buttons work for current context automatically</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mockup Cards -->
+        <div class="mockup-grid">
+            <!-- Solo Mode -->
+            <div class="mockup-card solo" onclick="window.location.href='unified-solo.html'">
+                <div class="mockup-badge">Solo Mode</div>
+                <div class="mockup-icon">👤</div>
+                <h2 class="mockup-title">Starting Point</h2>
+                <p class="mockup-description">Simple dashboard for managing your own portfolios - no clients yet</p>
+
+                <ul class="mockup-features">
+                    <li>My Portfolios only</li>
+                    <li>Personal stats & metrics</li>
+                    <li>Upload, chat, reports</li>
+                    <li>CTA to add first client</li>
+                    <li>Agency features grayed out</li>
+                </ul>
+
+                <a href="unified-solo.html" class="view-btn">View Solo Mode →</a>
+            </div>
+
+            <!-- Hybrid Mode -->
+            <div class="mockup-card hybrid" onclick="window.location.href='unified-hybrid.html'">
+                <div class="mockup-badge">Hybrid Mode</div>
+                <div class="mockup-icon">🏢</div>
+                <h2 class="mockup-title">After Adding Clients</h2>
+                <p class="mockup-description">Same dashboard, now with context switcher and unlocked agency features</p>
+
+                <ul class="mockup-features">
+                    <li>Context switcher dropdown</li>
+                    <li>Switch: My Portfolios ↔ Clients</li>
+                    <li>Clients menu now active</li>
+                    <li>Agency features unlocked</li>
+                    <li>Analytics & bulk operations</li>
+                </ul>
+
+                <a href="unified-hybrid.html" class="view-btn">View Hybrid Mode →</a>
+            </div>
+        </div>
+
+        <!-- Key Benefits -->
+        <div class="concept-section">
+            <h2>✅ Why This is Better</h2>
+
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🚀 Zero Learning Curve</h3>
+                    <p>Users never need to "learn a new dashboard" - it just grows with them</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🎨 Simpler Codebase</h3>
+                    <p>One dashboard to maintain instead of two separate interfaces</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>💡 Natural Growth</h3>
+                    <p>No "upgrade to agency" confusion - just add a client when ready</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>🔄 Seamless Switching</h3>
+                    <p>Manage personal portfolios and client accounts in same session</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>📱 Consistent UX</h3>
+                    <p>Same actions, same navigation, same muscle memory</p>
+                </div>
+
+                <div class="feature-card">
+                    <h3>⚙️ Smart Defaults</h3>
+                    <p>Shows what you need when you need it - no overwhelming features</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Old Mockups (kept as backup) -->
+        <div class="concept-section">
+            <div class="old-mockups">
+                <h3>📦 Previous Approach (Kept as Backup)</h3>
+                <p>The original "two separate dashboards" concept is still available for reference:</p>
+                <div class="old-mockups-links">
+                    <a href="index.html" class="btn btn-secondary btn-sm">View Original Comparison</a>
+                    <a href="agency-dashboard.html" class="btn btn-secondary btn-sm">Agency Dashboard</a>
+                    <a href="client-dashboard.html" class="btn btn-secondary btn-sm">Client Dashboard</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div style="text-align: center; padding: 2rem; color: var(--text-muted); font-size: 0.875rem;">
+            <p>💡 Click through the mockups above to see the unified dashboard in action</p>
+            <p style="margin-top: 0.5rem;">Built with Portfolio AI design system • December 2024</p>
+        </div>
+    </div>
+</body>
+</html>

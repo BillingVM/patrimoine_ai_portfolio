@@ -1,0 +1,638 @@
+2025-12-18 15:14:25 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:25 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:25 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:25 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:25 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:26 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:26 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:26 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:26 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:26 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:27 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:27 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:27 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:27 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:27 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:28 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:28 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:28 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:28 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:28 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:29 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:29 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:29 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:29 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:29 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:30 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:30 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:30 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:30 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:30 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:32 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:32 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:32 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:32 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:32 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:33 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:33 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:33 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:33 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:33 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:38 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:38 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:38 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:38 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:38 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:40 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:40 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:40 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:40 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:40 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:41 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:41 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:41 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:41 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:41 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:42 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:42 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:42 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:42 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:42 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:43 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:43 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:43 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:43 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:43 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:44 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:44 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:44 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:44 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:44 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:45 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:45 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:45 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:45 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:45 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:46 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:46 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:46 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:46 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:46 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:47 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:47 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:47 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:47 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:47 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:14:49 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:14:49 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:14:49 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:14:49 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:14:49 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:16 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:16 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:16 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:16 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:16 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:18 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:18 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:18 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:18 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:18 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:19 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:19 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:19 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:19 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:19 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:20 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:20 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:20 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:20 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:20 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:21 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:21 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:21 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:21 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:21 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:22 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:22 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:22 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:22 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:22 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:23 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:23 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:23 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:23 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:23 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:24 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:24 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:24 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:24 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:24 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:25 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:25 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:25 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:25 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:25 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:15:26 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:15:26 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:15:26 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:15:26 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:15:26 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:15 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:15 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:15 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:15 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:15 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:16 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:16 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:16 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:16 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:16 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:17 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:17 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:17 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:17 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:17 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:18 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:18 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:18 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:18 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:18 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:20 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:20 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:20 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:20 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:20 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:21 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:21 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:21 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:21 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:21 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:22 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:22 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:22 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:22 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:22 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:23 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:23 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:23 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:23 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:23 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:24 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:24 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:24 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:24 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:24 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:16:25 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:16:25 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:16:25 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:16:25 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:16:25 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:38 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:38 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:38 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:38 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:38 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:40 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:40 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:40 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:40 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:40 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:41 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:41 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:41 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:41 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:41 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:42 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:42 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:42 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:42 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:42 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:43 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:43 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:43 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:43 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:43 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:44 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:44 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:44 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:44 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:44 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:45 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:45 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:45 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:45 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:45 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:47 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:47 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:47 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:47 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:47 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:48 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:48 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:48 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:48 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:48 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:24:49 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:24:49 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:24:49 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:24:49 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:24:49 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:297:5)
+2025-12-18 15:49:51 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:51 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:51 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:51 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:51 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:52 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:52 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:52 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:52 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:52 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:53 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:53 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:53 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:53 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:55 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:55 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:55 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:55 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:55 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:56 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:56 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:56 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:56 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:56 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:57 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:57 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:57 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:57 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:57 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:58 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:58 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:58 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:58 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:58 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:49:59 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:49:59 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:49:59 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:49:59 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:49:59 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:50:00 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:50:00 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:50:00 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:50:00 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:50:00 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:50:01 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:50:01 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:50:01 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:50:01 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:50:01 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:52 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:52 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:52 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:52 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:52 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:53 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:53 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:53 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:53 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:54 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:54 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:54 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:54 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:54 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:55 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:55 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:55 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:55 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:55 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:56 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:56 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:56 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:56 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:56 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:57 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:57 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:57 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:57 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:57 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:55:58 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:55:58 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:55:58 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:55:58 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:55:58 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:56:00 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:56:00 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:56:00 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:56:00 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:56:00 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:56:01 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:56:01 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:56:01 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:56:01 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:56:01 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 15:56:02 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 15:56:02 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 15:56:02 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 15:56:02 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 15:56:02 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:46 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:46 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:46 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:46 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:46 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:47 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:47 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:47 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:47 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:47 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:48 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:48 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:48 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:48 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:48 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:49 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:49 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:49 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:49 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:49 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:50 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:50 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:50 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:50 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:50 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:51 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:51 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:51 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:51 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:51 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:53 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:53 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:53 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:53 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:54 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:54 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:54 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:54 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:54 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:55 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:55 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:55 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:55 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:55 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:00:56 +02:00: ❌ Failed to start server: Error: SASL: SCRAM-SERVER-FIRST-MESSAGE: client password must be a string
+2025-12-18 16:00:56 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/pg-pool/index.js:45:11
+2025-12-18 16:00:56 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:00:56 +02:00:     at async Object.initTables (/var/www/sol.inoutconnect.com/portai/api/db.js:31:18)
+2025-12-18 16:00:56 +02:00:     at async start (/var/www/sol.inoutconnect.com/portai/api/server.js:301:5)
+2025-12-18 16:09:08 +02:00: ❌ OCR error: TypeError: Cannot read properties of undefined (reading 'length')
+2025-12-18 16:09:08 +02:00:     at performOCR (/var/www/sol.inoutconnect.com/portai/api/ocr.js:44:25)
+2025-12-18 16:09:08 +02:00:     at async parseImage (/var/www/sol.inoutconnect.com/portai/api/upload.js:173:21)
+2025-12-18 16:09:08 +02:00:     at async parseFile (/var/www/sol.inoutconnect.com/portai/api/upload.js:38:16)
+2025-12-18 16:09:08 +02:00:     at async /var/www/sol.inoutconnect.com/portai/api/server.js:102:21
+2025-12-18 16:09:08 +02:00: Error parsing file: Error: OCR failed: Cannot read properties of undefined (reading 'length')
+2025-12-18 16:09:08 +02:00:     at performOCR (/var/www/sol.inoutconnect.com/portai/api/ocr.js:53:11)
+2025-12-18 16:09:08 +02:00:     at async parseImage (/var/www/sol.inoutconnect.com/portai/api/upload.js:173:21)
+2025-12-18 16:09:08 +02:00:     at async parseFile (/var/www/sol.inoutconnect.com/portai/api/upload.js:38:16)
+2025-12-18 16:09:08 +02:00:     at async /var/www/sol.inoutconnect.com/portai/api/server.js:102:21
+2025-12-18 16:09:08 +02:00: ❌ Upload error: Error: Failed to parse jpg file: OCR failed: Cannot read properties of undefined (reading 'length')
+2025-12-18 16:09:08 +02:00:     at parseFile (/var/www/sol.inoutconnect.com/portai/api/upload.js:44:11)
+2025-12-18 16:09:08 +02:00:     at async /var/www/sol.inoutconnect.com/portai/api/server.js:102:21
+2025-12-18 16:23:57 +02:00: ❌ AI generation error: Error: OpenRouter API error (401): {"error":{"message":"No cookie auth credentials found","code":401}}
+2025-12-18 16:23:57 +02:00:     at generateReport (/var/www/sol.inoutconnect.com/portai/api/ai.js:54:13)
+2025-12-18 16:23:57 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:23:57 +02:00:     at async /var/www/sol.inoutconnect.com/portai/api/server.js:170:22
+2025-12-18 16:23:57 +02:00: ❌ Report generation error: Error: Failed to generate report: OpenRouter API error (401): {"error":{"message":"No cookie auth credentials found","code":401}}
+2025-12-18 16:23:57 +02:00:     at generateReport (/var/www/sol.inoutconnect.com/portai/api/ai.js:79:11)
+2025-12-18 16:23:57 +02:00:     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
+2025-12-18 16:23:57 +02:00:     at async /var/www/sol.inoutconnect.com/portai/api/server.js:170:22
+2025-12-18 16:38:57 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:38:57 +02:00:     const data = await response.json();
+2025-12-18 16:38:57 +02:00:           ^
+2025-12-18 16:38:57 +02:00: 
+2025-12-18 16:38:57 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:38:57 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:38:57 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:38:57 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:57 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:57 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:57 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:38:57 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:38:57 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:38:57 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:38:57 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:57 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:57 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:57 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:57 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:38:57 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:57 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:58 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:38:58 +02:00:     const data = await response.json();
+2025-12-18 16:38:58 +02:00:           ^
+2025-12-18 16:38:58 +02:00: 
+2025-12-18 16:38:58 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:38:58 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:38:58 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:38:58 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:58 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:58 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:58 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:38:58 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:38:58 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:38:58 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:38:58 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:58 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:58 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:58 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:58 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:38:58 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:58 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:59 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:38:59 +02:00:     const data = await response.json();
+2025-12-18 16:38:59 +02:00:           ^
+2025-12-18 16:38:59 +02:00: 
+2025-12-18 16:38:59 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:38:59 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:38:59 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:38:59 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:59 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:59 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:59 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:38:59 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:38:59 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:38:59 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:38:59 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:59 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:38:59 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:38:59 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:38:59 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:38:59 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:38:59 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:00 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:00 +02:00:     const data = await response.json();
+2025-12-18 16:39:00 +02:00:           ^
+2025-12-18 16:39:00 +02:00: 
+2025-12-18 16:39:00 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:00 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:00 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:00 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:00 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:00 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:00 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:00 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:00 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:00 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:00 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:00 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:00 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:00 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:00 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:00 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:00 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:02 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:02 +02:00:     const data = await response.json();
+2025-12-18 16:39:02 +02:00:           ^
+2025-12-18 16:39:02 +02:00: 
+2025-12-18 16:39:02 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:02 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:02 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:02 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:02 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:02 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:02 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:02 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:02 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:02 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:02 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:02 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:02 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:02 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:02 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:02 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:02 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:03 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:03 +02:00:     const data = await response.json();
+2025-12-18 16:39:03 +02:00:           ^
+2025-12-18 16:39:03 +02:00: 
+2025-12-18 16:39:03 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:03 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:03 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:03 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:03 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:03 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:03 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:03 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:03 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:03 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:03 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:03 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:03 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:03 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:03 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:03 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:03 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:04 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:04 +02:00:     const data = await response.json();
+2025-12-18 16:39:04 +02:00:           ^
+2025-12-18 16:39:04 +02:00: 
+2025-12-18 16:39:04 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:04 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:04 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:04 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:04 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:04 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:04 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:04 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:04 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:04 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:04 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:04 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:04 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:04 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:04 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:04 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:04 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:05 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:05 +02:00:     const data = await response.json();
+2025-12-18 16:39:05 +02:00:           ^
+2025-12-18 16:39:05 +02:00: 
+2025-12-18 16:39:05 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:05 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:05 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:05 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:05 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:05 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:05 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:05 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:05 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:05 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:05 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:05 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:05 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:05 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:05 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:05 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:05 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:06 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:06 +02:00:     const data = await response.json();
+2025-12-18 16:39:06 +02:00:           ^
+2025-12-18 16:39:06 +02:00: 
+2025-12-18 16:39:06 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:06 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:06 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:06 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:06 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:06 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:06 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:06 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:06 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:06 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:06 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:06 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:06 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:06 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:06 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:06 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:06 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:07 +02:00: /var/www/sol.inoutconnect.com/portai/api/ai.js:68
+2025-12-18 16:39:07 +02:00:     const data = await response.json();
+2025-12-18 16:39:07 +02:00:           ^
+2025-12-18 16:39:07 +02:00: 
+2025-12-18 16:39:07 +02:00: SyntaxError: Identifier 'data' has already been declared
+2025-12-18 16:39:07 +02:00:     at wrapSafe (node:internal/modules/cjs/loader:1464:18)
+2025-12-18 16:39:07 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1495:20)
+2025-12-18 16:39:07 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:07 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:07 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:07 +02:00:     at Module.require (node:internal/modules/cjs/loader:1289:19)
+2025-12-18 16:39:07 +02:00:     at Hook._require.Module.require (/usr/local/lib/node_modules/pm2/node_modules/require-in-the-middle/index.js:101:39)
+2025-12-18 16:39:07 +02:00:     at require (node:internal/modules/helpers:182:18)
+2025-12-18 16:39:07 +02:00:     at Object.<anonymous> (/var/www/sol.inoutconnect.com/portai/api/server.js:16:28)
+2025-12-18 16:39:07 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:07 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 16:39:07 +02:00:     at Module.load (node:internal/modules/cjs/loader:1266:32)
+2025-12-18 16:39:07 +02:00:     at Module._load (node:internal/modules/cjs/loader:1091:12)
+2025-12-18 16:39:07 +02:00:     at Object.<anonymous> (/usr/local/lib/node_modules/pm2/lib/ProcessContainerFork.js:33:23)
+2025-12-18 16:39:07 +02:00:     at Module._compile (node:internal/modules/cjs/loader:1521:14)
+2025-12-18 16:39:07 +02:00:     at Module._extensions..js (node:internal/modules/cjs/loader:1623:10)
+2025-12-18 17:48:53 +02:00: ❌ Error fetching credits balance: TypeError: db.query is not a function
+2025-12-18 17:48:53 +02:00:     at getBalance (/var/www/sol.inoutconnect.com/portai/api/credits.js:19:27)
+2025-12-18 17:48:53 +02:00:     at Object.getUserSummary (/var/www/sol.inoutconnect.com/portai/api/credits.js:166:25)
+2025-12-18 17:48:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/server.js:324:35
+2025-12-18 17:48:53 +02:00:     at Layer.handle [as handle_request] (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/layer.js:95:5)
+2025-12-18 17:48:53 +02:00:     at next (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/route.js:149:13)
+2025-12-18 17:48:53 +02:00:     at Route.dispatch (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/route.js:119:3)
+2025-12-18 17:48:53 +02:00:     at Layer.handle [as handle_request] (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/layer.js:95:5)
+2025-12-18 17:48:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:284:15
+2025-12-18 17:48:53 +02:00:     at Function.process_params (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:346:12)
+2025-12-18 17:48:53 +02:00:     at next (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:280:10)
+2025-12-18 17:48:53 +02:00:     at urlencodedParser (/var/www/sol.inoutconnect.com/portai/api/node_modules/body-parser/lib/types/urlencoded.js:91:7)
+2025-12-18 17:48:53 +02:00:     at Layer.handle [as handle_request] (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/layer.js:95:5)
+2025-12-18 17:48:53 +02:00:     at trim_prefix (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:328:13)
+2025-12-18 17:48:53 +02:00:     at /var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:286:9
+2025-12-18 17:48:53 +02:00:     at Function.process_params (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:346:12)
+2025-12-18 17:48:53 +02:00:     at next (/var/www/sol.inoutconnect.com/portai/api/node_modules/express/lib/router/index.js:280:10)

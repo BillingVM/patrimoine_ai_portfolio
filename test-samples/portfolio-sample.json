@@ -1,0 +1,27 @@
+[
+  {
+    "ticker": "AAPL",
+    "quantity": 100,
+    "price": 175.50
+  },
+  {
+    "ticker": "MSFT",
+    "quantity": 75,
+    "price": 380.25
+  },
+  {
+    "ticker": "GOOGL",
+    "quantity": 50,
+    "price": 142.80
+  },
+  {
+    "ticker": "TSLA",
+    "quantity": 25,
+    "price": 248.90
+  },
+  {
+    "ticker": "NVDA",
+    "quantity": 40,
+    "price": 495.30
+  }
+]

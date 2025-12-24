@@ -11,6 +11,7 @@ const FollowUpDetector = require('./followUpDetector');
 const PortfolioContextDetector = require('./portfolioContextDetector');
 const PortfolioResolver = require('./portfolioResolver');
 const UnifiedContextAnalyzer = require('./unifiedContextAnalyzer');
+const ConversationDataExtractor = require('./conversationDataExtractor');
 const credits = require('./credits');
 
 class EnhancedChatHandler {
@@ -22,6 +23,7 @@ class EnhancedChatHandler {
         this.portfolioContextDetector = new PortfolioContextDetector();
         this.portfolioResolver = new PortfolioResolver();
         this.unifiedContextAnalyzer = new UnifiedContextAnalyzer();
+        this.conversationDataExtractor = new ConversationDataExtractor();
 
         // Initialize data gatherer with config
         const config = this.modelManager.getConfig();
@@ -129,11 +131,26 @@ class EnhancedChatHandler {
             // Track system overhead (not charged to user)
             await credits.trackSystemUsage(userId, 500, 'Intent classification');
 
+            // ==================== STAGE 1.5: Extract Data from Conversation History ====================
+            console.log('\n📚 STAGE 1.5: Conversation Data Extraction (System Cost - FREE for user)');
+            const extractStart = Date.now();
+
+            const conversationData = this.conversationDataExtractor.extract(history);
+
+            pipeline.stages.conversationDataExtraction = {
+                duration: Date.now() - extractStart,
+                stockPricesFound: Object.keys(conversationData.stockPrices || {}).length,
+                holdingsFound: Object.keys(conversationData.portfolioHoldings || {}).length
+            };
+
+            console.log(`   ✓ Extracted ${Object.keys(conversationData.stockPrices || {}).length} stock prices from conversation`);
+            console.log(`   ✓ Extracted ${Object.keys(conversationData.portfolioHoldings || {}).length} holdings from conversation`);
+
             // ==================== STAGE 2: Data Gathering ====================
             console.log('\n📊 STAGE 2: Data Gathering (API costs - FREE for user)');
             const gatherStart = Date.now();
 
-            const gatheredData = await this.dataGatherer.gatherData(classification, userMessage);
+            const gatheredData = await this.dataGatherer.gatherData(classification, userMessage, conversationData);
 
             pipeline.stages.dataGathering = {
                 duration: Date.now() - gatherStart,

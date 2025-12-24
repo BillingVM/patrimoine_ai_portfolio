@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Mockups - Portfolio AI</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            padding: 0;
+            margin: 0;
+        }
+
+        .mockup-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+            background: var(--bg-primary);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            color: var(--text-muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 3rem;
+        }
+
+        .mockup-card {
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .mockup-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+        }
+
+        .mockup-card.agency:hover {
+            border-color: var(--accent-blue);
+            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.3);
+        }
+
+        .mockup-card.client:hover {
+            border-color: #10b981;
+            box-shadow: 0 12px 32px rgba(16, 185, 129, 0.3);
+        }
+
+        .mockup-badge {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .mockup-card.agency .mockup-badge {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .mockup-card.client .mockup-badge {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .mockup-icon {
+            font-size: 4rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .mockup-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .mockup-description {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .mockup-features {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 2rem 0;
+        }
+
+        .mockup-features li {
+            padding: 0.5rem 0;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .mockup-features li::before {
+            content: "✓";
+            color: #10b981;
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+
+        .view-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .mockup-card.agency .view-btn {
+            background: linear-gradient(135deg, var(--accent-blue) 0%, #2563eb 100%);
+            color: white;
+        }
+
+        .mockup-card.client .view-btn {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .view-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .comparison-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-primary);
+            border-radius: 16px;
+            padding: 2.5rem;
+            max-width: 1200px;
+            width: 100%;
+            margin-bottom: 2rem;
+        }
+
+        .comparison-section h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            text-align: center;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .comparison-table th,
+        .comparison-table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .comparison-table th {
+            background: var(--bg-tertiary);
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .comparison-table td {
+            color: var(--text-secondary);
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .check {
+            color: #10b981;
+            font-weight: 700;
+        }
+
+        .cross {
+            color: var(--text-muted);
+            opacity: 0.5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="mockup-container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎨 Dashboard Mockups</h1>
+            <p>Preview the redesigned Portfolio AI dashboards for Agency and Client users</p>
+        </div>
+
+        <!-- Mockup Cards -->
+        <div class="mockup-grid">
+            <!-- Agency Dashboard -->
+            <div class="mockup-card agency" onclick="window.location.href='agency-dashboard.html'">
+                <div class="mockup-badge">Agency</div>
+                <div class="mockup-icon">🏢</div>
+                <h2 class="mockup-title">Agency Dashboard</h2>
+                <p class="mockup-description">Comprehensive command center for financial advisors managing multiple clients and portfolios</p>
+
+                <ul class="mockup-features">
+                    <li>Multi-client management</li>
+                    <li>Bulk operations & analytics</li>
+                    <li>Activity feed & alerts</li>
+                    <li>Team collaboration</li>
+                    <li>Advanced reporting</li>
+                </ul>
+
+                <a href="agency-dashboard.html" class="view-btn">View Agency Dashboard →</a>
+            </div>
+
+            <!-- Client Dashboard -->
+            <div class="mockup-card client" onclick="window.location.href='client-dashboard.html'">
+                <div class="mockup-badge">Client</div>
+                <div class="mockup-icon">👤</div>
+                <h2 class="mockup-title">Client Dashboard</h2>
+                <p class="mockup-description">Simple, friendly interface for individual investors to manage their portfolios</p>
+
+                <ul class="mockup-features">
+                    <li>Portfolio overview</li>
+                    <li>Quick actions</li>
+                    <li>Performance tracking</li>
+                    <li>AI assistant access</li>
+                    <li>Report downloads</li>
+                </ul>
+
+                <a href="client-dashboard.html" class="view-btn">View Client Dashboard →</a>
+            </div>
+        </div>
+
+        <!-- Comparison Table -->
+        <div class="comparison-section">
+            <h2>📊 Feature Comparison</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th style="text-align: center;">Agency</th>
+                        <th style="text-align: center;">Client</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>View Own Portfolios</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>AI Chat Assistant</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Generate Reports</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Upload Portfolios</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Manage Multiple Clients</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>View Other Clients' Data</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>Agency Analytics Dashboard</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>Bulk Operations</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>Team Management</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>Activity Feed & Alerts</td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                    </tr>
+                    <tr>
+                        <td>Simplified Interface</td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td>Guided Onboarding</td>
+                        <td style="text-align: center;"><span class="cross">—</span></td>
+                        <td style="text-align: center;"><span class="check">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Key Differences -->
+        <div class="comparison-section">
+            <h2>🎯 Key Design Differences</h2>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 1.5rem;">
+                <div>
+                    <h3 style="color: var(--accent-blue); margin-bottom: 1rem;">Agency Design</h3>
+                    <ul style="color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Professional blue theme</strong> - Corporate, trustworthy</li>
+                        <li><strong>Dense information</strong> - Maximum data visibility</li>
+                        <li><strong>Multi-column layouts</strong> - Efficient use of space</li>
+                        <li><strong>Advanced filters</strong> - Powerful search & sorting</li>
+                        <li><strong>Bulk actions</strong> - Manage multiple items at once</li>
+                        <li><strong>Analytics focus</strong> - Charts, trends, insights</li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="color: #10b981; margin-bottom: 1rem;">Client Design</h3>
+                    <ul style="color: var(--text-secondary); line-height: 1.8;">
+                        <li><strong>Warm green theme</strong> - Friendly, approachable</li>
+                        <li><strong>Spacious layout</strong> - Clear, easy to understand</li>
+                        <li><strong>Card-based design</strong> - Visual hierarchy</li>
+                        <li><strong>Guided actions</strong> - Clear next steps</li>
+                        <li><strong>Simplified navigation</strong> - Only what they need</li>
+                        <li><strong>Focus on clarity</strong> - Plain language, big buttons</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p>💡 These are interactive mockups. Click through to explore the full designs.</p>
+            <p style="margin-top: 0.5rem;">Built with Portfolio AI design system • December 2024</p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,245 @@
+2025-12-18 16:01:12 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:01:12 +02:00: ✅ Database tables initialized
+2025-12-18 16:01:12 +02:00: =================================
+2025-12-18 16:01:12 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:01:12 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:01:12 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:01:12 +02:00: 🤖 AI Model: undefined
+2025-12-18 16:01:12 +02:00: =================================
+2025-12-18 16:08:52 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:09:03 +02:00: 📤 Uploaded: photo_2025-12-16_08-49-19.jpg (50832 bytes)
+2025-12-18 16:09:03 +02:00: 📄 Parsing jpg file...
+2025-12-18 16:09:03 +02:00: 🔧 Initializing Tesseract OCR worker...
+2025-12-18 16:09:04 +02:00: ✅ OCR worker ready
+2025-12-18 16:09:04 +02:00: 🔍 Running OCR on: 1766066943579-200597959.jpg
+2025-12-18 16:09:05 +02:00: OCR Progress: 0%
+2025-12-18 16:09:05 +02:00: OCR Progress: 10%
+2025-12-18 16:09:06 +02:00: OCR Progress: 20%
+2025-12-18 16:09:06 +02:00: OCR Progress: 30%
+2025-12-18 16:09:07 +02:00: OCR Progress: 40%
+2025-12-18 16:09:07 +02:00: OCR Progress: 50%
+2025-12-18 16:09:07 +02:00: OCR Progress: 60%
+2025-12-18 16:09:08 +02:00: OCR Progress: 100%
+2025-12-18 16:09:43 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:09:43 +02:00: ✅ Database tables initialized
+2025-12-18 16:09:43 +02:00: =================================
+2025-12-18 16:09:43 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:09:43 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:09:43 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:09:43 +02:00: 🤖 AI Model: undefined
+2025-12-18 16:09:43 +02:00: =================================
+2025-12-18 16:15:50 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:18:42 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:18:42 +02:00: ✅ Database tables initialized
+2025-12-18 16:18:42 +02:00: =================================
+2025-12-18 16:18:42 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:18:42 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:18:42 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:18:42 +02:00: 🤖 AI Model: undefined
+2025-12-18 16:18:42 +02:00: =================================
+2025-12-18 16:23:17 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:23:31 +02:00: 📤 Uploaded: photo_2025-12-16_08-49-19.jpg (50832 bytes)
+2025-12-18 16:23:31 +02:00: 📄 Parsing jpg file...
+2025-12-18 16:23:31 +02:00: 🔧 Initializing Tesseract OCR worker...
+2025-12-18 16:23:32 +02:00: ✅ OCR worker ready
+2025-12-18 16:23:32 +02:00: 🔍 Running Tesseract OCR on: 1766067811588-362656903.jpg
+2025-12-18 16:23:32 +02:00: OCR Progress: 0%
+2025-12-18 16:23:33 +02:00: OCR Progress: 10%
+2025-12-18 16:23:33 +02:00: OCR Progress: 20%
+2025-12-18 16:23:34 +02:00: OCR Progress: 30%
+2025-12-18 16:23:34 +02:00: OCR Progress: 40%
+2025-12-18 16:23:35 +02:00: OCR Progress: 50%
+2025-12-18 16:23:35 +02:00: OCR Progress: 60%
+2025-12-18 16:23:36 +02:00: OCR Progress: 100%
+2025-12-18 16:23:36 +02:00: ✅ OCR complete - Confidence: 58.00%, Words: 0
+2025-12-18 16:23:36 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:23:36 +02:00: ✅ Portfolio saved with ID: 1
+2025-12-18 16:23:56 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:23:56 +02:00: 🤖 Generating report for portfolio #1...
+2025-12-18 16:23:56 +02:00: 🤖 Generating AI report using deepseek/deepseek-chat...
+2025-12-18 16:34:15 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:34:15 +02:00: ✅ Database tables initialized
+2025-12-18 16:34:15 +02:00: =================================
+2025-12-18 16:34:15 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:34:15 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:34:15 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:34:15 +02:00: 🤖 AI Model: undefined
+2025-12-18 16:34:15 +02:00: =================================
+2025-12-18 16:35:14 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:35:14 +02:00: ✅ Database tables initialized
+2025-12-18 16:35:14 +02:00: =================================
+2025-12-18 16:35:14 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:35:14 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:35:14 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:35:14 +02:00: 🤖 AI Model: undefined
+2025-12-18 16:35:14 +02:00: =================================
+2025-12-18 16:35:40 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:35:40 +02:00: ✅ Database tables initialized
+2025-12-18 16:35:40 +02:00: =================================
+2025-12-18 16:35:40 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:35:40 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:35:40 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:35:40 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-18 16:35:40 +02:00: =================================
+2025-12-18 16:39:24 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:39:24 +02:00: ✅ Database tables initialized
+2025-12-18 16:39:24 +02:00: =================================
+2025-12-18 16:39:24 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 16:39:24 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 16:39:24 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 16:39:24 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-18 16:39:24 +02:00: =================================
+2025-12-18 16:42:31 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:42:34 +02:00: 🤖 Generating report for portfolio #1...
+2025-12-18 16:42:34 +02:00: 🤖 Generating AI report using xiaomi/mimo-v2-flash:free...
+2025-12-18 16:42:56 +02:00: ✅ Report generated - Tokens: 2634, Cost: $0.002371
+2025-12-18 16:42:56 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 16:42:56 +02:00: ✅ Report generated with ID: 1
+2025-12-18 17:19:35 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:19:35 +02:00: ✅ Database tables initialized
+2025-12-18 17:19:35 +02:00: =================================
+2025-12-18 17:19:35 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 17:19:35 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 17:19:35 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 17:19:35 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-18 17:19:35 +02:00: =================================
+2025-12-18 17:21:17 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:22:25 +02:00: 📤 Uploaded: portfolio_bidon.csv (97 bytes)
+2025-12-18 17:22:25 +02:00: 📄 Parsing csv file...
+2025-12-18 17:22:25 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:22:25 +02:00: ✅ Portfolio saved with ID: 2
+2025-12-18 17:22:35 +02:00: 🤖 Generating report for portfolio #2...
+2025-12-18 17:22:35 +02:00: 🤖 Generating AI report using xiaomi/mimo-v2-flash:free...
+2025-12-18 17:22:35 +02:00: 📊 Detected 3 tickers: AAPL, GOOGL, MSFT
+2025-12-18 17:22:40 +02:00: 🔧 AI requesting 9 tool calls...
+2025-12-18 17:22:52 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:22:52 +02:00: ✅ Report generated with ID: 2
+2025-12-18 17:23:25 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:23:47 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:24:05 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:26:29 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:29:30 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:32:16 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:32:28 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:39:47 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:40:17 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:48:20 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:48:34 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:48:34 +02:00: ✅ Database tables initialized
+2025-12-18 17:48:34 +02:00: =================================
+2025-12-18 17:48:34 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 17:48:34 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 17:48:34 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 17:48:34 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-18 17:48:34 +02:00: =================================
+2025-12-18 17:49:28 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:49:28 +02:00: ✅ Database tables initialized
+2025-12-18 17:49:28 +02:00: =================================
+2025-12-18 17:49:28 +02:00: 🚀 Portfolio AI API Server
+2025-12-18 17:49:28 +02:00: 📡 Running on http://localhost:3001
+2025-12-18 17:49:28 +02:00: 🗄️  Database: portfolio_ai
+2025-12-18 17:49:28 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-18 17:49:28 +02:00: =================================
+2025-12-18 17:49:42 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:49:50 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:50:13 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:50:13 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:51:46 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:51:46 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:53:55 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:55:27 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:55:45 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 17:55:45 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 18:08:40 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 18:08:40 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 18:10:10 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 18:10:10 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 21:13:55 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 21:13:55 +02:00: 🤖 Generating report for portfolio #1...
+2025-12-18 21:13:55 +02:00: 💰 Current balance: 100000 credits
+2025-12-18 21:13:55 +02:00: 🤖 Generating AI report using xiaomi/mimo-v2-flash:free...
+2025-12-18 21:13:55 +02:00: 📊 Detected 0 tickers: 
+2025-12-18 21:14:00 +02:00: 🔧 AI requesting 1 tool calls...
+2025-12-18 21:14:02 +02:00: 💳 Deducted 8587 credits from user 1. New balance: 91413
+2025-12-18 21:14:02 +02:00: ✅ Report generated with ID: 3
+2025-12-18 21:14:02 +02:00: 💳 Deducted 8587 credits. New balance: 91413
+2025-12-18 21:18:10 +02:00: ✅ Connected to PostgreSQL database
+2025-12-18 21:18:10 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 08:43:43 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 08:43:43 +02:00: ✅ Database tables initialized
+2025-12-19 08:43:43 +02:00: =================================
+2025-12-19 08:43:43 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 08:43:43 +02:00: 📡 Running on http://localhost:3001
+2025-12-19 08:43:43 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 08:43:43 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 08:43:43 +02:00: =================================
+2025-12-19 12:36:57 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:36:57 +02:00: ✅ Database tables initialized
+2025-12-19 12:36:57 +02:00: =================================
+2025-12-19 12:36:57 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 12:36:57 +02:00: 📡 Running on http://localhost:3001
+2025-12-19 12:36:57 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 12:36:57 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 12:36:57 +02:00: =================================
+2025-12-19 12:37:14 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:37:14 +02:00: ✅ Created client: John Doe (ID: 1)
+2025-12-19 12:42:54 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:43:15 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:46:03 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:46:03 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:54:38 +02:00: ✅ SSL certificates loaded for domain: sol.inoutconnect.com
+2025-12-19 12:54:38 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 12:54:38 +02:00: ✅ Database tables initialized
+2025-12-19 12:54:38 +02:00: =================================
+2025-12-19 12:54:38 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 12:54:38 +02:00: 📡 Running on https://localhost:3001
+2025-12-19 12:54:38 +02:00: 🔒 Protocol: HTTPS (SSL Enabled)
+2025-12-19 12:54:38 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 12:54:38 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 12:54:38 +02:00: 🌐 Domain: sol.inoutconnect.com
+2025-12-19 12:54:38 +02:00: =================================
+2025-12-19 14:57:37 +02:00: 📴 Shutting down gracefully...
+2025-12-19 14:57:39 +02:00: ✅ SSL certificates loaded for domain: sol.inoutconnect.com
+2025-12-19 14:57:39 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 14:57:39 +02:00: ✅ Database tables initialized
+2025-12-19 14:57:39 +02:00: =================================
+2025-12-19 14:57:39 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 14:57:39 +02:00: 📡 Running on https://localhost:3001
+2025-12-19 14:57:39 +02:00: 🔒 Protocol: HTTPS (SSL Enabled)
+2025-12-19 14:57:39 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 14:57:39 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 14:57:39 +02:00: 🌐 Domain: sol.inoutconnect.com
+2025-12-19 14:57:39 +02:00: =================================
+2025-12-19 14:58:06 +02:00: ✅ SSL certificates loaded for domain: sol.inoutconnect.com
+2025-12-19 14:58:06 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 14:58:06 +02:00: ✅ Database tables initialized
+2025-12-19 14:58:06 +02:00: =================================
+2025-12-19 14:58:06 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 14:58:06 +02:00: 📡 Running on https://localhost:3001
+2025-12-19 14:58:06 +02:00: 🔒 Protocol: HTTPS (SSL Enabled)
+2025-12-19 14:58:06 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 14:58:06 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 14:58:06 +02:00: 🌐 Domain: sol.inoutconnect.com
+2025-12-19 14:58:06 +02:00: =================================
+2025-12-19 15:02:46 +02:00: ✅ SSL certificates loaded for domain: sol.inoutconnect.com
+2025-12-19 15:02:46 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 15:02:46 +02:00: ✅ Database tables initialized
+2025-12-19 15:02:46 +02:00: =================================
+2025-12-19 15:02:46 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 15:02:46 +02:00: 📡 Running on https://localhost:3001
+2025-12-19 15:02:46 +02:00: 🔒 Protocol: HTTPS (SSL Enabled)
+2025-12-19 15:02:46 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 15:02:46 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 15:02:46 +02:00: 🌐 Domain: sol.inoutconnect.com
+2025-12-19 15:02:46 +02:00: =================================
+2025-12-19 15:04:15 +02:00: ✅ SSL certificates loaded for domain: sol.inoutconnect.com
+2025-12-19 15:04:15 +02:00: ✅ Connected to PostgreSQL database
+2025-12-19 15:04:15 +02:00: ✅ Database tables initialized
+2025-12-19 15:04:15 +02:00: =================================
+2025-12-19 15:04:15 +02:00: 🚀 Portfolio AI API Server
+2025-12-19 15:04:15 +02:00: 📡 Running on https://localhost:3001
+2025-12-19 15:04:15 +02:00: 🔒 Protocol: HTTPS (SSL Enabled)
+2025-12-19 15:04:15 +02:00: 🗄️  Database: portfolio_ai
+2025-12-19 15:04:15 +02:00: 🤖 AI Model: xiaomi/mimo-v2-flash:free
+2025-12-19 15:04:15 +02:00: 🌐 Domain: sol.inoutconnect.com
+2025-12-19 15:04:15 +02:00: =================================
