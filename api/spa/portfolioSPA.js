@@ -292,25 +292,36 @@ class PortfolioSPA extends BaseSPA {
 - Fundamental and technical analysis
 - Market trends and economic indicators
 
+**CRITICAL: You have access to real-time market data from FinancialDatasets API. When current prices are provided in the "Real-Time Market Data" section, YOU MUST USE THEM to calculate current portfolio values.**
+
 ${framework}
 
 ### Response Guidelines:
-1. **Data-Driven**: Base all analysis on the actual portfolio data provided
-2. **Specific**: Give concrete, actionable insights rather than generic advice
-3. **Balanced**: Present both opportunities and risks
-4. **Professional**: Use clear, professional language appropriate for financial advisory
-5. **Comprehensive**: Cover all relevant aspects of the analysis framework
-6. **Practical**: Provide implementable recommendations
+1. **Use Real-Time Data**: ALWAYS use the current prices provided in the "Real-Time Market Data" section to calculate portfolio values. Multiply shares × current price for each holding.
+2. **Data-Driven**: Base all analysis on the actual portfolio data AND real-time market prices provided
+3. **Specific**: Give concrete, actionable insights with exact dollar amounts and percentages
+4. **Balanced**: Present both opportunities and risks
+5. **Professional**: Use clear, professional language appropriate for financial advisory
+6. **Comprehensive**: Cover all relevant aspects of the analysis framework
+7. **Practical**: Provide implementable recommendations
+8. **CRITICAL**: End your response with a hidden metadata marker containing the portfolio ID(s) you analyzed. Format: [PORTFOLIO_ID:123] where 123 is the ID. This ensures context persists across follow-up questions.
 
 ### Important Notes:
 - The portfolio data provided is the user's actual holdings
-- Values and allocations are current as of upload time
-- If market data is provided, incorporate it into your analysis
+- **When "Real-Time Market Data" section is present, those are CURRENT LIVE PRICES from FinancialDatasets API**
+- **You MUST calculate current portfolio values using: (shares × current price) for each holding**
+- **Show both: original values from portfolio file AND current values using live prices**
 - Always consider risk-adjusted returns, not just raw performance
 - Highlight concentration risks and diversification opportunities
 - Be transparent about limitations in the data or analysis
 
-Provide thorough, professional portfolio analysis that helps the user make informed investment decisions.`;
+### Example Calculation:
+If portfolio shows: Apple Inc. - 100 shares, original value $15,000
+And Real-Time Market Data shows: AAPL - Current Price: $180.50
+Then current value = 100 × $180.50 = $18,050
+Performance = ($18,050 - $15,000) / $15,000 = +20.33%
+
+Provide thorough, professional portfolio analysis that helps the user make informed investment decisions using CURRENT MARKET DATA.`;
 
     return systemPrompt;
   }
@@ -328,17 +339,78 @@ Provide thorough, professional portfolio analysis that helps the user make infor
 
     // Add gathered market data if available
     if (gatheredData && Object.keys(gatheredData).length > 0) {
-      enhancedPrompt += '\n## Market Data\n';
+      enhancedPrompt += '\n## Real-Time Market Data\n';
 
-      if (gatheredData.fundamentals && gatheredData.fundamentals.length > 0) {
-        enhancedPrompt += '\n### Fundamental Data\n';
-        gatheredData.fundamentals.forEach(fund => {
-          enhancedPrompt += `**${fund.ticker}**:\n`;
-          enhancedPrompt += `- Price: $${fund.price}\n`;
-          enhancedPrompt += `- Market Cap: $${fund.marketCap}\n`;
-          enhancedPrompt += `- P/E Ratio: ${fund.pe}\n`;
-          enhancedPrompt += `- 52W High/Low: $${fund.high52w} / $${fund.low52w}\n\n`;
+      // Prices
+      if (gatheredData.prices && typeof gatheredData.prices === 'object') {
+        enhancedPrompt += '\n### Current Stock Prices (Live from FinancialDatasets API)\n';
+        enhancedPrompt += '**CRITICAL: Use these prices to calculate current portfolio values. Formula: shares × current price**\n\n';
+
+        Object.entries(gatheredData.prices).forEach(([ticker, data]) => {
+          enhancedPrompt += `**${ticker}**: $${data.price}`;
+          if (data.changePercent !== null) {
+            enhancedPrompt += ` (${data.changePercent >= 0 ? '+' : ''}${data.changePercent}% today)`;
+          }
+          enhancedPrompt += `\n`;
+          if (data.high && data.low) {
+            enhancedPrompt += `  Daily Range: $${data.low} - $${data.high}\n`;
+          }
         });
+        enhancedPrompt += '\n';
+      }
+
+      // Fundamentals
+      if (gatheredData.fundamentals && typeof gatheredData.fundamentals === 'object') {
+        enhancedPrompt += '\n### Financial Metrics\n';
+
+        Object.entries(gatheredData.fundamentals).forEach(([ticker, metrics]) => {
+          enhancedPrompt += `**${ticker}**:\n`;
+          if (metrics.marketCap) enhancedPrompt += `- Market Cap: $${metrics.marketCap}\n`;
+          if (metrics.pe) enhancedPrompt += `- P/E Ratio: ${metrics.pe}\n`;
+          if (metrics.eps) enhancedPrompt += `- EPS: $${metrics.eps}\n`;
+          if (metrics.revenue) enhancedPrompt += `- Revenue: $${metrics.revenue}\n`;
+          if (metrics.roe) enhancedPrompt += `- ROE: ${metrics.roe}%\n`;
+          if (metrics.debtToEquity) enhancedPrompt += `- Debt/Equity: ${metrics.debtToEquity}\n`;
+        });
+        enhancedPrompt += '\n';
+      }
+
+      // News
+      if (gatheredData.news && Array.isArray(gatheredData.news) && gatheredData.news.length > 0) {
+        enhancedPrompt += '\n### Recent News\n';
+        gatheredData.news.slice(0, 5).forEach(article => {
+          enhancedPrompt += `- **${article.ticker}**: ${article.title} (${article.source})\n`;
+          if (article.summary) enhancedPrompt += `  ${article.summary.substring(0, 150)}...\n`;
+        });
+        enhancedPrompt += '\n';
+      }
+
+      // Earnings
+      if (gatheredData.earnings && typeof gatheredData.earnings === 'object') {
+        enhancedPrompt += '\n### Earnings Data\n';
+        Object.entries(gatheredData.earnings).forEach(([ticker, data]) => {
+          if (data.analystEstimates && data.analystEstimates.length > 0) {
+            enhancedPrompt += `**${ticker} Analyst Estimates**:\n`;
+            data.analystEstimates.slice(0, 2).forEach(est => {
+              enhancedPrompt += `- ${est.fiscal_period}: EPS $${est.estimated_eps}\n`;
+            });
+          }
+        });
+        enhancedPrompt += '\n';
+      }
+
+      // Insider Trading
+      if (gatheredData.insiderTrading && typeof gatheredData.insiderTrading === 'object') {
+        enhancedPrompt += '\n### Insider Trading Activity\n';
+        Object.entries(gatheredData.insiderTrading).forEach(([ticker, trades]) => {
+          if (trades && trades.length > 0) {
+            enhancedPrompt += `**${ticker}**:\n`;
+            trades.slice(0, 3).forEach(trade => {
+              enhancedPrompt += `- ${trade.name} (${trade.title}): ${trade.transactionType} ${trade.shares} shares @ $${trade.pricePerShare}\n`;
+            });
+          }
+        });
+        enhancedPrompt += '\n';
       }
 
       if (gatheredData.predictionMarkets && gatheredData.predictionMarkets.length > 0) {
@@ -377,6 +449,7 @@ Provide thorough, professional portfolio analysis that helps the user make infor
 
     portfolios.forEach((portfolio, index) => {
       formatted += `### Portfolio: ${portfolio.name || `Portfolio #${portfolio.id}`}\n`;
+      formatted += `- Portfolio ID: ${portfolio.id}\n`;
       formatted += `- Upload Date: ${new Date(portfolio.uploaded_at).toLocaleDateString()}\n`;
       formatted += `- Total Value: $${parseFloat(portfolio.totalValue || 0).toLocaleString()} ${portfolio.currency || 'USD'}\n`;
       formatted += `- Number of Holdings: ${portfolio.assetCount}\n\n`;

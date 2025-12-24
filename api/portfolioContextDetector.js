@@ -143,15 +143,40 @@ class PortfolioContextDetector {
         const identifiers = [];
         const lower = message.toLowerCase();
 
-        // Extract by name (P1, P2, "Tech Portfolio", etc.)
-        const nameMatches = message.match(this.identifierPatterns.byName);
-        if (nameMatches) {
-            nameMatches.forEach(match => {
+        // CRITICAL: Check for simple "my portfolio" reference first
+        // If user just says "my portfolio" without a specific name, use implicit/recency
+        const hasSimpleMyPortfolio = /\bmy\s+portfolio\b/i.test(message) &&
+                                      !/\b(tech|retirement|growth|value|income|dividend|[\w]{5,})\s+portfolio\b/i.test(message);
+
+        if (hasSimpleMyPortfolio) {
+            // Check history for previous portfolio
+            const previousPortfolio = this.getPreviousPortfolioFromHistory(history);
+            if (previousPortfolio) {
                 identifiers.push({
-                    type: 'name',
-                    value: match.trim(),
-                    referencedBy: 'explicit'
+                    type: 'implicit',
+                    value: previousPortfolio,
+                    referencedBy: 'conversation_context'
                 });
+            } else {
+                // Default to latest portfolio
+                identifiers.push({
+                    type: 'recency',
+                    value: 'latest',
+                    referencedBy: 'implicit_latest'
+                });
+            }
+            return identifiers; // Return early to avoid greedy name matching
+        }
+
+        // Extract by specific name (P1, P2, "Tech Portfolio", etc.)
+        // Only match specific portfolio names (1-3 word prefixes before "portfolio")
+        const specificNamePattern = /\b([a-z]{3,15}(?:\s+[a-z]{3,15}){0,2})\s+portfolio\b/i;
+        const specificMatch = message.match(specificNamePattern);
+        if (specificMatch) {
+            identifiers.push({
+                type: 'name',
+                value: specificMatch[1].trim() + ' portfolio',
+                referencedBy: 'explicit'
             });
         }
 
@@ -186,7 +211,7 @@ class PortfolioContextDetector {
             });
         }
 
-        // Check for implicit references
+        // Fallback: Check for implicit references
         if (identifiers.length === 0 && this.identifierPatterns.byImplicit.test(lower)) {
             const previousPortfolio = this.getPreviousPortfolioFromHistory(history);
             if (previousPortfolio) {
@@ -194,6 +219,13 @@ class PortfolioContextDetector {
                     type: 'implicit',
                     value: previousPortfolio,
                     referencedBy: 'conversation_context'
+                });
+            } else {
+                // Last resort: use latest portfolio
+                identifiers.push({
+                    type: 'recency',
+                    value: 'latest',
+                    referencedBy: 'fallback_latest'
                 });
             }
         }
@@ -309,15 +341,26 @@ class PortfolioContextDetector {
     getPreviousPortfolioFromHistory(history) {
         if (!history || history.length === 0) return null;
 
-        const recentMessages = history.slice(-2).reverse(); // Last 2 messages, most recent first
+        // Look for portfolio ID in special metadata format [PORTFOLIO_ID:123]
+        const recentMessages = history.slice(-5).reverse(); // Last 5 messages
 
         for (const msg of recentMessages) {
-            const match = msg.content.match(this.identifierPatterns.byName);
-            if (match) {
-                return match[0].trim();
+            // Check for portfolio ID metadata marker
+            const idMatch = msg.content.match(/\[PORTFOLIO_ID:(\d+)\]/);
+            if (idMatch) {
+                console.log(`   ✓ Found portfolio ID in history: ${idMatch[1]}`);
+                return idMatch[1]; // Return just the ID number
+            }
+
+            // Check for "Portfolio #X" references
+            const portfolioNumMatch = msg.content.match(/\bPortfolio\s*#(\d+)\b/i);
+            if (portfolioNumMatch) {
+                console.log(`   ✓ Found portfolio reference in history: Portfolio #${portfolioNumMatch[1]}`);
+                return portfolioNumMatch[1];
             }
         }
 
+        console.log(`   ⚠ No portfolio reference found in history`);
         return null;
     }
 

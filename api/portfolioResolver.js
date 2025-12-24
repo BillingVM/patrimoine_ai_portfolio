@@ -124,6 +124,15 @@ class PortfolioResolver {
       let portfolios = [];
 
       switch (identifier.type) {
+        case 'id':
+          // Direct portfolio ID from conversation history
+          const portfolioId = parseInt(identifier.value);
+          if (!isNaN(portfolioId)) {
+            const portfolio = await portfolioQueries.getPortfolio(portfolioId, userId);
+            if (portfolio) portfolios = [portfolio];
+          }
+          break;
+
         case 'name':
           // Exact or fuzzy match by name
           portfolios = await portfolioQueries.getPortfoliosByName(identifier.value, userId);
@@ -147,12 +156,22 @@ class PortfolioResolver {
           break;
 
         case 'implicit':
-          // Try to resolve from conversation context
-          portfolios = await portfolioQueries.getPortfoliosByName(identifier.value, userId);
-          if (portfolios.length === 0) {
-            // Fallback to latest if implicit reference doesn't match
-            const latest = await portfolioQueries.getLatestPortfolio(userId);
-            if (latest) portfolios = [latest];
+          // Check if value is a numeric ID (from history)
+          const implicitId = parseInt(identifier.value);
+          if (!isNaN(implicitId)) {
+            const portfolio = await portfolioQueries.getPortfolio(implicitId, userId);
+            if (portfolio) {
+              portfolios = [portfolio];
+              console.log(`   ✓ Resolved implicit ID ${implicitId} to portfolio: ${portfolio.name || `#${portfolio.id}`}`);
+            }
+          } else {
+            // Try to resolve from conversation context by name
+            portfolios = await portfolioQueries.getPortfoliosByName(identifier.value, userId);
+            if (portfolios.length === 0) {
+              // Fallback to latest if implicit reference doesn't match
+              const latest = await portfolioQueries.getLatestPortfolio(userId);
+              if (latest) portfolios = [latest];
+            }
           }
           break;
       }
