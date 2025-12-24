@@ -14,9 +14,15 @@ class PortfolioChat {
         this.userScrolledUp = false; // Track if user manually scrolled up
         this.currentFile = null; // Currently selected file
         this.currentFileData = null; // Uploaded file data (portfolioId, etc.)
+        this.portfolioId = null; // Portfolio ID from URL parameter
+        this.portfolioData = null; // Portfolio and client data
+        this.currentSessionId = null; // Current chat session ID
+        this.isLoadingSession = false; // Flag to prevent double-saving when loading
 
         this.initializeElements();
         this.attachEventListeners();
+        this.checkPortfolioContext();
+        this.loadChatHistory();
         this.checkPendingPrompt();
     }
 
@@ -33,7 +39,11 @@ class PortfolioChat {
             uploadBtn: document.getElementById('uploadBtn'),
             fileInput: document.getElementById('fileInput'),
             attachmentPreview: document.getElementById('attachmentPreview'),
-            dragOverlay: document.getElementById('dragOverlay')
+            dragOverlay: document.getElementById('dragOverlay'),
+            // Portfolio context elements
+            portfolioContext: document.getElementById('portfolioContext'),
+            portfolioName: document.getElementById('portfolioName'),
+            clientLink: document.getElementById('clientLink')
         };
     }
 
@@ -131,6 +141,69 @@ class PortfolioChat {
         this.elements.charCount.textContent = `${count}/4000`;
     }
 
+    /**
+     * Check if portfolio context exists in URL and load it
+     */
+    async checkPortfolioContext() {
+        const urlParams = new URLSearchParams(window.location.search);
+        // Support both 'portfolio' and 'portfolio_id' parameter names
+        this.portfolioId = urlParams.get('portfolio') || urlParams.get('portfolio_id');
+
+        if (!this.portfolioId) return;
+
+        try {
+            // Fetch portfolio details
+            const response = await fetch(`${API_URL}/portfolio/${this.portfolioId}`);
+            const data = await response.json();
+
+            if (!data.success || !data.portfolio) return;
+
+            this.portfolioData = data.portfolio;
+
+            // Fetch client details if client_id exists
+            if (this.portfolioData.client_id) {
+                const clientResponse = await fetch(`${API_URL}/clients/${this.portfolioData.client_id}`);
+                const clientData = await clientResponse.json();
+
+                if (clientData.success) {
+                    this.portfolioData.client = clientData.client;
+                }
+            }
+
+            // Display portfolio context
+            this.displayPortfolioContext();
+        } catch (error) {
+            console.error('Error loading portfolio context:', error);
+        }
+    }
+
+    /**
+     * Display portfolio context header
+     */
+    displayPortfolioContext() {
+        if (!this.portfolioData) return;
+
+        const portfolioName = this.portfolioData.portfolio_name || this.portfolioData.original_name;
+        this.elements.portfolioName.textContent = portfolioName;
+
+        if (this.portfolioData.client) {
+            this.elements.clientLink.textContent = this.portfolioData.client.name;
+            this.elements.clientLink.href = `client-detail.php?id=${this.portfolioData.client.id}`;
+        } else {
+            this.elements.clientLink.parentElement.style.display = 'none';
+        }
+
+        this.elements.portfolioContext.style.display = 'flex';
+
+        // Set the portfolio context for file uploads (so it's included in chat)
+        this.currentFileData = {
+            portfolioId: this.portfolioData.id,
+            filename: this.portfolioData.filename,
+            originalName: portfolioName,
+            fileType: this.portfolioData.file_type
+        };
+    }
+
     checkPendingPrompt() {
         const pendingPrompt = sessionStorage.getItem('pendingPrompt');
         if (pendingPrompt) {
@@ -181,9 +254,11 @@ class PortfolioChat {
             url.searchParams.append('message', messageText);
             url.searchParams.append('history', JSON.stringify(this.messageHistory));
 
-            // Include portfolio context if file is attached
-            if (this.currentFileData) {
-                url.searchParams.append('portfolio_id', this.currentFileData.portfolioId);
+            // Include portfolio context if available (from URL or uploaded file)
+            const portfolioId = this.portfolioId || (this.currentFileData ? this.currentFileData.portfolioId : null);
+            if (portfolioId) {
+                url.searchParams.append('portfolio_id', portfolioId);
+                console.log(`📎 Including portfolio_id=${portfolioId} in request`);
             }
 
             const eventSource = new EventSource(url.toString());
@@ -218,6 +293,13 @@ class PortfolioChat {
                             { role: 'user', content: messageText },
                             { role: 'assistant', content: streamingContent || finalResult.response }
                         );
+
+                        // Create session if first message, then save messages
+                        (async () => {
+                            await this.createSession(messageText);
+                            await this.saveMessage('user', messageText);
+                            await this.saveMessage('assistant', streamingContent || finalResult.response);
+                        })();
                     }
 
                     this.isStreaming = false;
@@ -235,7 +317,16 @@ class PortfolioChat {
                 try {
                     const data = JSON.parse(event.data);
 
-                    if (data.type === 'progress') {
+                    if (data.type === 'insufficient_credits') {
+                        // Handle insufficient credits - show topup modal
+                        eventSource.close();
+                        this.currentEventSource = null;
+                        this.removeThinkingIndicator();
+                        this.showInsufficientCreditsModal(data.balance);
+                        this.isStreaming = false;
+                        this.updateSendButton();
+                        this.elements.chatInput.focus();
+                    } else if (data.type === 'progress') {
                         // Update thinking indicator with progress
                         this.updateThinkingIndicator(data.message, data.progress);
                     } else if (data.type === 'token') {
@@ -500,6 +591,7 @@ class PortfolioChat {
     startNewChat() {
         // Clear messages and history
         this.messageHistory = [];
+        this.currentSessionId = null; // Clear current session
         this.elements.chatMessages.innerHTML = `
             <div class="chat-welcome">
                 <div class="welcome-icon">
@@ -515,6 +607,9 @@ class PortfolioChat {
         this.elements.chatInput.value = '';
         this.updateCharCount();
         this.elements.chatInput.focus();
+
+        // Reload chat history to refresh UI
+        this.loadChatHistory();
     }
 
     checkScrollPosition() {
@@ -909,9 +1004,273 @@ class PortfolioChat {
             }, 3000);
         }
     }
+
+    /**
+     * Show insufficient credits modal with topup option
+     */
+    showInsufficientCreditsModal(balance) {
+        // Show the add credits modal
+        const modal = document.getElementById('addCreditsModal');
+        if (modal) {
+            modal.style.display = 'flex';
+            modal.classList.add('show');
+
+            // Update modal header to show depletion message
+            const modalHeader = modal.querySelector('.modal-header h2');
+            if (modalHeader) {
+                modalHeader.innerHTML = `
+                    <span style="color: #ef4444;">⚠️ Insufficient Credits</span>
+                `;
+            }
+
+            // Add/update depletion message
+            const modalBody = modal.querySelector('.modal-body');
+            let depletionMsg = modalBody.querySelector('.credits-depletion-message');
+
+            if (!depletionMsg) {
+                depletionMsg = document.createElement('div');
+                depletionMsg.className = 'credits-depletion-message';
+                modalBody.insertBefore(depletionMsg, modalBody.firstChild);
+            }
+
+            depletionMsg.innerHTML = `
+                <p style="color: var(--text-secondary); margin-bottom: 1.5rem; padding: 1rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 8px;">
+                    <strong>Your credit balance is depleted (${balance} credits remaining).</strong><br>
+                    Please purchase credits to continue using the AI assistant.
+                </p>
+            `;
+
+            // Show error toast as well
+            this.showError('Insufficient credits. Please purchase credits to continue.');
+        } else {
+            // Fallback if modal doesn't exist
+            this.showError('Insufficient credits. Please add credits to continue using the AI assistant.');
+        }
+    }
+
+    // ==================== CHAT SESSION MANAGEMENT ====================
+
+    /**
+     * Load chat history sidebar
+     */
+    async loadChatHistory() {
+        try {
+            const response = await fetch(`${API_URL}/chat/sessions`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.renderChatHistory(data.sessions);
+            }
+        } catch (error) {
+            console.error('Error loading chat history:', error);
+        }
+    }
+
+    /**
+     * Render chat history in sidebar
+     */
+    renderChatHistory(sessions) {
+        const historyContainer = document.getElementById('chatHistorySidebar');
+        if (!historyContainer) return;
+
+        let html = '';
+
+        // General chats section
+        if (sessions.general && sessions.general.length > 0) {
+            html += `
+                <div class="history-section">
+                    <div class="history-section-header" onclick="toggleHistorySection('general')">
+                        <span>💬 General Chats</span>
+                        <span class="history-count">${sessions.general.length}</span>
+                    </div>
+                    <div class="history-section-content" id="history-general">
+                        ${sessions.general.map(session => this.renderSessionItem(session)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Portfolio-specific chats
+        if (sessions.byPortfolio && sessions.byPortfolio.length > 0) {
+            sessions.byPortfolio.forEach(portfolio => {
+                html += `
+                    <div class="history-section">
+                        <div class="history-section-header" onclick="toggleHistorySection('portfolio-${portfolio.portfolioId}')">
+                            <span>📊 ${portfolio.portfolioName}</span>
+                            <span class="history-count">${portfolio.sessions.length}</span>
+                        </div>
+                        <div class="history-section-content" id="history-portfolio-${portfolio.portfolioId}">
+                            ${portfolio.sessions.map(session => this.renderSessionItem(session)).join('')}
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        if (!html) {
+            html = `<div class="history-empty">No chat history yet. Start a conversation!</div>`;
+        }
+
+        historyContainer.innerHTML = html;
+    }
+
+    /**
+     * Render single session item
+     */
+    renderSessionItem(session) {
+        const isActive = session.id === this.currentSessionId;
+        const date = new Date(session.last_message_at);
+        const timeAgo = this.formatTimeAgo(date);
+
+        return `
+            <div class="history-item ${isActive ? 'active' : ''}" onclick="window.chatInstance.loadSession(${session.id})">
+                <div class="history-item-title">${this.escapeHtml(session.title)}</div>
+                <div class="history-item-meta">
+                    <span>${session.message_count} messages</span>
+                    <span>•</span>
+                    <span>${timeAgo}</span>
+                </div>
+            </div>
+        `;
+    }
+
+    /**
+     * Format time ago string
+     */
+    formatTimeAgo(date) {
+        const seconds = Math.floor((new Date() - date) / 1000);
+
+        if (seconds < 60) return 'Just now';
+        if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
+        if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
+        if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
+
+        return date.toLocaleDateString();
+    }
+
+    /**
+     * Create a new session or use existing one
+     */
+    async createSession(firstMessage) {
+        if (this.currentSessionId) {
+            return this.currentSessionId; // Already have a session
+        }
+
+        try {
+            const title = firstMessage.substring(0, 50);
+            const response = await fetch(`${API_URL}/chat/sessions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    title: title,
+                    portfolioId: this.portfolioId || null
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.currentSessionId = data.session.id;
+                console.log(`✅ Created session #${this.currentSessionId}`);
+
+                // Reload history to show new session
+                this.loadChatHistory();
+
+                return this.currentSessionId;
+            }
+        } catch (error) {
+            console.error('Error creating session:', error);
+        }
+
+        return null;
+    }
+
+    /**
+     * Save a message to the current session
+     */
+    async saveMessage(role, content, metadata = {}) {
+        if (!this.currentSessionId || this.isLoadingSession) {
+            return; // No session yet or loading existing session
+        }
+
+        try {
+            await fetch(`${API_URL}/chat/sessions/${this.currentSessionId}/messages`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    role,
+                    content,
+                    metadata
+                })
+            });
+        } catch (error) {
+            console.error('Error saving message:', error);
+        }
+    }
+
+    /**
+     * Load an existing session
+     */
+    async loadSession(sessionId) {
+        try {
+            this.isLoadingSession = true;
+
+            const response = await fetch(`${API_URL}/chat/sessions/${sessionId}`);
+            const data = await response.json();
+
+            if (data.success) {
+                const session = data.session;
+
+                // Clear current chat
+                this.elements.chatMessages.innerHTML = '';
+                this.messageHistory = [];
+                this.currentSessionId = session.id;
+
+                // Set portfolio context if session has one
+                if (session.portfolio_id) {
+                    this.portfolioId = session.portfolio_id;
+                }
+
+                // Render all messages
+                session.messages.forEach(msg => {
+                    if (msg.role === 'user') {
+                        this.addUserMessage(msg.content);
+                    } else if (msg.role === 'assistant') {
+                        this.addAssistantMessage(msg.content);
+                    }
+
+                    // Add to history for context
+                    this.messageHistory.push({
+                        role: msg.role,
+                        content: msg.content
+                    });
+                });
+
+                // Reload history to update active state
+                this.loadChatHistory();
+
+                this.scrollToBottom();
+                console.log(`✅ Loaded session #${sessionId} with ${session.messages.length} messages`);
+            }
+
+            this.isLoadingSession = false;
+
+        } catch (error) {
+            console.error('Error loading session:', error);
+            this.isLoadingSession = false;
+        }
+    }
+}
+
+// Global function for history section toggling (called from onclick)
+function toggleHistorySection(sectionId) {
+    const content = document.getElementById(`history-${sectionId}`);
+    if (content) {
+        content.classList.toggle('collapsed');
+    }
 }
 
 // Initialize chat when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-    new PortfolioChat();
+    window.chatInstance = new PortfolioChat();
 });

@@ -128,7 +128,7 @@ class PortfolioResolver {
           // Direct portfolio ID from conversation history
           const portfolioId = parseInt(identifier.value);
           if (!isNaN(portfolioId)) {
-            const portfolio = await portfolioQueries.getPortfolio(portfolioId, userId);
+            const portfolio = await portfolioQueries.getPortfolioById(portfolioId, userId);
             if (portfolio) portfolios = [portfolio];
           }
           break;
@@ -159,7 +159,7 @@ class PortfolioResolver {
           // Check if value is a numeric ID (from history)
           const implicitId = parseInt(identifier.value);
           if (!isNaN(implicitId)) {
-            const portfolio = await portfolioQueries.getPortfolio(implicitId, userId);
+            const portfolio = await portfolioQueries.getPortfolioById(implicitId, userId);
             if (portfolio) {
               portfolios = [portfolio];
               console.log(`   ✓ Resolved implicit ID ${implicitId} to portfolio: ${portfolio.name || `#${portfolio.id}`}`);

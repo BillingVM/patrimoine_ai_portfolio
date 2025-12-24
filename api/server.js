@@ -25,6 +25,8 @@ const EnhancedChatHandler = require('./enhancedChat');
 const EnhancedChatWithProgress = require('./enhancedChatWithProgress');
 const VisionService = require('./visionService');
 const ocr = require('./ocr');
+const sessionHelper = require('./sessionHelper');
+const chatSessions = require('./chatSessions');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -314,9 +316,23 @@ app.get('/api/portfolios', async (req, res) => {
 /**
  * GET /api/portfolio/:id
  * Get single portfolio with report
+ * SECURITY: Verifies portfolio belongs to current user
  */
 app.get('/api/portfolio/:id', async (req, res) => {
   try {
+    // Get current user ID
+    const userId = sessionHelper.getCurrentUserId(req);
+
+    // Verify portfolio ownership
+    const hasAccess = await sessionHelper.verifyPortfolioOwnership(req.params.id, userId, db);
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied. This portfolio does not belong to you.'
+      });
+    }
+
     const portfolio = await db.getPortfolio(req.params.id);
 
     if (!portfolio) {
@@ -357,9 +373,23 @@ app.get('/api/portfolio/:id', async (req, res) => {
 /**
  * DELETE /api/portfolio/:id
  * Delete portfolio
+ * SECURITY: Verifies portfolio belongs to current user
  */
 app.delete('/api/portfolio/:id', async (req, res) => {
   try {
+    // Get current user ID
+    const userId = sessionHelper.getCurrentUserId(req);
+
+    // Verify portfolio ownership
+    const hasAccess = await sessionHelper.verifyPortfolioOwnership(req.params.id, userId, db);
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied. This portfolio does not belong to you.'
+      });
+    }
+
     const deleted = await db.deletePortfolio(req.params.id);
 
     if (!deleted) {
@@ -380,6 +410,7 @@ app.delete('/api/portfolio/:id', async (req, res) => {
 /**
  * POST /api/portfolio/detect
  * AI-powered portfolio detection using Vision AI/OCR + classification
+ * SECURITY: Verifies portfolio belongs to current user
  */
 app.post('/api/portfolio/detect', async (req, res) => {
   try {
@@ -390,6 +421,17 @@ app.post('/api/portfolio/detect', async (req, res) => {
     }
 
     console.log(`🔍 Detecting portfolio for ID: ${portfolioId}`);
+
+    // SECURITY: Verify portfolio ownership
+    const userId = sessionHelper.getCurrentUserId(req);
+    const hasAccess = await sessionHelper.verifyPortfolioOwnership(portfolioId, userId, db);
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied. This portfolio does not belong to you.'
+      });
+    }
 
     // 1. Fetch portfolio from database
     const portfolio = await db.getPortfolio(portfolioId);
@@ -528,6 +570,7 @@ ${contentForAI.substring(0, 3000)}`;
 /**
  * PUT /api/portfolio/:id/metadata
  * Update portfolio name and client assignment
+ * SECURITY: Verifies portfolio belongs to current user
  */
 app.put('/api/portfolio/:id/metadata', async (req, res) => {
   try {
@@ -536,6 +579,17 @@ app.put('/api/portfolio/:id/metadata', async (req, res) => {
 
     if (!name || name.trim().length === 0) {
       return res.status(400).json({ error: 'Portfolio name is required' });
+    }
+
+    // SECURITY: Verify portfolio ownership
+    const userId = sessionHelper.getCurrentUserId(req);
+    const hasAccess = await sessionHelper.verifyPortfolioOwnership(id, userId, db);
+
+    if (!hasAccess) {
+      return res.status(403).json({
+        success: false,
+        error: 'Access denied. This portfolio does not belong to you.'
+      });
     }
 
     console.log(`📝 Updating portfolio #${id} metadata:`);
@@ -651,17 +705,28 @@ app.get('/api/chat-stream', async (req, res) => {
     // Parse history from JSON string
     const parsedHistory = history ? JSON.parse(history) : [];
 
+    // Setup SSE headers
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
+
     // Check credits balance
     const hasCredits = await credits.hasCredits(userId);
     const balance = await credits.getBalance(userId);
 
     if (!hasCredits) {
-      return res.status(402).json({
+      // Send insufficient credits error via SSE
+      res.write(`data: ${JSON.stringify({
+        type: 'insufficient_credits',
         error: 'Insufficient credits',
         message: 'Your credit balance is depleted. Please add more credits to continue.',
         balance: balance,
         needsPayment: true
-      });
+      })}\n\n`);
+      res.write('data: [DONE]\n\n');
+      res.end();
+      return;
     }
 
     // Fetch portfolio context if portfolio_id provided
@@ -670,6 +735,17 @@ app.get('/api/chat-stream', async (req, res) => {
 
     if (portfolio_id) {
       console.log(`📎 Including portfolio context for ID: ${portfolio_id}`);
+
+      // SECURITY: Verify portfolio ownership
+      const hasAccess = await sessionHelper.verifyPortfolioOwnership(portfolio_id, userId, db);
+
+      if (!hasAccess) {
+        return res.status(403).json({
+          error: 'Access denied',
+          message: 'This portfolio does not belong to you.',
+          success: false
+        });
+      }
 
       try {
         const portfolio = await db.getPortfolio(portfolio_id);
@@ -698,12 +774,6 @@ app.get('/api/chat-stream', async (req, res) => {
         // Continue without portfolio context
       }
     }
-
-    // Set SSE headers
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    res.setHeader('X-Accel-Buffering', 'no'); // Disable nginx buffering
 
     // Create progress-enabled chat handler
     const chatWithProgress = new EnhancedChatWithProgress();
@@ -884,6 +954,181 @@ app.get('/api/credits/pricing', (req, res) => {
       ]
     }
   });
+});
+
+// ==================== CHAT SESSION ENDPOINTS ====================
+
+/**
+ * POST /api/chat/sessions
+ * Create a new chat session
+ */
+app.post('/api/chat/sessions', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const { title, portfolioId } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const session = await chatSessions.createSession(userId, title, portfolioId || null);
+
+    res.json({
+      success: true,
+      session
+    });
+
+  } catch (error) {
+    console.error('❌ Error creating chat session:', error);
+    res.status(500).json({
+      error: 'Failed to create chat session',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/chat/sessions
+ * Get all chat sessions for current user (grouped by general/portfolio)
+ */
+app.get('/api/chat/sessions', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const sessions = await chatSessions.getUserSessions(userId);
+
+    res.json({
+      success: true,
+      sessions
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching chat sessions:', error);
+    res.status(500).json({
+      error: 'Failed to fetch chat sessions',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/chat/sessions/:id
+ * Get a specific chat session with all messages
+ */
+app.get('/api/chat/sessions/:id', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const sessionId = parseInt(req.params.id);
+
+    const session = await chatSessions.getSession(sessionId, userId);
+
+    if (!session) {
+      return res.status(404).json({ error: 'Chat session not found' });
+    }
+
+    res.json({
+      success: true,
+      session
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching chat session:', error);
+    res.status(500).json({
+      error: 'Failed to fetch chat session',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * POST /api/chat/sessions/:id/messages
+ * Add a message to a chat session
+ */
+app.post('/api/chat/sessions/:id/messages', async (req, res) => {
+  try {
+    const sessionId = parseInt(req.params.id);
+    const { role, content, metadata } = req.body;
+
+    if (!role || !content) {
+      return res.status(400).json({ error: 'Role and content are required' });
+    }
+
+    const message = await chatSessions.addMessage(sessionId, role, content, metadata || {});
+
+    res.json({
+      success: true,
+      message
+    });
+
+  } catch (error) {
+    console.error('❌ Error adding message:', error);
+    res.status(500).json({
+      error: 'Failed to add message',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * PUT /api/chat/sessions/:id
+ * Update chat session title
+ */
+app.put('/api/chat/sessions/:id', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const sessionId = parseInt(req.params.id);
+    const { title } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ error: 'Title is required' });
+    }
+
+    const session = await chatSessions.updateSessionTitle(sessionId, title, userId);
+
+    if (!session) {
+      return res.status(404).json({ error: 'Chat session not found' });
+    }
+
+    res.json({
+      success: true,
+      session
+    });
+
+  } catch (error) {
+    console.error('❌ Error updating chat session:', error);
+    res.status(500).json({
+      error: 'Failed to update chat session',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * DELETE /api/chat/sessions/:id
+ * Delete a chat session and all its messages
+ */
+app.delete('/api/chat/sessions/:id', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const sessionId = parseInt(req.params.id);
+
+    const deleted = await chatSessions.deleteSession(sessionId, userId);
+
+    if (!deleted) {
+      return res.status(404).json({ error: 'Chat session not found' });
+    }
+
+    res.json({
+      success: true,
+      message: 'Chat session deleted'
+    });
+
+  } catch (error) {
+    console.error('❌ Error deleting chat session:', error);
+    res.status(500).json({
+      error: 'Failed to delete chat session',
+      message: error.message
+    });
+  }
 });
 
 // ==================== CLIENT ENDPOINTS ====================

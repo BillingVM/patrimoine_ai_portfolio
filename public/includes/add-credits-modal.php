@@ -306,11 +306,16 @@ async function completePurchase() {
             // Show success message
             showToastNotification(`Successfully added ${amount.toLocaleString()} credits!`, 'success');
 
-            // Reload credits widget
+            // Reload credits widget to update balance display
             if (typeof loadCredits === 'function') {
                 loadCredits();
             }
-        } else {
+
+            // Trigger custom event for chat page to update balance without reload
+            window.dispatchEvent(new CustomEvent('creditsUpdated', {
+                detail: { newBalance: data.balance }
+            }));
+        } else{
             showToastNotification(data.message || 'Failed to purchase credits', 'error');
         }
     } catch (error) {
@@ -327,6 +332,18 @@ function closeAddCreditsModal() {
     if (modal) {
         modal.style.display = 'none';
         modal.classList.remove('show');
+
+        // Reset modal header to default
+        const modalHeader = modal.querySelector('.modal-header h2');
+        if (modalHeader) {
+            modalHeader.textContent = 'Add Credits';
+        }
+
+        // Remove depletion message if exists
+        const depletionMsg = modal.querySelector('.credits-depletion-message');
+        if (depletionMsg) {
+            depletionMsg.remove();
+        }
     }
 }
 

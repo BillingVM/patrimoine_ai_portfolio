@@ -38,6 +38,17 @@
 <body>
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
+    <!-- Chat History Sidebar -->
+    <aside class="chat-history-sidebar" id="chatHistorySidebar">
+        <div class="history-header">
+            <h3>Chat History</h3>
+        </div>
+        <div class="history-content">
+            <!-- History will be loaded dynamically -->
+            <div class="history-loading">Loading...</div>
+        </div>
+    </aside>
+
     <main class="main-content chat-page">
         <!-- Chat Header -->
         <header class="chat-header">
@@ -55,6 +66,20 @@
                 </button>
             </div>
         </header>
+
+        <!-- Portfolio Context (shown when chat is related to a specific portfolio) -->
+        <div class="portfolio-context" id="portfolioContext" style="display: none;">
+            <div class="portfolio-context-icon">📊</div>
+            <div class="portfolio-context-info">
+                <div class="portfolio-context-label">Chatting about:</div>
+                <div class="portfolio-context-title" id="portfolioContextTitle">
+                    <span id="portfolioName">Loading...</span>
+                </div>
+                <div class="portfolio-context-client">
+                    Client: <a href="#" id="clientLink" class="client-link">Loading...</a>
+                </div>
+            </div>
+        </div>
 
         <!-- Chat Container -->
         <div class="chat-container" id="chatContainer">

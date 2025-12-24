@@ -14,6 +14,7 @@ const CREDITS_PRICING = {
 
 /**
  * Get user credits balance
+ * Returns 0 if balance is negative (never show negative balance to user)
  */
 async function getBalance(userId = 1) {
   const result = await db.pool.query(
@@ -25,7 +26,9 @@ async function getBalance(userId = 1) {
     throw new Error('User not found');
   }
 
-  return result.rows[0].credits_balance;
+  const actualBalance = result.rows[0].credits_balance;
+  // Never display negative balance to user
+  return Math.max(0, actualBalance);
 }
 
 /**
