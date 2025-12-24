@@ -1011,6 +1011,65 @@ app.get('/api/chat/sessions', async (req, res) => {
 });
 
 /**
+ * GET /api/chat/sessions/paginated
+ * Get paginated chat sessions (for modal tabs)
+ * Query params: limit, offset, portfolio_id OR general=true
+ * NOTE: Must be BEFORE /:id route to avoid matching "paginated" as an ID
+ */
+app.get('/api/chat/sessions/paginated', async (req, res) => {
+  try {
+    const userId = sessionHelper.getCurrentUserId(req);
+    const limit = parseInt(req.query.limit) || 20;
+    const offset = parseInt(req.query.offset) || 0;
+
+    // Determine if this is general chats or portfolio-specific
+    let portfolioId = null;
+    if (req.query.portfolio_id) {
+      const parsedId = parseInt(req.query.portfolio_id);
+
+      // Validate portfolio ID is a valid number
+      if (isNaN(parsedId) || parsedId <= 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid portfolio ID',
+          message: 'Portfolio ID must be a positive integer'
+        });
+      }
+
+      portfolioId = parsedId;
+
+      // Verify portfolio ownership
+      const ownsPortfolio = await sessionHelper.verifyPortfolioOwnership(portfolioId, userId, db);
+      if (!ownsPortfolio) {
+        return res.status(403).json({ error: 'Access denied to this portfolio' });
+      }
+    } else if (req.query.general === 'true') {
+      portfolioId = null; // Explicitly set to null for general chats
+    }
+
+    const result = await chatSessions.getSessionsPaginated(userId, portfolioId, limit, offset);
+
+    res.json({
+      success: true,
+      sessions: result.sessions,
+      total: result.total,
+      limit: result.limit,
+      offset: result.offset,
+      hasMore: result.hasMore,
+      currentPage: result.currentPage,
+      totalPages: result.totalPages
+    });
+
+  } catch (error) {
+    console.error('❌ Error fetching paginated sessions:', error);
+    res.status(500).json({
+      error: 'Failed to fetch chat sessions',
+      message: error.message
+    });
+  }
+});
+
+/**
  * GET /api/chat/sessions/:id
  * Get a specific chat session with all messages
  */

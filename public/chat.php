@@ -38,17 +38,6 @@
 <body>
     <?php include __DIR__ . '/includes/sidebar.php'; ?>
 
-    <!-- Chat History Sidebar -->
-    <aside class="chat-history-sidebar" id="chatHistorySidebar">
-        <div class="history-header">
-            <h3>Chat History</h3>
-        </div>
-        <div class="history-content">
-            <!-- History will be loaded dynamically -->
-            <div class="history-loading">Loading...</div>
-        </div>
-    </aside>
-
     <main class="main-content chat-page">
         <!-- Chat Header -->
         <header class="chat-header">
@@ -155,6 +144,45 @@
 
     <!-- Toast Notification -->
     <div class="toast" id="toast" style="display: none;"></div>
+
+    <!-- Chat History Modal -->
+    <div class="modal" id="chatHistoryModal" style="display: none;">
+        <div class="modal-content modal-chat-history">
+            <div class="modal-header">
+                <h2>Chat History</h2>
+                <button class="modal-close" id="chatHistoryModalClose">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Tabs for different chat categories -->
+                <div class="history-tabs" id="historyTabs">
+                    <!-- Tabs will be dynamically generated -->
+                </div>
+
+                <!-- Tab content -->
+                <div class="history-tab-content" id="historyTabContent">
+                    <!-- Chat list will be dynamically generated -->
+                    <div class="history-loading">Loading chat history...</div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="history-pagination" id="historyPagination" style="display: none;">
+                    <button class="btn btn-secondary btn-sm" id="historyPrevPage" disabled>
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Previous
+                    </button>
+                    <span class="history-page-info" id="historyPageInfo">Page 1</span>
+                    <button class="btn btn-secondary btn-sm" id="historyNextPage">
+                        Next
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <?php include __DIR__ . '/includes/add-credits-modal.php'; ?>
 

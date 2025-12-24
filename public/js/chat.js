@@ -1051,87 +1051,322 @@ class PortfolioChat {
     // ==================== CHAT SESSION MANAGEMENT ====================
 
     /**
-     * Load chat history sidebar
+     * Placeholder for backward compatibility
      */
     async loadChatHistory() {
+        // Modal-based history, no sidebar to load
+        console.log('Chat history uses modal (opened via sidebar button)');
+    }
+
+    /**
+     * Open chat history modal and load tabs
+     */
+    async openChatHistoryModal() {
+        const modal = document.getElementById('chatHistoryModal');
+        if (!modal) return;
+
+        modal.style.display = 'flex';
+
+        // Load all sessions grouped by portfolio
         try {
             const response = await fetch(`${API_URL}/chat/sessions`);
             const data = await response.json();
 
             if (data.success) {
-                this.renderChatHistory(data.sessions);
+                this.renderHistoryTabs(data.sessions);
+                this.loadTabContent('general', null); // Load first tab (General)
             }
         } catch (error) {
             console.error('Error loading chat history:', error);
+            document.getElementById('historyTabContent').innerHTML = `
+                <div class="history-error">Failed to load chat history. Please try again.</div>
+            `;
         }
     }
 
     /**
-     * Render chat history in sidebar
+     * Close chat history modal
      */
-    renderChatHistory(sessions) {
-        const historyContainer = document.getElementById('chatHistorySidebar');
-        if (!historyContainer) return;
-
-        let html = '';
-
-        // General chats section
-        if (sessions.general && sessions.general.length > 0) {
-            html += `
-                <div class="history-section">
-                    <div class="history-section-header" onclick="toggleHistorySection('general')">
-                        <span>💬 General Chats</span>
-                        <span class="history-count">${sessions.general.length}</span>
-                    </div>
-                    <div class="history-section-content" id="history-general">
-                        ${sessions.general.map(session => this.renderSessionItem(session)).join('')}
-                    </div>
-                </div>
-            `;
+    closeChatHistoryModal() {
+        const modal = document.getElementById('chatHistoryModal');
+        if (modal) {
+            modal.style.display = 'none';
         }
+    }
 
-        // Portfolio-specific chats
+    /**
+     * Render tabs for General + Portfolio chats
+     */
+    renderHistoryTabs(sessions) {
+        const tabsContainer = document.getElementById('historyTabs');
+        if (!tabsContainer) return;
+
+        let tabsHtml = `
+            <div class="history-tab active" data-tab="general" data-portfolio-id="null">
+                💬 General Chats
+                ${sessions.general && sessions.general.length > 0 ? `<span class="tab-badge">${sessions.general.length}</span>` : ''}
+            </div>
+        `;
+
+        // Add portfolio tabs
         if (sessions.byPortfolio && sessions.byPortfolio.length > 0) {
             sessions.byPortfolio.forEach(portfolio => {
-                html += `
-                    <div class="history-section">
-                        <div class="history-section-header" onclick="toggleHistorySection('portfolio-${portfolio.portfolioId}')">
-                            <span>📊 ${portfolio.portfolioName}</span>
-                            <span class="history-count">${portfolio.sessions.length}</span>
-                        </div>
-                        <div class="history-section-content" id="history-portfolio-${portfolio.portfolioId}">
-                            ${portfolio.sessions.map(session => this.renderSessionItem(session)).join('')}
-                        </div>
+                tabsHtml += `
+                    <div class="history-tab" data-tab="portfolio" data-portfolio-id="${portfolio.portfolioId}">
+                        📊 ${this.escapeHtml(portfolio.portfolioName)}
+                        <span class="tab-badge">${portfolio.sessions.length}</span>
                     </div>
                 `;
             });
         }
 
-        if (!html) {
-            html = `<div class="history-empty">No chat history yet. Start a conversation!</div>`;
-        }
+        tabsContainer.innerHTML = tabsHtml;
 
-        historyContainer.innerHTML = html;
+        // Add click handlers to tabs
+        const tabs = tabsContainer.querySelectorAll('.history-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active from all tabs
+                tabs.forEach(t => t.classList.remove('active'));
+                // Add active to clicked tab
+                tab.classList.add('active');
+
+                // Load tab content
+                const tabType = tab.dataset.tab;
+                const portfolioIdStr = tab.dataset.portfolioId;
+
+                // Handle null/general case properly
+                let portfolioId = null;
+                if (portfolioIdStr && portfolioIdStr !== 'null') {
+                    const parsed = parseInt(portfolioIdStr);
+                    if (!isNaN(parsed)) {
+                        portfolioId = parsed;
+                    }
+                }
+
+                this.loadTabContent(tabType, portfolioId);
+            });
+        });
     }
 
     /**
-     * Render single session item
+     * Load paginated sessions for a specific tab
      */
-    renderSessionItem(session) {
-        const isActive = session.id === this.currentSessionId;
-        const date = new Date(session.last_message_at);
-        const timeAgo = this.formatTimeAgo(date);
+    async loadTabContent(tabType, portfolioId, page = 1) {
+        const contentContainer = document.getElementById('historyTabContent');
+        const paginationContainer = document.getElementById('historyPagination');
 
-        return `
-            <div class="history-item ${isActive ? 'active' : ''}" onclick="window.chatInstance.loadSession(${session.id})">
-                <div class="history-item-title">${this.escapeHtml(session.title)}</div>
-                <div class="history-item-meta">
-                    <span>${session.message_count} messages</span>
-                    <span>•</span>
-                    <span>${timeAgo}</span>
+        if (!contentContainer) return;
+
+        // Show loading
+        contentContainer.innerHTML = '<div class="history-loading">Loading chat history...</div>';
+        paginationContainer.style.display = 'none';
+
+        try {
+            const limit = 20;
+            const offset = (page - 1) * limit;
+
+            // Build query string
+            const params = new URLSearchParams({
+                limit: limit,
+                offset: offset
+            });
+
+            // Only add portfolio_id if it's a valid number
+            if (portfolioId !== null && portfolioId !== undefined && !isNaN(portfolioId) && portfolioId > 0) {
+                params.append('portfolio_id', portfolioId);
+            } else {
+                params.append('general', 'true'); // Flag for general chats
+            }
+
+            const response = await fetch(`${API_URL}/chat/sessions/paginated?${params.toString()}`);
+            const data = await response.json();
+
+            if (data.success) {
+                this.renderSessionList(data.sessions, contentContainer);
+                this.renderPagination(data, page, tabType, portfolioId, paginationContainer);
+            } else {
+                contentContainer.innerHTML = '<div class="history-error">Failed to load chat history.</div>';
+            }
+        } catch (error) {
+            console.error('Error loading tab content:', error);
+            contentContainer.innerHTML = '<div class="history-error">Failed to load chat history. Please try again.</div>';
+        }
+    }
+
+    /**
+     * Render list of chat sessions
+     */
+    renderSessionList(sessions, container) {
+        if (!sessions || sessions.length === 0) {
+            container.innerHTML = `
+                <div class="history-empty">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="48" height="48">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                    </svg>
+                    <p>No chat history yet</p>
+                    <p class="history-empty-hint">Start a conversation to see it here!</p>
+                </div>
+            `;
+            return;
+        }
+
+        let html = '<div class="history-list">';
+
+        sessions.forEach(session => {
+            const date = new Date(session.last_message_at || session.created_at);
+            const timeAgo = this.formatTimeAgo(date);
+            const isActive = session.id === this.currentSessionId;
+
+            html += `
+                <div class="history-chat-item ${isActive ? 'active' : ''}" data-session-id="${session.id}">
+                    <div class="history-chat-content">
+                        <div class="history-chat-title">${this.escapeHtml(session.title)}</div>
+                        <div class="history-chat-meta">
+                            <span>${session.message_count || 0} messages</span>
+                            <span>•</span>
+                            <span>${timeAgo}</span>
+                        </div>
+                        ${session.last_message_preview ? `
+                            <div class="history-chat-preview">${this.escapeHtml(session.last_message_preview.substring(0, 80))}${session.last_message_preview.length > 80 ? '...' : ''}</div>
+                        ` : ''}
+                    </div>
+                    <button class="history-delete-btn" data-session-id="${session.id}" title="Delete chat">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                    </button>
+                </div>
+            `;
+        });
+
+        html += '</div>';
+        container.innerHTML = html;
+
+        // Add click handlers
+        container.querySelectorAll('.history-chat-item').forEach(item => {
+            const sessionId = parseInt(item.dataset.sessionId);
+
+            // Click on chat item to load
+            item.querySelector('.history-chat-content').addEventListener('click', () => {
+                this.loadSession(sessionId);
+                this.closeChatHistoryModal();
+            });
+
+            // Click on delete button
+            item.querySelector('.history-delete-btn').addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent loading session
+                this.showDeleteConfirmation(sessionId);
+            });
+        });
+    }
+
+    /**
+     * Render pagination controls
+     */
+    renderPagination(data, currentPage, tabType, portfolioId, container) {
+        if (data.totalPages <= 1) {
+            container.style.display = 'none';
+            return;
+        }
+
+        container.style.display = 'flex';
+
+        const prevBtn = document.getElementById('historyPrevPage');
+        const nextBtn = document.getElementById('historyNextPage');
+        const pageInfo = document.getElementById('historyPageInfo');
+
+        if (pageInfo) {
+            pageInfo.textContent = `Page ${currentPage} of ${data.totalPages}`;
+        }
+
+        if (prevBtn) {
+            prevBtn.disabled = currentPage === 1;
+            prevBtn.onclick = () => {
+                if (currentPage > 1) {
+                    this.loadTabContent(tabType, portfolioId, currentPage - 1);
+                }
+            };
+        }
+
+        if (nextBtn) {
+            nextBtn.disabled = currentPage >= data.totalPages;
+            nextBtn.onclick = () => {
+                if (currentPage < data.totalPages) {
+                    this.loadTabContent(tabType, portfolioId, currentPage + 1);
+                }
+            };
+        }
+    }
+
+    /**
+     * Show delete confirmation dialog
+     */
+    showDeleteConfirmation(sessionId) {
+        const dialog = document.createElement('div');
+        dialog.className = 'delete-confirm-overlay';
+        dialog.innerHTML = `
+            <div class="delete-confirm-dialog">
+                <h3>Delete Chat?</h3>
+                <p>This action cannot be undone. All messages in this chat will be permanently deleted.</p>
+                <div class="delete-confirm-actions">
+                    <button class="btn btn-secondary" id="deleteCancelBtn">Cancel</button>
+                    <button class="btn btn-danger" id="deleteConfirmBtn">Delete</button>
                 </div>
             </div>
         `;
+
+        document.body.appendChild(dialog);
+
+        // Cancel button
+        dialog.querySelector('#deleteCancelBtn').addEventListener('click', () => {
+            dialog.remove();
+        });
+
+        // Confirm delete button
+        dialog.querySelector('#deleteConfirmBtn').addEventListener('click', async () => {
+            dialog.remove();
+            await this.deleteSession(sessionId);
+        });
+
+        // Click outside to close
+        dialog.addEventListener('click', (e) => {
+            if (e.target === dialog) {
+                dialog.remove();
+            }
+        });
+    }
+
+    /**
+     * Delete a chat session
+     */
+    async deleteSession(sessionId) {
+        try {
+            const response = await fetch(`${API_URL}/chat/sessions/${sessionId}`, {
+                method: 'DELETE'
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.showSuccess('Chat deleted successfully');
+
+                // If deleted chat was current session, reset
+                if (sessionId === this.currentSessionId) {
+                    this.startNewChat();
+                }
+
+                // Reload modal content
+                this.openChatHistoryModal();
+            } else {
+                this.showError('Failed to delete chat');
+            }
+        } catch (error) {
+            console.error('Error deleting session:', error);
+            this.showError('Failed to delete chat. Please try again.');
+        }
     }
 
     /**
@@ -1262,15 +1497,32 @@ class PortfolioChat {
     }
 }
 
-// Global function for history section toggling (called from onclick)
-function toggleHistorySection(sectionId) {
-    const content = document.getElementById(`history-${sectionId}`);
-    if (content) {
-        content.classList.toggle('collapsed');
+// Global function to open chat history modal (called from sidebar button)
+function openChatHistoryModal() {
+    if (window.chatInstance) {
+        window.chatInstance.openChatHistoryModal();
     }
 }
 
 // Initialize chat when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     window.chatInstance = new PortfolioChat();
+
+    // Modal close button event listener
+    const modalCloseBtn = document.getElementById('chatHistoryModalClose');
+    if (modalCloseBtn) {
+        modalCloseBtn.addEventListener('click', () => {
+            window.chatInstance.closeChatHistoryModal();
+        });
+    }
+
+    // Close modal when clicking outside
+    const modal = document.getElementById('chatHistoryModal');
+    if (modal) {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                window.chatInstance.closeChatHistoryModal();
+            }
+        });
+    }
 });

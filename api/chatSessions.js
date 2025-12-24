@@ -234,6 +234,72 @@ async function getSessionCount(userId) {
     return parseInt(result.rows[0].count) || 0;
 }
 
+/**
+ * Get sessions with pagination
+ * @param {number} userId - User ID
+ * @param {number|null} portfolioId - Portfolio ID (null for general chats)
+ * @param {number} limit - Number of sessions per page
+ * @param {number} offset - Offset for pagination
+ * @returns {Promise<Object>} Paginated sessions
+ */
+async function getSessionsPaginated(userId, portfolioId = null, limit = 20, offset = 0) {
+    // Validate and sanitize portfolioId
+    let validPortfolioId = null;
+    if (portfolioId !== null && portfolioId !== undefined) {
+        const parsed = typeof portfolioId === 'number' ? portfolioId : parseInt(portfolioId);
+        if (!isNaN(parsed) && parsed > 0) {
+            validPortfolioId = parsed;
+        }
+    }
+
+    const portfolioCondition = validPortfolioId === null
+        ? 's.portfolio_id IS NULL'
+        : 's.portfolio_id = $2';
+
+    const params = validPortfolioId === null
+        ? [userId, limit, offset]
+        : [userId, validPortfolioId, limit, offset];
+
+    const countQuery = `
+        SELECT COUNT(*) as total
+        FROM chat_sessions s
+        WHERE s.user_id = $1 AND ${portfolioCondition}
+    `;
+
+    const dataQuery = `
+        SELECT
+            s.id,
+            s.user_id,
+            s.portfolio_id,
+            s.title,
+            s.created_at,
+            s.updated_at,
+            s.last_message_at,
+            (SELECT COUNT(*) FROM chat_messages WHERE session_id = s.id) as message_count
+        FROM chat_sessions s
+        WHERE s.user_id = $1 AND ${portfolioCondition}
+        ORDER BY s.last_message_at DESC
+        LIMIT ${validPortfolioId === null ? '$2' : '$3'}
+        OFFSET ${validPortfolioId === null ? '$3' : '$4'}
+    `;
+
+    const countParams = validPortfolioId === null ? [userId] : [userId, validPortfolioId];
+    const countResult = await pool.query(countQuery, countParams);
+    const total = parseInt(countResult.rows[0].total) || 0;
+
+    const dataResult = await pool.query(dataQuery, params);
+
+    return {
+        sessions: dataResult.rows,
+        total,
+        limit,
+        offset,
+        hasMore: offset + limit < total,
+        currentPage: Math.floor(offset / limit) + 1,
+        totalPages: Math.ceil(total / limit)
+    };
+}
+
 module.exports = {
     createSession,
     getUserSessions,
@@ -242,5 +308,6 @@ module.exports = {
     updateSessionTitle,
     deleteSession,
     generateTitle,
-    getSessionCount
+    getSessionCount,
+    getSessionsPaginated
 };

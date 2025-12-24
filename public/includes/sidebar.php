@@ -38,7 +38,16 @@
             </svg>
         </a>
 
-        <a href="credits-history.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'credits-history.php' ? 'active' : ''; ?>" title="History">
+        <button class="sidebar-link" title="Chat History" onclick="openChatHistoryModal()" style="border: none; background: none; cursor: pointer;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 3v5h-5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M8 16H3v5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </button>
+
+        <a href="credits-history.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'credits-history.php' ? 'active' : ''; ?>" title="Credits History">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
                 <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
