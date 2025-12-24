@@ -10,6 +10,7 @@ const ModelManager = require('./modelManager');
 const FollowUpDetector = require('./followUpDetector');
 const PortfolioContextDetector = require('./portfolioContextDetector');
 const PortfolioResolver = require('./portfolioResolver');
+const UnifiedContextAnalyzer = require('./unifiedContextAnalyzer');
 const credits = require('./credits');
 
 class EnhancedChatHandler {
@@ -20,6 +21,7 @@ class EnhancedChatHandler {
         this.followUpDetector = new FollowUpDetector();
         this.portfolioContextDetector = new PortfolioContextDetector();
         this.portfolioResolver = new PortfolioResolver();
+        this.unifiedContextAnalyzer = new UnifiedContextAnalyzer();
 
         // Initialize data gatherer with config
         const config = this.modelManager.getConfig();
@@ -63,13 +65,17 @@ class EnhancedChatHandler {
                 result: followUpDetection
             };
 
-            // If it's a follow-up, use lightweight path
-            if (followUpDetection.isFollowUp) {
-                console.log('✅ Follow-up detected! Using LIGHTWEIGHT path (skipping data gathering)');
+            // CRITICAL: Only use lightweight path if it's a follow-up that DOESN'T need data
+            if (followUpDetection.isFollowUp && !followUpDetection.needsData) {
+                console.log('✅ Pure follow-up (no data needed)! Using LIGHTWEIGHT path');
                 return await this.processFollowUp(userMessage, history, userId, pipeline);
             }
 
-            console.log('📌 New topic detected. Using FULL pipeline with data gathering.');
+            if (followUpDetection.isFollowUp && followUpDetection.needsData) {
+                console.log('⚠️ Follow-up BUT NEEDS DATA! Using FULL pipeline with data gathering');
+            } else {
+                console.log('📌 New topic detected. Using FULL pipeline with data gathering.');
+            }
 
             // ==================== STAGE 0.5: Portfolio Context Detection ====================
             console.log('\n📊 STAGE 0.5: Portfolio Context Detection (System Cost - FREE for user)');

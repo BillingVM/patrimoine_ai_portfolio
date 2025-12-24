@@ -52,16 +52,16 @@ class EnhancedChatWithProgress extends EventEmitter {
             const followUpStart = Date.now();
             console.log('🔍 Calling followUpDetector.detect()...');
             const followUpDetection = this.chatHandler.followUpDetector.detect(userMessage, history);
-            console.log(`✅ Follow-up detection complete: isFollowUp=${followUpDetection.isFollowUp}, confidence=${followUpDetection.confidence}`);
+            console.log(`✅ Follow-up detection complete: isFollowUp=${followUpDetection.isFollowUp}, needsData=${followUpDetection.needsData}, confidence=${followUpDetection.confidence}`);
 
             pipeline.stages.followUpDetection = {
                 duration: Date.now() - followUpStart,
                 result: followUpDetection
             };
 
-            // If it's a follow-up, use lightweight path
-            if (followUpDetection.isFollowUp) {
-                console.log('⚡ FOLLOW-UP DETECTED! Switching to lightweight path...');
+            // CRITICAL: Only use lightweight path if it's a follow-up that DOESN'T need data
+            if (followUpDetection.isFollowUp && !followUpDetection.needsData) {
+                console.log('⚡ PURE FOLLOW-UP (no data needed)! Switching to lightweight path...');
                 console.log('📤 Emitting: followup detected progress (15%)');
                 this.emit('progress', {
                     stage: 'followup',
@@ -72,109 +72,48 @@ class EnhancedChatWithProgress extends EventEmitter {
                 return await this.processFollowUpWithProgress(userMessage, history, userId, pipeline);
             }
 
-            console.log('📌 New topic detected. Proceeding with full pipeline...');
+            // If it's a follow-up that NEEDS data, or a new topic, use full pipeline
+            if (followUpDetection.isFollowUp && followUpDetection.needsData) {
+                console.log('⚠️ FOLLOW-UP BUT NEEDS DATA! Using full pipeline with data gathering...');
+            } else {
+                console.log('📌 New topic detected. Proceeding with full pipeline...');
+            }
+
             console.log('📤 Emitting: new topic progress (10%)');
             this.emit('progress', {
                 stage: 'followup',
-                message: 'New topic detected. Running full analysis...',
+                message: followUpDetection.isFollowUp ? 'Follow-up needs data. Running full analysis...' : 'New topic detected. Running full analysis...',
                 progress: 10
             });
 
-            // ==================== STAGE 0.5: Portfolio Context Detection ====================
-            console.log('\n📊 STAGE 0.5: Portfolio Context Detection');
-            console.log('📤 Emitting: portfolio detection progress (15%)');
+            // ==================== STAGE 1: Unified Context Analysis ====================
+            console.log('\n🎯 STAGE 1: UNIFIED CONTEXT ANALYSIS');
+            console.log('📤 Emitting: context analysis progress (15%)');
             this.emit('progress', {
-                stage: 'portfolio',
-                message: 'Detecting portfolio context...',
+                stage: 'context',
+                message: 'Analyzing complete context (portfolio + intent + data needs)...',
                 progress: 15
             });
 
-            const portfolioDetectStart = Date.now();
-            console.log('🔍 Calling portfolioContextDetector.detect()...');
-            const portfolioContextDetection = this.chatHandler.portfolioContextDetector.detect(userMessage, history);
-            console.log(`✅ Portfolio context detection complete:`);
-            console.log(`   - isPortfolioRelated: ${portfolioContextDetection.isPortfolioRelated}`);
-            console.log(`   - scope: ${portfolioContextDetection.scope}`);
-            console.log(`   - confidence: ${portfolioContextDetection.confidence}`);
+            const contextStart = Date.now();
+            console.log('🔍 Calling UnifiedContextAnalyzer.analyze()...');
+            const unifiedContext = await this.chatHandler.unifiedContextAnalyzer.analyze(userMessage, history, userId);
 
-            pipeline.stages.portfolioDetection = {
-                duration: Date.now() - portfolioDetectStart,
-                isPortfolioRelated: portfolioContextDetection.isPortfolioRelated,
-                scope: portfolioContextDetection.scope
+            console.log(`✅ Unified context analysis complete:`);
+            console.log(this.chatHandler.unifiedContextAnalyzer.getSummary(unifiedContext));
+
+            pipeline.stages.unifiedContext = {
+                duration: Date.now() - contextStart,
+                portfolio: unifiedContext.portfolio,
+                intent: unifiedContext.intent,
+                entities: unifiedContext.entities,
+                needsData: unifiedContext.needsData
             };
 
-            // Resolve portfolio context if detected
-            let portfolioContext = null;
-            if (portfolioContextDetection.isPortfolioRelated) {
-                console.log('📊 Portfolio context IS related! Resolving...');
-                console.log('📤 Emitting: portfolio resolution progress (18%)');
-                this.emit('progress', {
-                    stage: 'portfolio',
-                    message: `Resolving portfolio references... (${portfolioContextDetection.scope})`,
-                    progress: 18
-                });
-
-                const portfolioResolveStart = Date.now();
-                console.log('🔍 Calling portfolioResolver.resolve()...');
-                try {
-                    portfolioContext = await this.chatHandler.portfolioResolver.resolve(portfolioContextDetection, userId);
-                    console.log(`✅ Portfolio resolution complete:`);
-                    console.log(`   - resolved: ${portfolioContext.resolved}`);
-                    console.log(`   - portfolios: ${portfolioContext.portfolios ? portfolioContext.portfolios.length : 'undefined'}`);
-                    console.log(`   - Full context:`, JSON.stringify(portfolioContext, null, 2));
-                } catch (error) {
-                    console.error('❌ ERROR in portfolioResolver.resolve():', error);
-                    console.error('   Stack:', error.stack);
-                    throw error;
-                }
-
-                pipeline.stages.portfolioResolution = {
-                    duration: Date.now() - portfolioResolveStart,
-                    resolved: portfolioContext.resolved,
-                    portfolioCount: portfolioContext.portfolios?.length || 0
-                };
-
-                if (portfolioContext.resolved && portfolioContext.portfolios && portfolioContext.portfolios.length > 0) {
-                    console.log(`✅ Successfully resolved ${portfolioContext.portfolios.length} portfolio(s)`);
-                    console.log('📤 Emitting: portfolios found progress (22%)');
-                    this.emit('progress', {
-                        stage: 'portfolio',
-                        message: `Found ${portfolioContext.portfolios.length} portfolio(s)`,
-                        progress: 22
-                    });
-                } else {
-                    console.log('⚠️  Portfolio resolution did not return portfolios');
-                }
-            } else {
-                console.log('📌 Portfolio context NOT related. Skipping resolution.');
-            }
-
-            // ==================== STAGE 1: Intent Classification ====================
-            console.log('\n📋 STAGE 1: Intent Classification');
-            console.log('📤 Emitting: classification progress (25%)');
+            console.log('📤 Emitting: context ready progress (35%)');
             this.emit('progress', {
-                stage: 'classification',
-                message: 'Analyzing your intent...',
-                progress: 25
-            });
-
-            const classifyStart = Date.now();
-            console.log('🔍 Calling intentClassifier.classify()...');
-            const classification = await this.chatHandler.intentClassifier.classify(userMessage);
-            console.log(`✅ Classification complete:`);
-            console.log(`   - intents: ${classification.intents ? classification.intents.join(', ') : 'undefined'}`);
-            console.log(`   - entities: ${classification.entities ? classification.entities.join(', ') : 'none'}`);
-            console.log(`   - confidence: ${classification.confidence}`);
-
-            pipeline.stages.classification = {
-                duration: Date.now() - classifyStart,
-                result: classification
-            };
-
-            console.log('📤 Emitting: intent detected progress (35%)');
-            this.emit('progress', {
-                stage: 'classification',
-                message: `Intent detected: ${classification.intents.join(', ')}`,
+                stage: 'context',
+                message: `Context ready: ${unifiedContext.intent?.intents.join(', ') || 'general'}`,
                 progress: 35
             });
 
@@ -189,7 +128,7 @@ class EnhancedChatWithProgress extends EventEmitter {
 
             const gatherStart = Date.now();
             console.log('🔍 Calling dataGatherer.gatherData()...');
-            const gatheredData = await this.chatHandler.dataGatherer.gatherData(classification, userMessage);
+            const gatheredData = await this.chatHandler.dataGatherer.gatherData(unifiedContext, userMessage);
             console.log(`✅ Data gathering complete`);
             console.log(`   - Data keys:`, Object.keys(gatheredData));
 
@@ -218,12 +157,12 @@ class EnhancedChatWithProgress extends EventEmitter {
 
             const spaStart = Date.now();
             console.log('🔍 Calling spaOrchestrator.generateSuperPrompt()...');
-            console.log(`   - Portfolio context: ${portfolioContext ? 'YES' : 'NO'}`);
+            console.log(`   - Portfolio context: ${unifiedContext.portfolio ? 'YES' : 'NO'}`);
             const superPrompt = await this.chatHandler.spaOrchestrator.generateSuperPrompt(
                 userMessage,
-                classification,
+                unifiedContext.intent,
                 gatheredData,
-                portfolioContext
+                unifiedContext.portfolio
             );
             console.log(`✅ SPA generation complete`);
             console.log(`   - SPA used: ${superPrompt.spaName || superPrompt.combinedFrom || superPrompt.metadata?.spa || 'unknown'}`);
@@ -314,7 +253,7 @@ class EnhancedChatWithProgress extends EventEmitter {
             const creditsResult = await credits.deductUserCredits(
                 userId,
                 tokensUsed,
-                `Chat: ${classification.intents.join(', ')}`,
+                `Chat: ${unifiedContext.intent?.intents.join(', ') || 'general'}`,
                 null,
                 null
             );
@@ -343,12 +282,12 @@ class EnhancedChatWithProgress extends EventEmitter {
                 success: true,
                 response: aiResponse.content,
                 modelUsed: aiResponse.modelUsed,
-                classification: classification,
-                portfolioContext: portfolioContext ? {
+                classification: unifiedContext.intent,
+                portfolioContext: unifiedContext.portfolio ? {
                     detected: true,
-                    scope: portfolioContext.scope,
-                    portfolioCount: portfolioContext.portfolios?.length || 0,
-                    portfolios: portfolioContext.portfolios?.map(p => ({
+                    scope: unifiedContext.portfolio.scope,
+                    portfolioCount: unifiedContext.portfolio.portfolios?.length || 0,
+                    portfolios: unifiedContext.portfolio.portfolios?.map(p => ({
                         id: p.id,
                         name: p.name || `Portfolio #${p.id}`,
                         totalValue: p.totalValue,
@@ -362,12 +301,10 @@ class EnhancedChatWithProgress extends EventEmitter {
                 pipeline: {
                     totalDuration: pipeline.totalDuration,
                     stages: {
-                        portfolioDetection: pipeline.stages.portfolioDetection?.duration,
-                        portfolioResolution: pipeline.stages.portfolioResolution?.duration,
-                        classification: pipeline.stages.classification.duration,
-                        dataGathering: pipeline.stages.dataGathering.duration,
-                        spaGeneration: pipeline.stages.spaGeneration.duration,
-                        aiResponse: pipeline.stages.aiResponse.duration
+                        unifiedContext: pipeline.stages.unifiedContext?.duration,
+                        dataGathering: pipeline.stages.dataGathering?.duration,
+                        spaGeneration: pipeline.stages.spaGeneration?.duration,
+                        aiResponse: pipeline.stages.aiResponse?.duration
                     }
                 }
             };
@@ -515,11 +452,11 @@ Guidelines:
                 modelUsed: aiResponse.modelUsed,
                 followUp: true,
                 followUpDetection: pipeline.stages.followUpDetection.result,
-                portfolioContext: portfolioContext ? {
+                portfolioContext: unifiedContext.portfolio ? {
                     detected: true,
-                    scope: portfolioContext.scope,
-                    portfolioCount: portfolioContext.portfolios?.length || 0,
-                    portfolios: portfolioContext.portfolios?.map(p => ({
+                    scope: unifiedContext.portfolio.scope,
+                    portfolioCount: unifiedContext.portfolio.portfolios?.length || 0,
+                    portfolios: unifiedContext.portfolio.portfolios?.map(p => ({
                         id: p.id,
                         name: p.name || `Portfolio #${p.id}`,
                         totalValue: p.totalValue,

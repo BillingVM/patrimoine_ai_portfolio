@@ -4,10 +4,12 @@
  */
 
 const portfolioQueries = require('./portfolioQueries');
+const TickerNormalizer = require('./tickerNormalizer');
 
 class PortfolioResolver {
   constructor() {
     this.cache = new Map(); // Cache resolved portfolios for session
+    this.tickerNormalizer = new TickerNormalizer();
   }
 
   /**
@@ -187,12 +189,19 @@ class PortfolioResolver {
         );
       }
 
+      // Normalize tickers from company names to ticker symbols
+      const rawTickers = parsedData?.tickers || [];
+      const normalizedTickers = this.tickerNormalizer.normalizeAll(rawTickers);
+
+      console.log(`   📊 Portfolio #${portfolio.id}: Normalized ${rawTickers.length} → ${normalizedTickers.length} tickers`);
+
       return {
         ...portfolio,
         holdings: parsedData?.holdings || [],
         totalValue: parsedData?.totalValue || portfolio.total_value || 0,
         assetCount: parsedData?.assetCount || 0,
-        tickers: parsedData?.tickers || [],
+        tickers: normalizedTickers, // Use normalized tickers
+        rawTickers: rawTickers, // Keep original for reference
         currency: portfolio.currency || 'USD'
       };
     });
