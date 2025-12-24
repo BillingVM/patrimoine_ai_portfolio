@@ -438,6 +438,18 @@ Provide thorough, professional portfolio analysis that helps the user make infor
       enhancedPrompt += `- Assets of Interest: ${assetMentions.join(', ')}\n`;
     }
 
+    // CRITICAL: Explicitly tell AI which portfolio ID(s) to include in response
+    const portfolioIds = portfolios.map(p => p.id).filter(Boolean);
+    if (portfolioIds.length > 0) {
+      enhancedPrompt += `\n**CRITICAL INSTRUCTION**: At the end of your response, you MUST include the following metadata marker exactly as shown:\n`;
+      if (portfolioIds.length === 1) {
+        enhancedPrompt += `[PORTFOLIO_ID:${portfolioIds[0]}]\n`;
+      } else {
+        enhancedPrompt += `[PORTFOLIO_ID:${portfolioIds.join(',')}]\n`;
+      }
+      enhancedPrompt += `This ensures the conversation context persists for follow-up questions.\n`;
+    }
+
     return enhancedPrompt;
   }
 

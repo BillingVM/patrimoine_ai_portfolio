@@ -96,7 +96,29 @@ class PortfolioContextDetector {
         }
 
         // Extract portfolio identifiers
-        const identifiers = this.extractIdentifiers(message, history);
+        let identifiers = this.extractIdentifiers(message, history);
+
+        // CRITICAL: If portfolio-related but no identifiers, check history
+        if (identifiers.length === 0) {
+            console.log('   ⚠️ Portfolio-related but no identifiers. Checking history...');
+            const previousPortfolio = this.getPreviousPortfolioFromHistory(history);
+            if (previousPortfolio) {
+                identifiers.push({
+                    type: 'implicit',
+                    value: previousPortfolio,
+                    referencedBy: 'conversation_history'
+                });
+                console.log(`   ✓ Using portfolio from history: ${previousPortfolio}`);
+            } else {
+                // Fallback to latest portfolio
+                identifiers.push({
+                    type: 'recency',
+                    value: 'latest',
+                    referencedBy: 'fallback_latest'
+                });
+                console.log(`   → No history found. Using latest portfolio as fallback.`);
+            }
+        }
 
         // Extract asset mentions
         const assetMentions = this.extractAssetMentions(message);
