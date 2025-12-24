@@ -11,6 +11,8 @@ const { pool } = require('./db');
  * @returns {Promise<Array>} List of user's portfolios
  */
 async function getUserPortfolios(userId = 1) {
+  // FIXED: For demo system, get all portfolios
+  // In production, would filter by user_id column when it exists
   const query = `
     SELECT
       p.id,
@@ -28,13 +30,11 @@ async function getUserPortfolios(userId = 1) {
       c.name as client_name
     FROM portfolios_simple p
     LEFT JOIN clients c ON c.id = p.client_id
-    WHERE p.client_id IN (
-      SELECT id FROM clients WHERE id = $1  -- For now, all portfolios for demo
-    )
     ORDER BY p.uploaded_at DESC
   `;
 
-  const result = await pool.query(query, [userId]);
+  const result = await pool.query(query);
+  console.log(`   📊 Found ${result.rows.length} total portfolios`);
   return result.rows;
 }
 
@@ -112,20 +112,24 @@ async function getPortfoliosByName(name, userId = 1) {
  * @returns {Promise<Object|null>} Most recent portfolio
  */
 async function getLatestPortfolio(userId = 1) {
+  // FIXED: For demo system, get most recent portfolio regardless of client_id
+  // In production, would filter by user_id column when it exists
   const query = `
     SELECT
       p.*,
       c.name as client_name
     FROM portfolios_simple p
     LEFT JOIN clients c ON c.id = p.client_id
-    WHERE p.client_id IN (
-      SELECT id FROM clients WHERE id = $1
-    )
     ORDER BY p.uploaded_at DESC
     LIMIT 1
   `;
 
-  const result = await pool.query(query, [userId]);
+  const result = await pool.query(query);
+  if (result.rows[0]) {
+    console.log(`   ✅ Latest portfolio: ID ${result.rows[0].id}, uploaded ${result.rows[0].uploaded_at}`);
+  } else {
+    console.log(`   ⚠️ No portfolios found in database`);
+  }
   return result.rows[0] || null;
 }
 
@@ -136,6 +140,7 @@ async function getLatestPortfolio(userId = 1) {
  * @returns {Promise<Object|null>} Portfolio at that position
  */
 async function getPortfolioByOrder(order, userId = 1) {
+  // FIXED: For demo system, get portfolio by order from all portfolios
   const query = `
     SELECT
       p.*,
@@ -143,13 +148,10 @@ async function getPortfolioByOrder(order, userId = 1) {
       ROW_NUMBER() OVER (ORDER BY p.uploaded_at DESC) as portfolio_order
     FROM portfolios_simple p
     LEFT JOIN clients c ON c.id = p.client_id
-    WHERE p.client_id IN (
-      SELECT id FROM clients WHERE id = $1
-    )
     ORDER BY p.uploaded_at DESC
   `;
 
-  const result = await pool.query(query, [userId]);
+  const result = await pool.query(query);
 
   // Filter to get the portfolio at the specified order
   const portfolios = result.rows;
@@ -162,15 +164,13 @@ async function getPortfolioByOrder(order, userId = 1) {
  * @returns {Promise<number>} Total portfolio count
  */
 async function getPortfolioCount(userId = 1) {
+  // FIXED: For demo system, count all portfolios
   const query = `
     SELECT COUNT(*) as count
     FROM portfolios_simple p
-    WHERE p.client_id IN (
-      SELECT id FROM clients WHERE id = $1
-    )
   `;
 
-  const result = await pool.query(query, [userId]);
+  const result = await pool.query(query);
   return parseInt(result.rows[0].count) || 0;
 }
 
