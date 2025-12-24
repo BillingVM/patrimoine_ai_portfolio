@@ -17,15 +17,19 @@ class EnhancedChatWithProgress extends EventEmitter {
      * @param {string} userMessage - User's message
      * @param {Array} history - Conversation history
      * @param {number} userId - User ID
+     * @param {number} explicitPortfolioId - Explicit portfolio ID from URL (optional)
      * @returns {Promise<Object>} Enhanced response
      */
-    async processMessageWithProgress(userMessage, history = [], userId = 1) {
+    async processMessageWithProgress(userMessage, history = [], userId = 1, explicitPortfolioId = null) {
         console.log('\n' + '='.repeat(80));
         console.log('🚀 ENHANCED CHAT WITH PROGRESS - STARTED');
         console.log('='.repeat(80));
         console.log(`📝 User Message: "${userMessage.substring(0, 100)}..."`);
         console.log(`📚 History Length: ${history.length} messages`);
         console.log(`👤 User ID: ${userId}`);
+        if (explicitPortfolioId) {
+            console.log(`📎 Explicit Portfolio ID from URL: ${explicitPortfolioId}`);
+        }
 
         const pipeline = {
             startTime: Date.now(),
@@ -97,7 +101,7 @@ class EnhancedChatWithProgress extends EventEmitter {
 
             const contextStart = Date.now();
             console.log('🔍 Calling UnifiedContextAnalyzer.analyze()...');
-            const unifiedContext = await this.chatHandler.unifiedContextAnalyzer.analyze(userMessage, history, userId);
+            const unifiedContext = await this.chatHandler.unifiedContextAnalyzer.analyze(userMessage, history, userId, explicitPortfolioId);
 
             console.log(`✅ Unified context analysis complete:`);
             console.log(this.chatHandler.unifiedContextAnalyzer.getSummary(unifiedContext));

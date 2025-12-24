@@ -327,8 +327,11 @@ app.get('/api/portfolio/:id', async (req, res) => {
       success: true,
       portfolio: {
         id: portfolio.id,
-        filename: portfolio.original_name,
-        fileType: portfolio.file_type,
+        filename: portfolio.filename,
+        original_name: portfolio.original_name,
+        portfolio_name: portfolio.portfolio_name,
+        file_type: portfolio.file_type,
+        client_id: portfolio.client_id,
         rawData: portfolio.raw_data,
         uploadedAt: portfolio.uploaded_at,
         report: portfolio.report_id ? {
@@ -716,10 +719,12 @@ app.get('/api/chat-stream', async (req, res) => {
     });
 
     // Process message with enhanced context
+    // CRITICAL: Pass portfolio_id to ensure we use the EXACT portfolio from URL
     const result = await chatWithProgress.processMessageWithProgress(
       enhancedMessage,
       parsedHistory,
-      userId
+      userId,
+      portfolio_id ? parseInt(portfolio_id) : null  // Pass explicit portfolio ID
     );
 
     // Send final result

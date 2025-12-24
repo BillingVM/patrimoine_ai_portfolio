@@ -22,11 +22,15 @@ class UnifiedContextAnalyzer {
      * @param {string} message - User message
      * @param {Array} history - Conversation history
      * @param {number} userId - User ID
+     * @param {number} explicitPortfolioId - Explicit portfolio ID from URL (optional)
      * @returns {Promise<Object>} Unified context object
      */
-    async analyze(message, history = [], userId = 1) {
+    async analyze(message, history = [], userId = 1, explicitPortfolioId = null) {
         console.log('\n🎯 UNIFIED CONTEXT ANALYSIS');
         console.log(`📝 Message: "${message.substring(0, 60)}..."`);
+        if (explicitPortfolioId) {
+            console.log(`🎯 EXPLICIT PORTFOLIO ID: ${explicitPortfolioId} (from URL parameter)`);
+        }
 
         const context = {
             message,
@@ -47,17 +51,24 @@ class UnifiedContextAnalyzer {
             timestamp: new Date().toISOString()
         };
 
-        // STEP 1: Detect portfolio context
-        console.log('\n📊 Step 1: Portfolio Context Detection');
-        const portfolioDetection = this.portfolioDetector.detect(message, history);
+        // STEP 1: Portfolio Context Resolution
+        console.log('\n📊 Step 1: Portfolio Context Resolution');
 
-        if (portfolioDetection.isPortfolioRelated) {
-            console.log('   ✓ Portfolio-related query detected');
-            const portfolioResolution = await this.portfolioResolver.resolve(portfolioDetection, userId);
+        // CRITICAL: If explicit portfolio ID provided, use it directly
+        if (explicitPortfolioId) {
+            console.log(`   ✓ Using EXPLICIT portfolio ID: ${explicitPortfolioId}`);
+            const portfolioResolution = await this.portfolioResolver.resolve({
+                isPortfolioRelated: true,
+                scope: 'specific',
+                identifiers: [{
+                    type: 'id',
+                    value: explicitPortfolioId,
+                    referencedBy: 'url_parameter'
+                }]
+            }, userId);
 
             if (portfolioResolution.resolved) {
                 context.portfolio = portfolioResolution;
-
                 // Extract tickers from portfolio
                 const portfolioTickers = new Set();
                 if (portfolioResolution.portfolios) {
@@ -68,10 +79,40 @@ class UnifiedContextAnalyzer {
                     });
                 }
                 context.entities = Array.from(portfolioTickers);
+                console.log(`   ✓ Explicit portfolio resolved: ${portfolioResolution.portfolios.length} portfolio(s)`);
                 console.log(`   ✓ Portfolio tickers: ${context.entities.join(', ')}`);
+            } else {
+                console.log(`   ⚠️ Explicit portfolio ${explicitPortfolioId} not found. Falling back to auto-detection.`);
             }
-        } else {
-            console.log('   ⚬ Not portfolio-related');
+        }
+
+        // Only do auto-detection if no explicit portfolio or explicit failed
+        if (!context.portfolio) {
+            console.log('   → No explicit portfolio. Running auto-detection...');
+            const portfolioDetection = this.portfolioDetector.detect(message, history);
+
+            if (portfolioDetection.isPortfolioRelated) {
+                console.log('   ✓ Portfolio-related query detected');
+                const portfolioResolution = await this.portfolioResolver.resolve(portfolioDetection, userId);
+
+                if (portfolioResolution.resolved) {
+                    context.portfolio = portfolioResolution;
+
+                    // Extract tickers from portfolio
+                    const portfolioTickers = new Set();
+                    if (portfolioResolution.portfolios) {
+                        portfolioResolution.portfolios.forEach(p => {
+                            if (p.tickers) {
+                                p.tickers.forEach(t => portfolioTickers.add(t));
+                            }
+                        });
+                    }
+                    context.entities = Array.from(portfolioTickers);
+                    console.log(`   ✓ Portfolio tickers: ${context.entities.join(', ')}`);
+                }
+            } else {
+                console.log('   ⚬ Not portfolio-related');
+            }
         }
 
         // STEP 2: Classify intent
