@@ -21,6 +21,7 @@ class SessionStateManager {
      */
     initializeState() {
         return {
+            portfolioId: null,  // Portfolio ID from URL or user selection
             prices: {},
             holdings: {},
             portfolioValue: null,
@@ -105,6 +106,19 @@ class SessionStateManager {
             previousValue: state.portfolioValue?.value || null
         };
 
+        state.metadata.lastUpdated = now;
+        return state;
+    }
+
+    /**
+     * Update portfolio ID in state
+     * @param {Object} state - Current state
+     * @param {number} portfolioId - Portfolio ID from URL or resolution
+     * @returns {Object} Updated state
+     */
+    updatePortfolioId(state, portfolioId) {
+        const now = new Date().toISOString();
+        state.portfolioId = portfolioId;
         state.metadata.lastUpdated = now;
         return state;
     }
@@ -228,7 +242,13 @@ class SessionStateManager {
         }
 
         let formatted = '\n## Session State (Known Data)\n';
-        formatted += `**Last Updated**: ${new Date(state.metadata?.lastUpdated).toLocaleString()}\n\n`;
+        formatted += `**Last Updated**: ${new Date(state.metadata?.lastUpdated).toLocaleString()}\n`;
+
+        // Portfolio ID
+        if (state.portfolioId) {
+            formatted += `**Portfolio ID**: ${state.portfolioId} (from previous conversation)\n`;
+        }
+        formatted += '\n';
 
         // Prices
         if (state.prices && Object.keys(state.prices).length > 0) {
@@ -281,6 +301,7 @@ class SessionStateManager {
         }
 
         console.log('📦 Session State Summary:');
+        console.log(`   Portfolio ID: ${state.portfolioId || 'None'}`);
         console.log(`   Prices: ${Object.keys(state.prices || {}).length} tickers`);
         console.log(`   Holdings: ${Object.keys(state.holdings || {}).length} positions`);
         console.log(`   Portfolio Value: ${state.portfolioValue ? `$${state.portfolioValue.value.toLocaleString()}` : 'None'}`);

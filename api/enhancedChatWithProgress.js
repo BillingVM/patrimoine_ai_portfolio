@@ -118,10 +118,26 @@ class EnhancedChatWithProgress extends EventEmitter {
 
             const contextStart = Date.now();
             console.log('🔍 Calling UnifiedContextAnalyzer.analyze()...');
-            const unifiedContext = await this.chatHandler.unifiedContextAnalyzer.analyze(userMessage, history, userId, explicitPortfolioId);
+
+            // CRITICAL: Use portfolio ID priority: URL parameter > Session state
+            const portfolioIdToUse = explicitPortfolioId || sessionState.portfolioId || null;
+            if (portfolioIdToUse) {
+                console.log(`📎 Using Portfolio ID ${portfolioIdToUse} from ${explicitPortfolioId ? 'URL' : 'session state'}`);
+            }
+
+            const unifiedContext = await this.chatHandler.unifiedContextAnalyzer.analyze(userMessage, history, userId, portfolioIdToUse);
 
             console.log(`✅ Unified context analysis complete:`);
             console.log(this.chatHandler.unifiedContextAnalyzer.getSummary(unifiedContext));
+
+            // CRITICAL: Save portfolio ID to session state if resolved
+            if (unifiedContext.portfolio && unifiedContext.portfolio.resolved && unifiedContext.portfolio.portfolios && unifiedContext.portfolio.portfolios.length > 0) {
+                const resolvedPortfolioId = unifiedContext.portfolio.portfolios[0].id;
+                if (resolvedPortfolioId && resolvedPortfolioId !== sessionState.portfolioId) {
+                    console.log(`💾 Saving portfolio ID ${resolvedPortfolioId} to session state`);
+                    this.sessionStateManager.updatePortfolioId(sessionState, resolvedPortfolioId);
+                }
+            }
 
             pipeline.stages.unifiedContext = {
                 duration: Date.now() - contextStart,
