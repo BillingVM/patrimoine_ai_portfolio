@@ -668,39 +668,6 @@ body {
   color: var(--text-primary);
 }
 
-.portfolios-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
-  gap: 16px;
-}
-
-.portfolio-card {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-primary);
-  border-radius: 8px;
-  padding: 20px;
-  transition: all 0.2s ease;
-}
-
-.portfolio-card:hover {
-  border-color: var(--border-secondary);
-  box-shadow: var(--shadow-md);
-}
-
-.portfolio-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: start;
-  margin-bottom: 12px;
-}
-
-.portfolio-header h3 {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--text-primary);
-  word-break: break-word;
-}
-
 .file-type-badge {
   background: var(--accent-blue);
   color: white;
@@ -922,60 +889,250 @@ body {
 }
 
 /* ==================== PORTFOLIO CARDS ==================== */
+.portfolios-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 24px;
+}
+
 .portfolio-card {
     background: var(--bg-secondary);
     border: 1px solid var(--border-primary);
     border-radius: 12px;
-    padding: 1.25rem;
-    transition: all 0.2s ease;
+    padding: 0;
+    transition: all 0.3s ease;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
 }
 
 .portfolio-card:hover {
-    background: var(--bg-tertiary);
     border-color: var(--accent-blue);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px rgba(59, 130, 246, 0.15);
 }
 
+/* Portfolio Header */
 .portfolio-header {
     display: flex;
-    align-items: flex-start;
-    gap: 1rem;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.25rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.portfolio-header-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+    min-width: 0;
 }
 
 .portfolio-icon {
-    font-size: 2rem;
-    line-height: 1;
+    width: 32px;
+    height: 32px;
+    color: var(--text-secondary);
     flex-shrink: 0;
+    transition: color 0.2s ease;
 }
 
-.portfolio-info {
-    flex: 1;
-    min-width: 0;
+.portfolio-card:hover .portfolio-icon {
+    color: var(--accent-blue);
 }
 
 .portfolio-name {
     font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin: 0 0 0.25rem 0;
+    margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
 }
 
-.portfolio-meta {
-    font-size: 0.875rem;
-    color: var(--text-muted);
-    margin: 0;
+.portfolio-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-shrink: 0;
 }
 
-.portfolio-actions {
-    position: relative;
-    flex-shrink: 0;
+/* Portfolio Stats Row */
+.portfolio-stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-primary);
+}
+
+.portfolio-stat {
     display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.portfolio-stat-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.portfolio-stat-value {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.status-badge {
+    display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.375rem;
+    padding: 0.25rem 0.625rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.status-badge.active {
+    background: rgba(16, 185, 129, 0.1);
+    color: #10b981;
+}
+
+.status-badge.inactive {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+}
+
+.status-indicator {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.status-indicator.active {
+    background: #10b981;
+}
+
+.status-indicator.inactive {
+    background: #6b7280;
+}
+
+/* Portfolio Holdings Preview */
+.portfolio-holdings {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--border-primary);
+    flex: 1;
+}
+
+.holdings-title {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 0.75rem 0;
+}
+
+.holding-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+}
+
+.holding-item:not(:last-child) {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.holding-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.holding-ticker {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.holding-name {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.holding-value {
+    text-align: right;
+}
+
+.holding-amount {
+    font-size: 0.875rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+.holding-percent {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.view-all-holdings {
+    display: block;
+    text-align: center;
+    padding: 0.625rem;
+    color: var(--accent-blue);
+    font-size: 0.75rem;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.view-all-holdings:hover {
+    color: #60a5fa;
+}
+
+/* Portfolio Performance Row */
+.portfolio-performance {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1rem 1.25rem;
+}
+
+.performance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.performance-label {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.performance-value {
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.performance-value.positive {
+    color: #10b981;
+}
+
+.performance-value.negative {
+    color: #ef4444;
+}
+
+.performance-value.neutral {
+    color: var(--text-secondary);
+}
+
+/* Portfolio Meta Info */
+.portfolio-meta {
+    font-size: 0.75rem;
+    color: var(--text-muted);
 }
 
 /* ==================== ACTION BUTTONS ==================== */
@@ -1043,3 +1200,147 @@ body {
     background: var(--bg-tertiary);
     color: var(--accent-blue);
 }
+
+/* ==================== UPLOAD GUIDE TOOLTIP ==================== */
+.upload-guide-tooltip {
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-primary);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    max-width: 380px;
+    animation: tooltipSlideUp 0.3s ease;
+}
+
+@keyframes tooltipSlideUp {
+    from {
+        opacity: 0;
+        transform: translateX(-50%) translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(-50%) translateY(0);
+    }
+}
+
+.tooltip-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    width: 24px;
+    height: 24px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.tooltip-close:hover {
+    color: var(--text-primary);
+}
+
+.tooltip-content {
+    padding: 1.25rem;
+}
+
+.tooltip-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.tooltip-header svg {
+    color: var(--accent-blue);
+}
+
+.tooltip-modes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.875rem;
+    margin-bottom: 1rem;
+}
+
+.tooltip-mode {
+    display: flex;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: var(--bg-tertiary);
+    border-radius: 8px;
+}
+
+.mode-icon {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    flex-shrink: 0;
+}
+
+.mode-icon.solo {
+    background: rgba(59, 130, 246, 0.1);
+    color: var(--accent-blue);
+}
+
+.mode-icon.hybrid {
+    background: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+}
+
+.mode-info {
+    flex: 1;
+}
+
+.mode-info strong {
+    display: block;
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    margin-bottom: 0.25rem;
+}
+
+.mode-info p {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    margin: 0;
+}
+
+.tooltip-footer {
+    padding-top: 0.875rem;
+    border-top: 1px solid var(--border-primary);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .upload-guide-tooltip {
+        max-width: calc(100% - 2rem);
+        left: 1rem;
+        right: 1rem;
+        transform: none;
+    }
+    
+    @keyframes tooltipSlideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+}
+

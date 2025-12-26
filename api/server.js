@@ -27,6 +27,9 @@ const VisionService = require('./visionService');
 const ocr = require('./ocr');
 const sessionHelper = require('./sessionHelper');
 const chatSessions = require('./chatSessions');
+const aumCalculator = require('./aumCalculator');
+const multiClientContextBuilder = require('./multiClientContextBuilder');
+const MultiClientSPA = require('./spa/MultiClientSPA');
 
 // Import routers
 const clientsRouter = require('./routes/clients');
@@ -175,6 +178,14 @@ app.post('/api/upload', upload.single('file'), async (req, res) => {
     );
 
     console.log(`✅ Portfolio saved with ID: ${portfolio.id}`);
+
+    // Recalculate AUM for this portfolio and related client
+    try {
+      await aumCalculator.recalculateAfterPortfolioChange(portfolio.id);
+    } catch (aumError) {
+      console.error('⚠️ Error calculating AUM:', aumError);
+      // Don't fail the upload, just log the error
+    }
 
     res.json({
       success: true,
@@ -390,10 +401,22 @@ app.delete('/api/portfolio/:id', async (req, res) => {
       });
     }
 
+    // Get client_id before deletion for AUM recalculation
+    const portfolio = await db.getPortfolio(req.params.id);
+    const clientId = portfolio ? portfolio.client_id : null;
+
     const deleted = await db.deletePortfolio(req.params.id);
 
     if (!deleted) {
       return res.status(404).json({ error: 'Portfolio not found' });
+    }
+
+    // Recalculate client AUM after deletion
+    try {
+      await aumCalculator.recalculateAfterPortfolioDeletion(clientId);
+    } catch (aumError) {
+      console.error('⚠️ Error recalculating AUM after deletion:', aumError);
+      // Don't fail the deletion, just log the error
     }
 
     res.json({ success: true, message: 'Portfolio deleted' });
@@ -596,6 +619,10 @@ app.put('/api/portfolio/:id/metadata', async (req, res) => {
     console.log(`   Name: ${name}`);
     console.log(`   Client ID: ${clientId || 'None'}`);
 
+    // Get old client_id for AUM recalculation
+    const oldPortfolio = await db.getPortfolio(id);
+    const oldClientId = oldPortfolio ? oldPortfolio.client_id : null;
+
     // Update database
     const query = `
       UPDATE portfolios_simple
@@ -611,6 +638,19 @@ app.put('/api/portfolio/:id/metadata', async (req, res) => {
     }
 
     console.log(`✅ Portfolio metadata updated successfully`);
+
+    // Recalculate AUM if client assignment changed
+    try {
+      await aumCalculator.recalculateAfterPortfolioChange(id);
+
+      // If client changed, recalculate old client too
+      if (oldClientId && oldClientId !== clientId) {
+        await aumCalculator.recalculateClient(oldClientId);
+      }
+    } catch (aumError) {
+      console.error('⚠️ Error recalculating AUM after metadata update:', aumError);
+      // Don't fail the update, just log the error
+    }
 
     res.json({
       success: true,
@@ -1422,6 +1462,183 @@ async function start() {
     process.exit(1);
   }
 }
+
+/**
+ * GET /api/chat-multiclient-stream
+ * Multi-client/multi-portfolio aware chat with SSE streaming
+ */
+app.get('/api/chat-multiclient-stream', async (req, res) => {
+  try {
+    const { message, session_id } = req.query;
+    const userId = 1; // Demo user
+
+    if (!message) {
+      return res.status(400).json({ error: 'Message is required' });
+    }
+
+    console.log(`💬 Multi-Client Chat: "${message.substring(0, 100)}..."`);
+
+    // Set up SSE
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    const sendEvent = (event, data) => {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    };
+
+    sendEvent('status', { stage: 'context_building', message: 'Analyzing all clients and portfolios...' });
+
+    // Step 1: Build filtered context with entity detection
+    const { scope, entities, context } = await multiClientContextBuilder.buildFilteredContext(message);
+
+    sendEvent('context', {
+      scope,
+      entities,
+      summary: context.summary
+    });
+
+    console.log(`📊 Detected Scope: ${scope}`);
+    console.log(`🎯 Entities:`, entities);
+
+    sendEvent('status', { stage: 'prompt_generation', message: 'Generating context-aware prompt...' });
+
+    // Step 2: Generate enhanced prompt using MultiClientSPA
+    const multiClientSPA = new MultiClientSPA();
+    const enhancedPrompt = await multiClientSPA.generatePrompt(message, scope, entities, context);
+
+    console.log(`✨ Enhanced Prompt Length: ${enhancedPrompt.length} chars`);
+
+    sendEvent('status', { stage: 'ai_processing', message: 'AI is analyzing your query...' });
+
+    // Step 3: Get AI response
+    const messages = [
+      {
+        role: 'system',
+        content: 'You are a professional portfolio management advisor. Provide specific, actionable insights based on the context provided. Use exact numbers and client/portfolio names when answering.'
+      },
+      {
+        role: 'user',
+        content: enhancedPrompt
+      }
+    ];
+
+    const aiResponse = await modelManager.callModel(messages, null, 2);
+
+    // Calculate token usage
+    const inputTokens = Math.ceil(enhancedPrompt.length / 4);
+    const outputTokens = Math.ceil(aiResponse.content.length / 4);
+    const totalTokens = inputTokens + outputTokens;
+
+    // Deduct credits
+    await credits.deductUserCredits(userId, totalTokens, {
+      type: 'multi_client_chat',
+      input_tokens: inputTokens,
+      output_tokens: outputTokens
+    });
+
+    // Save to session if session_id provided
+    if (session_id) {
+      await chatSessions.saveMessage(session_id, 'user', message, userId);
+      await chatSessions.saveMessage(session_id, 'assistant', aiResponse.content, userId, {
+        scope,
+        entities,
+        tokens_used: totalTokens
+      });
+    }
+
+    // Send final response
+    sendEvent('response', {
+      content: aiResponse.content,
+      scope,
+      entities,
+      tokens: totalTokens
+    });
+
+    sendEvent('done', { success: true });
+    res.end();
+
+  } catch (error) {
+    console.error('❌ Multi-Client Chat Error:', error);
+
+    // Send error event
+    const sendEvent = (event, data) => {
+      res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+    };
+
+    sendEvent('error', {
+      message: 'Failed to process chat request',
+      details: error.message
+    });
+
+    res.end();
+  }
+});
+
+/**
+ * POST /api/aum/recalculate
+ * Trigger full AUM recalculation for all portfolios and clients
+ */
+app.post('/api/aum/recalculate', async (req, res) => {
+  try {
+    console.log('🔄 Starting full AUM recalculation...');
+    const result = await aumCalculator.recalculateAll();
+
+    res.json({
+      success: true,
+      message: 'AUM recalculation complete',
+      ...result
+    });
+  } catch (error) {
+    console.error('❌ Error recalculating AUM:', error);
+    res.status(500).json({
+      error: 'Failed to recalculate AUM',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/aum/solo
+ * Get solo user (agency) AUM statistics
+ */
+app.get('/api/aum/solo', async (req, res) => {
+  try {
+    const stats = await aumCalculator.recalculateSoloUser();
+
+    res.json({
+      success: true,
+      ...stats
+    });
+  } catch (error) {
+    console.error('❌ Error getting solo user AUM:', error);
+    res.status(500).json({
+      error: 'Failed to get solo user AUM',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * GET /api/aum/stats
+ * Get overall AUM statistics
+ */
+app.get('/api/aum/stats', async (req, res) => {
+  try {
+    const stats = await aumCalculator.getOverallStats();
+
+    res.json({
+      success: true,
+      ...stats
+    });
+  } catch (error) {
+    console.error('❌ Error getting AUM stats:', error);
+    res.status(500).json({
+      error: 'Failed to get AUM stats',
+      message: error.message
+    });
+  }
+});
 
 // Handle graceful shutdown
 process.on('SIGTERM', async () => {

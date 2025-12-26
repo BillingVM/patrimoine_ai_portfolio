@@ -94,17 +94,12 @@
             <section class="portfolios-section">
                 <div class="section-header">
                     <h2>Portfolios</h2>
-                    <button class="btn btn-primary btn-sm" id="uploadPortfolioBtn">+ Upload Portfolio</button>
-                </div>
-
-                <!-- Drag & Drop Upload Area -->
-                <div class="portfolio-drop-zone" id="portfolioDropZone">
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="40" height="40">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                    </svg>
-                    <h4>Drop portfolio files here</h4>
-                    <p>or click Upload Portfolio button</p>
-                    <span class="drop-zone-hint">CSV, Excel, PDF, JSON, Images, Word, TXT supported</span>
+                    <a href="/portai/public/chat.php" class="btn btn-primary btn-sm">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="16" height="16" style="margin-right: 6px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                        Upload via Chat
+                    </a>
                 </div>
 
                 <div class="portfolios-grid" id="portfoliosGrid">
@@ -117,35 +112,10 @@
         </div>
     </main>
 
-    <!-- Upload Portfolio Modal -->
-    <div class="modal" id="uploadModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Upload Portfolio</h2>
-                <button class="modal-close" id="uploadModalClose">&times;</button>
-            </div>
-            <div class="modal-body">
-                <form id="uploadForm">
-                    <div class="upload-section" id="uploadSection">
-                        <h3>Drop portfolio file here</h3>
-                        <p>Supported: CSV, Excel, PDF, JSON, Images (JPG/PNG)</p>
-                        <input type="file" id="fileInput" accept=".csv,.xlsx,.xls,.pdf,.json,.jpg,.jpeg,.png,.docx,.doc,.txt">
-                        <button type="button" class="btn btn-primary" id="selectFileBtn">Select File</button>
-                    </div>
-                    <div id="uploadProgress" style="display: none;">
-                        <div class="loading-spinner"></div>
-                        <p>Uploading...</p>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast Notification -->
     <div class="toast" id="toast" style="display: none;"></div>
 
     <?php include __DIR__ . '/includes/add-credits-modal.php'; ?>
-    <?php include __DIR__ . '/includes/chat-widget.php'; ?>
 
     <?php
     // Dynamically load JavaScript with cache busting

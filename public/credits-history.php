@@ -194,7 +194,6 @@
     </script>
 
     <?php include __DIR__ . '/includes/add-credits-modal.php'; ?>
-    <?php include __DIR__ . '/includes/chat-widget.php'; ?>
 
     <?php
     // Load credits widget JS

@@ -8,7 +8,7 @@ window.API_BASE = window.API_BASE || 'https://sol.inoutconnect.com:11130/api';
 
 // DOM elements (will be initialized on DOMContentLoaded)
 let clientsGrid, addClientBtn, clientModal, modalClose, cancelBtn, clientForm, modalTitle, submitBtn, toast;
-let statsSection, totalClients, totalPortfolios, totalReports;
+let statsSection, totalClients, totalPortfolios, totalAUM, avgPortfolioValue, totalHoldings;
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', () => {
     statsSection = document.getElementById('statsSection');
     totalClients = document.getElementById('totalClients');
     totalPortfolios = document.getElementById('totalPortfolios');
-    totalReports = document.getElementById('totalReports');
+    totalAUM = document.getElementById('totalAUM');
+    avgPortfolioValue = document.getElementById('avgPortfolioValue');
+    totalHoldings = document.getElementById('totalHoldings');
 
     // Setup event listeners
     if (addClientBtn) {
@@ -123,8 +125,8 @@ function displayClients(clients) {
                     <span class="stat-label">Portfolios</span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-number">${client.report_count || 0}</span>
-                    <span class="stat-label">Reports</span>
+                    <span class="stat-number">${formatCurrency(client.total_aum || 0)}</span>
+                    <span class="stat-label">AUM</span>
                 </div>
             </div>
 
@@ -150,15 +152,128 @@ function displayClients(clients) {
 /**
  * Update statistics
  */
-function updateStats(clients) {
+async function updateStats(clients) {
     const totalPortfolioCount = clients.reduce((sum, c) => sum + (parseInt(c.portfolio_count) || 0), 0);
-    const totalReportCount = clients.reduce((sum, c) => sum + (parseInt(c.report_count) || 0), 0);
 
+    // Update basic stats
     totalClients.textContent = clients.length;
     totalPortfolios.textContent = totalPortfolioCount;
-    totalReports.textContent = totalReportCount;
+
+    // Fetch all portfolios to calculate AUM and holdings
+    try {
+        const portfolioStats = await fetchAllPortfoliosStats(clients);
+
+        totalAUM.textContent = formatCurrency(portfolioStats.totalAUM);
+        avgPortfolioValue.textContent = formatCurrency(portfolioStats.avgValue);
+        totalHoldings.textContent = portfolioStats.totalHoldings;
+    } catch (error) {
+        console.error('Error fetching portfolio stats:', error);
+        totalAUM.textContent = '$0';
+        avgPortfolioValue.textContent = '$0';
+        totalHoldings.textContent = '0';
+    }
 
     statsSection.style.display = clients.length > 0 ? 'grid' : 'none';
+}
+
+/**
+ * Fetch all portfolios and calculate aggregate statistics
+ */
+async function fetchAllPortfoliosStats(clients) {
+    let totalAUMValue = 0;
+    let totalHoldingsCount = 0;
+    let portfolioCount = 0;
+
+    // Fetch portfolios for each client
+    for (const client of clients) {
+        try {
+            const response = await fetch(`${window.API_BASE}/clients/${client.id}/portfolios`);
+            const data = await response.json();
+
+            if (data.success && data.portfolios) {
+                portfolioCount += data.portfolios.length;
+
+                for (const portfolio of data.portfolios) {
+                    // Parse raw data to extract holdings
+                    const holdings = parsePortfolioHoldings(portfolio.raw_data);
+
+                    // Calculate total value
+                    const portfolioValue = holdings.reduce((sum, h) => sum + h.value, 0);
+                    totalAUMValue += portfolioValue;
+                    totalHoldingsCount += holdings.length;
+                }
+            }
+        } catch (error) {
+            console.error(`Error fetching portfolios for client ${client.id}:`, error);
+        }
+    }
+
+    return {
+        totalAUM: totalAUMValue,
+        avgValue: portfolioCount > 0 ? totalAUMValue / portfolioCount : 0,
+        totalHoldings: totalHoldingsCount
+    };
+}
+
+/**
+ * Parse holdings from portfolio raw data
+ */
+function parsePortfolioHoldings(rawData) {
+    if (!rawData) return [];
+
+    try {
+        // Try to parse as JSON first
+        if (rawData.trim().startsWith('{') || rawData.trim().startsWith('[')) {
+            const parsed = JSON.parse(rawData);
+            if (Array.isArray(parsed)) {
+                return parsed.map(h => ({
+                    ticker: h.ticker || h.symbol || 'N/A',
+                    name: h.name || h.description || 'Unknown',
+                    value: parseFloat(h.value || h.amount || 0),
+                    percentage: parseFloat(h.percentage || h.weight || 0)
+                }));
+            }
+        }
+
+        // Try to parse as CSV
+        const lines = rawData.split('\n').filter(l => l.trim());
+        if (lines.length < 2) return [];
+
+        const holdings = [];
+        for (let i = 1; i < lines.length; i++) {
+            const values = lines[i].split(',');
+            if (values.length >= 3) {
+                holdings.push({
+                    ticker: values[0] || 'N/A',
+                    name: values[1] || 'Unknown',
+                    value: parseFloat(values[2] || 0),
+                    percentage: parseFloat(values[3] || 0)
+                });
+            }
+        }
+
+        return holdings;
+    } catch (error) {
+        console.error('Error parsing holdings:', error);
+        return [];
+    }
+}
+
+/**
+ * Format currency
+ */
+function formatCurrency(amount) {
+    if (amount >= 1000000) {
+        return `$${(amount / 1000000).toFixed(2)}M`;
+    } else if (amount >= 1000) {
+        return `$${(amount / 1000).toFixed(1)}K`;
+    }
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(amount);
 }
 
 /**

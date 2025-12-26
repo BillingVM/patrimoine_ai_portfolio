@@ -1550,3 +1550,60 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ==================== UPLOAD GUIDE TOOLTIP ====================
+/**
+ * Show upload guide tooltip on first hover of upload button
+ */
+function initUploadGuideTooltip() {
+    const uploadBtn = document.getElementById('uploadBtn');
+    const tooltip = document.getElementById('uploadGuideTooltip');
+    
+    if (!uploadBtn || !tooltip) return;
+    
+    // Check if already dismissed
+    const dismissed = localStorage.getItem('uploadGuideDismissed');
+    if (dismissed === 'true') return;
+    
+    let shown = false;
+    
+    // Show on first hover
+    uploadBtn.addEventListener('mouseenter', () => {
+        if (!shown && !dismissed) {
+            tooltip.style.display = 'block';
+            shown = true;
+            
+            // Auto-hide after 10 seconds
+            setTimeout(() => {
+                if (tooltip.style.display !== 'none') {
+                    tooltip.style.display = 'none';
+                }
+            }, 10000);
+        }
+    });
+    
+    // Hide when clicking outside
+    document.addEventListener('click', (e) => {
+        if (!tooltip.contains(e.target) && !uploadBtn.contains(e.target)) {
+            tooltip.style.display = 'none';
+        }
+    });
+}
+
+/**
+ * Dismiss upload guide tooltip permanently
+ */
+function dismissUploadGuide() {
+    const tooltip = document.getElementById('uploadGuideTooltip');
+    if (tooltip) {
+        tooltip.style.display = 'none';
+    }
+    localStorage.setItem('uploadGuideDismissed', 'true');
+}
+
+// Initialize tooltip when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initUploadGuideTooltip);
+} else {
+    initUploadGuideTooltip();
+}

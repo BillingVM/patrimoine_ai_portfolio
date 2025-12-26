@@ -70,6 +70,47 @@
             </div>
         </div>
 
+        <!-- Upload Guide Tooltip -->
+        <div class="upload-guide-tooltip" id="uploadGuideTooltip" style="display: none;">
+            <button class="tooltip-close" onclick="dismissUploadGuide()">&times;</button>
+            <div class="tooltip-content">
+                <div class="tooltip-header">
+                    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="10" stroke-width="2"/>
+                        <path d="M12 16v-4m0-4h.01" stroke-width="2" stroke-linecap="round"/>
+                    </svg>
+                    <span>Portfolio Upload</span>
+                </div>
+                <div class="tooltip-modes">
+                    <div class="tooltip-mode">
+                        <div class="mode-icon solo">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M12 2L2 7v10c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V7l-10-5z"/>
+                            </svg>
+                        </div>
+                        <div class="mode-info">
+                            <strong>Solo Mode</strong>
+                            <p>Upload without client → Your portfolio</p>
+                        </div>
+                    </div>
+                    <div class="tooltip-mode">
+                        <div class="mode-icon hybrid">
+                            <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                                <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>
+                            </svg>
+                        </div>
+                        <div class="mode-info">
+                            <strong>Hybrid Mode</strong>
+                            <p>Upload from client page → Client's portfolio</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="tooltip-footer">
+                    CSV, Excel, PDF, JSON, Images, Word, TXT
+                </div>
+            </div>
+        </div>
+
         <!-- Chat Container -->
         <div class="chat-container" id="chatContainer">
             <div class="chat-messages" id="chatMessages">
